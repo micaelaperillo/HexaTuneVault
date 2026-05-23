@@ -1,0 +1,226 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+:root {
+    --fondo: #1C1C1C;
+    --fonts: 'Poppins', Arial, Helvetica, sans-serif;
+}
+
+.Back {
+    background: linear-gradient(180deg, #03bf67 0%, #000000 100%);
+    height: auto;
+    min-height: 100vh;
+    padding-bottom: 10%;
+}
+
+.vault {
+    background-color: rgb(37, 37, 37);
+    height: auto;
+    width: 55%;
+    border-radius: 12px;
+    color: white;
+    padding: 1% 5%;
+    margin: 0 18%;
+    font-family: var(--fonts);
+    box-shadow: 0 0 40px rgba(8,7,16,0.6);
+}
+
+.main-image {
+    border-radius: 12px;
+}
+
+.rateBox {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2%;
+}
+
+.type {
+    font-size: 24px;
+    font-family: var(--fonts);
+    opacity: 50%;
+    margin: 30px 0 0 0;
+    padding: 0;
+}
+
+.info {
+    margin-left: 3%;
+}
+
+.info-header {
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+.button {
+    margin-left: auto;
+}
+
+.spotifyButton {
+    background-color: #00b35f;
+    outline: transparent;
+    border: transparent;
+    cursor: pointer;
+    border-radius: 24px;
+    font-size: 16px;
+    font-family: var(--fonts);
+    font-weight: bold;
+    padding: 10px 25px;
+    color: rgb(0, 0, 0);
+    display: flex;
+    align-items: center;
+}
+
+.spotifyLogo {
+    margin-right: 10px;
+}
+
+.secondary-image {
+    border-radius: 50px;
+    margin-right: 10px;
+}
+
+.secondary-info {
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+}
+
+.info-item {
+    margin: 0 10px;
+}
+
+.info-separation {
+    margin: 0 10px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.info-item-2 {
+    margin: 0 10px;
+    opacity: 80%;
+}
+
+.commentaries {
+    margin-top: 5%;
+    margin-bottom: 5%;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid rgb(94, 94, 94); /* Cambiar el color y el grosor según tus preferencias */
+}
+
+.join-vault {
+    display: flex;
+    align-items: center;
+}
+
+.join-button {
+    background: #3D13E5;
+    color: white;
+    height: 50px;
+    font-weight: bold;
+    font-family: var(--fonts);
+    font-size: 16px;
+    border: none;
+    border-radius: 24px;
+    padding: 15px 40px;
+    position: fixed;
+    bottom: 5%; 
+    left: 50%;
+    transform: translateX(-50%); 
+    z-index: 999; 
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.mini-logo {
+    margin-left: 15px;
+}
+
+#comment-form {
+    align-items: center;
+    font-size: 0px;
+    margin: 30px 30px 0 0;
+}
+
+.text-area {
+    display: flex;
+    align-items: center;
+}
+
+.rate-area {
+    margin: 2% 4%;
+    display: flex;
+    align-items: center;
+}
+
+.rate-text {
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-family: var(--fonts);
+    font-size: 16px;
+}   
+
+.submit-button {
+    background-color: #3d13e5;
+    color: #fff; 
+    padding: 20px;      
+    border-radius: 50px;
+    height: 50px;
+    width: 50px;
+    cursor: pointer;  
+    font-family: var(--fonts);
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+}
+
+#comment-form textarea {
+    width: 80%;
+    height: 60px;
+    min-height: 30px;
+    min-width: 200px;
+    background-color: var(--fondo);
+    color: white;
+    font-family: var(--fonts);
+    font-size: 16px;
+    border-radius: 12px;
+    border: none;
+    padding: 2% 5%;
+    margin-right: 20px;
+}
+
+.replies-button {
+    border: transparent;
+    border-radius: 12px;
+    background-color: rgba(255, 255, 255, 0.11);
+    color: white;
+    align-items: center;
+    display: flex;
+    font-family: var(--fonts);
+    padding: 5px 15px;
+    height: 30px;
+    margin-right: 20px;
+    cursor: pointer;
+    min-width: 115px;
+    text-align: center;
+    justify-content: center;
+}
+
+.replies-button-box {
+    margin: 10px 0 20px 50px;
+}

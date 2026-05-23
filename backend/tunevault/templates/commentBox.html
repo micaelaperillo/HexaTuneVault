@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'commentBox.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'custom.css' %}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    </head>
+    <body>
+        <div class="box">
+            <img class="image-comment" height="40px" width="40px" src="{{img}}">
+            {% if type != "false" %}
+            <a href="{% url 'post' vtype=type id=id post_id=post_id %}" style="text-decoration: none;">
+            <div class="comment">
+                <div class="comment-header">
+                    <h4 class="comment-title">{{username}}</h4>
+                    {% if is_artist %} 
+                        <i class="material-icons" style="color: rgb(0, 128, 255); margin-left: 10px;">verified</i>
+                    {% endif %}
+                    <p class="date" style="margin-right: 20px;">{{date}}</p>
+                    {% if rating != 0 and with_likes %}  
+                        <span class="star-rating">
+                            <i class="fa fa-star{% if rating >= 1 %} rated{% endif %}" aria-hidden="true"></i>
+                            <i class="fa fa-star{% if rating >= 2 %} rated{% endif %}" aria-hidden="true"></i>
+                            <i class="fa fa-star{% if rating >= 3 %} rated{% endif %}" aria-hidden="true"></i>
+                            <i class="fa fa-star{% if rating >= 4 %} rated{% endif %}" aria-hidden="true"></i>
+                            <i class="fa fa-star{% if rating >= 5 %} rated{% endif %}" aria-hidden="true"></i>
+                        </span>
+                    {% endif %}
+                </div>
+                <p class="commentary">{{title}}</p>
+            </div>
+            </a>
+            {% else %}
+            <div class="comment">
+                <div class="comment-header">
+                    <h4 class="comment-title">@{{username}}</h4>
+                    {% if is_artist %} 
+                        <i class="material-icons" style="color: rgb(0, 128, 255); margin-left: 10px;">verified</i>
+                    {% endif %}
+                    <p class="date">{{date}}</p>
+                </div>
+                <p class="commentary">{{title}}</p>
+            </div>
+            {% endif %}
+
+            
+                <div class="rate-right">
+
+                {% if with_likes %}
+                    <p style="margin: 0 8px 0 0; padding: 0px;">{{likes}}</p>
+
+                    {% if user.is_authenticated %}
+                        {% if is_post %}
+                        <form action="{% url 'like_post' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" value="{{post_id}}" name="post_id" />
+                            <input type="hidden" value="{{path}}" name="path" />
+                            <button type="submit" style="background-color: transparent; border: none; color: white; display: flex; align-items: center;">
+                                {% if is_liked %}
+                                <i class="material-icons" style="cursor: pointer; margin-right: 20px; color:rgb(255, 70, 70);">favorite</i>
+                                {% else %}
+                                <i class="material-icons" style="cursor: pointer; margin-right: 20px;">favorite_border</i>
+                                {% endif %}
+                            </button>
+                        </form>
+                        {% else %}
+                        <form action="{% url 'like_comment' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" value="{{comment_id}}" name="comment_id" />
+                            <input type="hidden" value="{{path}}" name="path" />
+                            <button type="submit" style="background-color: transparent; border: none; color: white; display: flex; align-items: center;">
+                                {% if is_liked %}
+                                <i class="material-icons" style="cursor: pointer; margin-right: 20px; color:rgb(255, 70, 70);">favorite</i>
+                                {% else %}
+                                <i class="material-icons" style="cursor: pointer; margin-right: 20px;">favorite_border</i>
+                                {% endif %}
+                            </button>
+                        </form>
+                        {% endif %}
+                    {% else %}
+                        <a href="/login" style="text-decoration: none;">
+                            <button style="background-color: transparent; border: none; color: white; display: flex; align-items: center;">
+                                <i class="material-icons" style="cursor: pointer; margin-right: 20px;">favorite_border</i>
+                            </button>
+                        </a>
+                    {% endif %}
+                {% else %}
+                    {% if rating != 0 %}  
+                    <span class="star-rating">
+                        <i class="fa fa-star{% if rating >= 1 %} rated{% endif %}" aria-hidden="true"></i>
+                        <i class="fa fa-star{% if rating >= 2 %} rated{% endif %}" aria-hidden="true"></i>
+                        <i class="fa fa-star{% if rating >= 3 %} rated{% endif %}" aria-hidden="true"></i>
+                        <i class="fa fa-star{% if rating >= 4 %} rated{% endif %}" aria-hidden="true"></i>
+                        <i class="fa fa-star{% if rating >= 5 %} rated{% endif %}" aria-hidden="true"></i>
+                    </span>
+                    {% endif %} 
+                {% endif %}
+
+                </div>
+        </div>
+
+        <script>
+            function toggleThumb(x) {
+               if (x.textContent === 'thumb_up_off_alt') {
+                   x.textContent = 'thumb_up';
+               } else {
+                   x.textContent = 'thumb_up_off_alt';
+               }
+           }
+       </script>
+    </body>
+</html>

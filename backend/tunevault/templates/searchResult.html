@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'basicsSections.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'globals.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'searchResults.css' %}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body class="Black">
+    <div class='BasicsSearch'>
+        {% include 'NavBar.html' %}
+        <div class='header'>
+            <h1 class="Title">Search results</h1>
+        </div>
+        
+        
+        <div class=''>
+            {% if result.0.vaults %}
+            <div class="sub-header">
+                <h2  class="sub-title">Artists</h2>
+                <button class="view-all" onclick="viewAll('music')">View all</button>
+            </div>
+            <div class='sub-gallery'>
+                {% for artist_data in result.0.vaults %}
+                    <div class='sub-gallery-item'>
+                        {% with artist_description="/vault/artist/"|add:artist_data.id %}
+                            {% include 'previewVault.html' with vtype='Artist' spotifyimg=artist_data.image description=artist_description likes=artist_data.likes  title=artist_data.artist %}
+                        {% endwith %}
+                    </div>
+                {% endfor %}
+            </div>      
+            {% endif %}
+
+            {% if result.1.vaults %}
+            <div class="sub-header">
+                <h2  class="sub-title">Albums</h2>
+                <button class="view-all" onclick="viewAll('music')">View all</button>
+            </div>
+            <div class='sub-gallery'>
+                {% for album in result.1.vaults %}
+                    {% with album_id=album.id %}
+                        <div class='sub-gallery-item'>
+                            {% with album_description="/vault/album/"|add:album_id %}
+                                {% include 'previewVault.html' with vtype='Album' spotifyimg=album.image description=album_description likes=album.likes  title=album.album %}
+                            {% endwith %}
+                        </div>
+                    {% endwith %}
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if result.2.vaults %}
+            <div class="sub-header">
+                <h2  class="sub-title">Podcasts</h2>
+                <button class="view-all" onclick="viewAll('podcasts')">View all</button>
+            </div>
+            <div class='sub-gallery'>
+                {% for podcast in result.2.vaults %}
+                    {% with podcast_id=podcast.id %}
+                    <div class='sub-gallery-item'>
+                        {% with podcast_description="/vault/podcast/"|add:podcast_id %}
+                            {% include 'previewVault.html' with vtype='Podcast' spotifyimg=podcast.image description=podcast_description likes=podcast.likes  title=podcast.show %}
+                        {% endwith %}
+                    </div>
+                    {% endwith %}
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+
+            {% if result.3.vaults %}
+            <div class="sub-header">
+                <h2  class="sub-title">Episodes</h2>
+                <button class="view-all" onclick="viewAll('podcasts')">View all</button>
+            </div>
+            <div class='sub-gallery'>
+                {% for episode in result.3.vaults %}
+                    {% with episode_id=episode.id %}
+                        <div class='sub-gallery-item'>
+                            {% with episode_description="/vault/episode/"|add:episode_id %}
+                                {% include 'previewVault.html' with vtype='Episode' spotifyimg=episode.image description=episode_description likes=episode.likes  title=episode.episode %}
+                            {% endwith %}
+                        </div>
+                    {% endwith %}
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if result.4.members %}            
+            <div class="sub-header">
+                <h2  class="sub-title">Member artists</h2>
+                <button class="view-all" onclick="viewAll('members')">View all</button>
+            </div>
+            <div class='gallery-mem'>
+                {% for user_data in result.4.members %}
+                    <div class='gallery2-item'>
+                    {% include 'previewProfile.html' with user_data=user_data %}
+                    </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="sub-header">
+                <h2  class="sub-title">Members</h2>
+                <button class="view-all" onclick="viewAll('members')">View all</button>
+            </div>
+            {% if result.5.members %}
+            <div class='gallery-mem'>
+                {% for user_data in result.5.members %}
+                    <div class='gallery2-item'>
+                    {% include 'previewProfile.html' with user_data=user_data %}
+                    </div>
+                {% endfor %}
+            </div>
+            {% else %}
+                <div class="no-results-mem">
+                    <i style="color: white;" class="material-icons noResultsIcon">search_off</i>
+                    <p style="color: white;">No results found</p>
+                </div>
+            {% endif %}
+        
+        </div>
+        
+    </div>
+
+    <script>
+        function viewAll(page){
+            var currentURL = window.location.href;
+
+            var urlParts = currentURL.split('/');
+            const query = urlParts[ urlParts.indexOf("search")+1 ]
+        
+            window.location.href = "/"+page+"/" + encodeURIComponent(query);
+        }
+    </script>
+</body>
+</html>

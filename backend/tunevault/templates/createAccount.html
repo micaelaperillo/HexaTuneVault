@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'login.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'globals.css' %}">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    </head>
+    <body>
+    <div class="Back">
+        <a href="/">
+            <div class="imageBox">
+                <img class="image" src="{% static 'resources/logo.png' %}" alt="logo" />
+            </div>
+        </a>
+        
+        <div class="formContainer">
+        <div class="formBox">
+            <form method="POST" > 
+            {% csrf_token %}
+            <div style="margin-left: 380px">
+                <a href="/">
+                    <i class="material-icons closeIcon">close</i>
+                </a>
+            </div>
+
+            <h3 class="Title">Create an account</h3>
+
+            <h3 class="InputItem">Username</h3> 
+            <div class="InputBox">
+                <input class="Input" type="text" name="username"/>
+            </div>
+
+            <h3 class="InputItem">Email</h3>
+            <div class="InputBox">
+                <input class="Input" type="email" name="email"/>
+            </div>
+
+            <h3 class="InputItem">Password</h3>
+            <div class="InputBox">
+                <input class="Input" type="password" name="password"/>
+            </div>
+
+            <h3 class="InputItem">Repeat password</h3>
+            <div class="InputBox">
+                <input class="Input" type="password" name="password2"/>  
+            </div>
+
+            <div  id="inputContainer" class="hidden">
+                <h3 class="InputItem">Spotify artist link</h3>
+                <div class="InputBox">
+                    <input class="Input" type="text" name="link"/>  
+                </div>
+            </div>
+
+            <div class="checkbox">
+                <h3 class="InputItem">I am an artist</h3>
+                <input type="checkbox" name="isArtist" id="myCheckbox" onchange="toggleInput()" style="margin-left: 10px; margin-top: 16px;">
+            </div>
+
+            <div class="errorMessage">
+                {% for message in messages %}
+                <p>{{message}}</p>
+                {% endfor %}
+            </div>
+
+            <div class="SignUpButton">
+                <button type='submit' class="SignUp">Sign up</button>
+            </div>
+            </form>
+
+            <div class="OtherOptionButtonBox">
+                <a href="/login">
+                    <button class="OtherOptionButton">Are you a member? <span style="text-decoration: underline;">Sign in</span></button>
+                </a>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleInput() {
+            var inputContainer = document.getElementById('inputContainer');
+            var checkbox = document.getElementById('myCheckbox');
+
+            if (checkbox.checked) {
+                inputContainer.classList.remove('hidden');
+            } else {
+                inputContainer.classList.add('hidden');
+            }
+        }
+    </script>
+    </body>
+</html>

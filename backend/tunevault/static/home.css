@@ -1,0 +1,122 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+:root {
+    --fonts: 'Poppins', Arial, Helvetica, sans-serif;
+}
+
+.BasicsHome {
+    background: linear-gradient(180deg, #3D13E5 0%, #0B022D 100%);
+    height: 700px;
+}
+    
+
+.homeImage {
+    height: 420px;
+    width: 440px;
+    margin-left: 120px;
+    margin-bottom: 5%;
+}
+
+.Header {
+    color: white;
+    font-size: 45px;
+    font-weight: bold;
+    font-family: var(--fonts);
+    padding-top: 10px;
+    padding-right : 60px;
+    padding-left : 0px;
+    width: 300px;
+    line-height: 60px;
+}
+
+.createAccount {
+    border-radius: 24px;
+    background-color: green;
+    width: 80%;
+    border: transparent;
+    cursor: pointer;
+}
+
+.createAccountp{
+    color: white;
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.homeBox {
+    background-color:none ; 
+    display: flex;   
+    justify-content: center;
+}
+
+.figure {
+    margin-top: 250px;
+}
+
+.SearchHome {
+    width: 650px;
+    height: 40px;
+    cursor: pointer;
+    padding-left: 10px;
+    background-color: rgb(29, 29, 29);
+    border-radius: 24px;
+    margin-top: 70%;
+    display: flex;
+    place-items: center;
+    position: absolute;
+    top: 10%;
+    left: 28%;
+    padding-right: 10px;   
+}
+
+.search_icon {
+    color:white;
+}
+
+.InputSearch {
+    background-color: rgb(29, 29, 29);
+    font-size: small;
+    color: white;
+    width: 600px;
+    outline: transparent;
+    border: transparent;
+    font-family: var(--fonts);
+}
+
+.InputSearch::placeholder {
+    color:white;
+}
+
+.subTitle {
+    color:white;
+    font-family: var(--fonts);
+    margin-bottom: 40px;
+    padding-top: 70px;
+}
+
+.hasBackground {
+    position: absolute;
+    z-index: 10;
+}
+
+.background {
+    position: absolute;
+    z-index: 5;
+}
+
+.home-post {
+    background-color: rgb(36, 36, 36);
+    margin: 20px 0;
+    border-radius: 15px;
+    padding: 25px 10px;
+    font-family: var(--fonts);
+}
+
+.posts-container {
+    margin: 0 15%;
+}
+
+.signin-text {
+    text-decoration: none;
+    color: white;
+}
