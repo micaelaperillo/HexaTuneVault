@@ -11,6 +11,9 @@ import {
 } from '../repository/i-comment.repository';
 import { CommentModel } from '../model/comment.model';
 import { CommentFilters } from '../model/comment-filters.model';
+import { CommentNotFoundException } from '../exceptions/comment-not-found.exception';
+import { NotLikedException } from '../exceptions/not-liked.exception';
+import { AlreadyLikedException } from '../exceptions/already-liked.exception';
 
 @Injectable()
 export class CommentService
@@ -42,7 +45,7 @@ export class CommentService
   async get(commentId: number): Promise<CommentModel> {
     const comment = await this.repo.findById(commentId);
     if (!comment) {
-      throw new Error('Comment not found');
+      throw new CommentNotFoundException(commentId);
     }
     return comment;
   }
@@ -50,10 +53,10 @@ export class CommentService
   async like(commentId: number, userId: number): Promise<void> {
     const comment = await this.repo.findById(commentId);
     if (!comment) {
-      throw new Error('Comment not found');
+      throw new CommentNotFoundException(commentId);
     }
     if (comment.likedBy.includes(userId)) {
-      throw new Error('User already liked this comment');
+      throw new AlreadyLikedException(commentId, userId);
     }
     await this.repo.addLike(commentId, userId);
   }
@@ -61,10 +64,10 @@ export class CommentService
   async unlike(commentId: number, userId: number): Promise<void> {
     const comment = await this.repo.findById(commentId);
     if (!comment) {
-      throw new Error('Comment not found');
+      throw new CommentNotFoundException(commentId);
     }
     if (!comment.likedBy.includes(userId)) {
-      throw new Error('User has not liked this comment');
+      throw new NotLikedException(commentId, userId);
     }
     await this.repo.removeLike(commentId, userId);
   }
