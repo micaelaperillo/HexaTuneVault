@@ -15,12 +15,12 @@ export class CommentRepository implements ICommentRepository {
   ) {}
 
   async create(
-    comment: Omit<CommentEntity, 'id' | 'createdAt' | 'likedBy'>,
-  ): Promise<CommentEntity> {
+    comment: Omit<CommentModel, 'id' | 'createdAt' | 'likedBy'>,
+  ): Promise<CommentModel> {
     return this.repo.save(comment);
   }
 
-  async findById(id: number): Promise<CommentEntity | null> {
+  async findById(id: number): Promise<CommentModel | null> {
     return this.repo.findOneBy({ id });
   }
 
