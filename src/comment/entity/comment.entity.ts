@@ -1,5 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from "typeorm";
-import { AssociatedType } from "../model/associated-type.enum";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { AssociatedType } from '../model/associated-type.enum';
 
 @Entity('comments')
 export class CommentEntity {
