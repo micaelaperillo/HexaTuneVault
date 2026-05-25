@@ -6,6 +6,8 @@ import { ICommentRepository } from '../repository/i-comment.repository';
 import { AssociatedType } from '../model/associated-type.enum';
 import { CommentModel } from '../model/comment.model';
 import { CommentFilters } from '../model/comment-filters.model';
+import { QueryFailedError } from 'typeorm';
+import { CommentDBException } from '../exceptions/comment-db.exception';
 
 @Injectable()
 export class CommentRepository implements ICommentRepository {
@@ -17,56 +19,74 @@ export class CommentRepository implements ICommentRepository {
   async create(
     comment: Omit<CommentModel, 'id' | 'createdAt' | 'likedBy'>,
   ): Promise<CommentModel> {
-    return this.repo.save(comment);
+    return this.run(() => this.repo.save(comment));
   }
 
   async findById(id: number): Promise<CommentModel | null> {
-    return this.repo.findOneBy({ id });
+    return this.run(() => this.repo.findOneBy({ id }));
   }
 
   async deleteById(id: number): Promise<void> {
-    await this.repo.delete(id);
+    await this.run(() => this.repo.delete(id));
   }
 
   async findByAssociatedId(
     associatedId: number,
     associatedType: AssociatedType,
   ): Promise<CommentModel[]> {
-    return this.repo.findBy({ associatedTo: associatedId, associatedType });
+    return this.run(() =>
+      this.repo.findBy({ associatedTo: associatedId, associatedType }),
+    );
   }
 
   async addLike(commentId: number, userId: number): Promise<void> {
-    const comment = await this.repo.findOneBy({ id: commentId });
+    const comment = await this.run(() =>
+      this.repo.findOneBy({ id: commentId }),
+    );
     if (comment && !comment.likedBy.includes(userId)) {
       comment.likedBy.push(userId);
-      await this.repo.save(comment);
+      await this.run(() => this.repo.save(comment));
     }
   }
 
   async removeLike(commentId: number, userId: number): Promise<void> {
-    const comment = await this.repo.findOneBy({ id: commentId });
+    const comment = await this.run(() =>
+      this.repo.findOneBy({ id: commentId }),
+    );
     if (comment) {
       comment.likedBy = comment.likedBy.filter((id) => id !== userId);
-      await this.repo.save(comment);
+      await this.run(() => this.repo.save(comment));
     }
   }
 
   async search(filters: CommentFilters): Promise<CommentModel[]> {
-    const qb = this.repo.createQueryBuilder('comment');
+    return this.run(() => {
+      const qb = this.repo.createQueryBuilder('comment');
 
-    if (filters.createdBy !== undefined)
-      qb.andWhere('comment.createdBy = :createdBy', {
-        createdBy: filters.createdBy,
-      });
-    if (filters.content !== undefined)
-      qb.andWhere('comment.content ILIKE :content', {
-        content: `%${filters.content}%`,
-      });
-    if (filters.associatedType !== undefined)
-      qb.andWhere('comment.associatedType = :associatedType', {
-        associatedType: filters.associatedType,
-      });
+      if (filters.createdBy !== undefined)
+        qb.andWhere('comment.createdBy = :createdBy', {
+          createdBy: filters.createdBy,
+        });
+      if (filters.content !== undefined)
+        qb.andWhere('comment.content ILIKE :content', {
+          content: `%${filters.content}%`,
+        });
+      if (filters.associatedType !== undefined)
+        qb.andWhere('comment.associatedType = :associatedType', {
+          associatedType: filters.associatedType,
+        });
 
-    return qb.getMany();
+      return qb.getMany();
+    });
+  }
+
+  private async run<T>(fn: () => Promise<T>): Promise<T> {
+    try {
+      return await fn();
+    } catch (e) {
+      if (e instanceof QueryFailedError)
+        throw new CommentDBException(e.message);
+      throw e;
+    }
   }
 }
