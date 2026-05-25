@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm/browser/repository/Repository.js';
+import { ILike, Repository } from 'typeorm';
 import { CommentEntity } from '../entity/comment.entity';
 import { ICommentRepository } from '../repository/i-comment.repository';
 import { AssociatedType } from '../model/associated-type.enum';
@@ -60,24 +60,19 @@ export class CommentRepository implements ICommentRepository {
   }
 
   async search(filters: CommentFilters): Promise<CommentModel[]> {
-    return this.run(() => {
-      const qb = this.repo.createQueryBuilder('comment');
-
-      if (filters.createdBy !== undefined)
-        qb.andWhere('comment.createdBy = :createdBy', {
+    return this.run(() =>
+      this.repo.findBy({
+        ...(filters.createdBy !== undefined && {
           createdBy: filters.createdBy,
-        });
-      if (filters.content !== undefined)
-        qb.andWhere('comment.content ILIKE :content', {
-          content: `%${filters.content}%`,
-        });
-      if (filters.associatedType !== undefined)
-        qb.andWhere('comment.associatedType = :associatedType', {
+        }),
+        ...(filters.content !== undefined && {
+          content: ILike(`%${filters.content}%`),
+        }),
+        ...(filters.associatedType !== undefined && {
           associatedType: filters.associatedType,
-        });
-
-      return qb.getMany();
-    });
+        }),
+      }),
+    );
   }
 
   private async run<T>(fn: () => Promise<T>): Promise<T> {
