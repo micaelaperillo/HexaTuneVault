@@ -9,6 +9,7 @@ import {
   Query,
   ParseIntPipe,
   UseFilters,
+  HttpCode,
 } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
 import {
@@ -69,6 +70,7 @@ export class CommentController {
   }
 
   @Delete(':id')
+  @HttpCode(204)
   async delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.deleteComment.deleteById(id);
   }
