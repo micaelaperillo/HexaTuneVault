@@ -1,4 +1,5 @@
-import { IsInt, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
+import { AssociatedType } from '../model/associated-type.enum';
 
 export class CommentFiltersDto {
   @IsOptional()
@@ -8,4 +9,8 @@ export class CommentFiltersDto {
   @IsOptional()
   @IsString()
   content?: string;
+
+  @IsOptional()
+  @IsEnum(AssociatedType)
+  associatedType?: AssociatedType;
 }
