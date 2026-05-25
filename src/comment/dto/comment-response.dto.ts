@@ -1,7 +1,6 @@
 import { AssociatedType } from '../model/associated-type.enum';
-import { Expose } from 'class-transformer';
+import { Expose, plainToInstance } from 'class-transformer';
 import { CommentModel } from '../model/comment.model';
-import { plainToInstance } from 'class-transformer';
 
 export class CommentResponseDto {
   @Expose()
