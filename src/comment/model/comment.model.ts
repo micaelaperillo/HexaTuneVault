@@ -2,7 +2,7 @@ export interface CommentModel {
     id: number;
     content: string;
     createdAt: Date;
-    createdBy: string;
+    createdBy: number;
     associatedTo: number;
-    likedBy: string[];
+    likedBy: number[];
 }
