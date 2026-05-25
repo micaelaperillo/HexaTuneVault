@@ -3,6 +3,6 @@ export interface CommentModel {
     content: string;
     createdAt: Date;
     createdBy: string;
-    targetId: number;
+    associatedTo: number;
     likedBy: string[];
 }
