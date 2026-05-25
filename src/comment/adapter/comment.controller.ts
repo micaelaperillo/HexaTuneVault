@@ -8,8 +8,7 @@ import {
   Body,
   Query,
   ParseIntPipe,
-  NotFoundException,
-  ConflictException,
+  UseFilters,
 } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
 import {
@@ -32,10 +31,10 @@ import {
 } from '../port/i-unlike-comment.port';
 import { CreateCommentDto } from '../dto/create-comment.dto';
 import { CommentFiltersDto } from '../dto/comment-filters.dto';
-import { CommentNotFoundException } from '../exceptions/comment-not-found.exception';
-import { AlreadyLikedException } from '../exceptions/already-liked.exception';
-import { NotLikedException } from '../exceptions/not-liked.exception';
+import { CommentExceptionFilter } from './comment-exception.filter';
+import { CommentResponseDto } from '../dto/comment-response.dto';
 
+@UseFilters(CommentExceptionFilter)
 @Controller('comments')
 export class CommentController {
   constructor(
@@ -48,60 +47,45 @@ export class CommentController {
   ) {}
 
   @Post()
-  create(@Body() dto: CreateCommentDto) {
-    return this.createComment.create(dto);
+  async create(@Body() dto: CreateCommentDto): Promise<CommentResponseDto> {
+    const comment = await this.createComment.create(dto);
+    return CommentResponseDto.from(comment);
   }
 
   @Get()
-  search(@Query() filters: CommentFiltersDto) {
-    return this.searchComment.search(filters);
+  async search(
+    @Query() filters: CommentFiltersDto,
+  ): Promise<CommentResponseDto[]> {
+    const comments = await this.searchComment.search(filters);
+    return CommentResponseDto.fromMany(comments);
   }
 
   @Get(':id')
-  async get(@Param('id', ParseIntPipe) id: number) {
-    try {
-      return await this.getComment.get(id);
-    } catch (e) {
-      if (e instanceof CommentNotFoundException)
-        throw new NotFoundException(e.message);
-      throw e;
-    }
+  async get(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<CommentResponseDto> {
+    const comment = await this.getComment.get(id);
+    return CommentResponseDto.from(comment);
   }
 
   @Delete(':id')
-  delete(@Param('id', ParseIntPipe) id: number) {
-    return this.deleteComment.deleteById(id);
+  async delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    await this.deleteComment.deleteById(id);
   }
 
   @Patch(':id/like')
   async like(
     @Param('id', ParseIntPipe) id: number,
     @Body('user_id', ParseIntPipe) userId: number,
-  ) {
-    try {
-      return await this.likeComment.like(id, userId);
-    } catch (e) {
-      if (e instanceof CommentNotFoundException)
-        throw new NotFoundException(e.message);
-      if (e instanceof AlreadyLikedException)
-        throw new ConflictException(e.message);
-      throw e;
-    }
+  ): Promise<void> {
+    await this.likeComment.like(id, userId);
   }
 
   @Patch(':id/unlike')
   async unlike(
     @Param('id', ParseIntPipe) id: number,
     @Body('user_id', ParseIntPipe) userId: number,
-  ) {
-    try {
-      return await this.unlikeComment.unlike(id, userId);
-    } catch (e) {
-      if (e instanceof CommentNotFoundException)
-        throw new NotFoundException(e.message);
-      if (e instanceof NotLikedException)
-        throw new ConflictException(e.message);
-      throw e;
-    }
+  ): Promise<void> {
+    await this.unlikeComment.unlike(id, userId);
   }
 }
