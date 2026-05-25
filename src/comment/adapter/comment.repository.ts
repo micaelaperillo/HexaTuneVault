@@ -14,7 +14,9 @@ export class CommentRepository implements ICommentRepository {
     private repo: Repository<CommentEntity>,
   ) {}
 
-  async create(comment: Omit<CommentEntity, 'id'>): Promise<CommentEntity> {
+  async create(
+    comment: Omit<CommentEntity, 'id' | 'createdAt' | 'likedBy'>,
+  ): Promise<CommentEntity> {
     return this.repo.save(comment);
   }
 

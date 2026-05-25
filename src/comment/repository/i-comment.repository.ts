@@ -5,7 +5,9 @@ import { CommentModel } from '../model/comment.model';
 export const COMMENT_REPOSITORY = Symbol('ICommentRepository');
 
 export interface ICommentRepository {
-  create(comment: Omit<CommentModel, 'id'>): Promise<CommentModel>;
+  create(
+    comment: Omit<CommentModel, 'id' | 'createdAt' | 'likedBy'>,
+  ): Promise<CommentModel>;
   findById(id: number): Promise<CommentModel | null>;
   search(filters: CommentFilters): Promise<CommentModel[]>;
   findByAssociatedId(

@@ -30,7 +30,9 @@ export class CommentService
     private readonly repo: ICommentRepository,
   ) {}
 
-  async create(comment: Omit<CommentModel, 'id'>): Promise<CommentModel> {
+  async create(
+    comment: Omit<CommentModel, 'id' | 'createdAt' | 'likedBy'>,
+  ): Promise<CommentModel> {
     return this.repo.create(comment);
   }
 
