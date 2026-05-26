@@ -2,16 +2,19 @@ import type { ArtistModel } from './model';
 import type { IGetArtist, ISearchArtist } from './port';
 import type { IArtistProvider, IArtistRepository } from './repository';
 
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 
 @Injectable()
 export class ArtistService implements ISearchArtist, IGetArtist {
+  private readonly logger = new Logger(ArtistService.name);
+
   constructor(
     @Inject('IArtistRepository') private repository: IArtistRepository,
     @Inject('IArtistProvider') private provider: IArtistProvider,
   ) {}
 
   search(name: string): Promise<ArtistModel[]> {
+    this.logger.debug({ name });
     return this.provider.search({ name });
   }
 
