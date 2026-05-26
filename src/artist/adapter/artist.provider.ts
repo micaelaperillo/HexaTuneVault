@@ -1,6 +1,7 @@
 import { SpotifyApi } from '@spotify/web-api-ts-sdk';
 
-import { ArtistFilters, ArtistEntity } from '../entity';
+import { ArtistProviderError } from '../exceptions';
+import { type ArtistFilters, ArtistEntity } from '../entity';
 import { IArtistProvider } from '../repository/artist.provider';
 
 export class ArtistProvider implements IArtistProvider {
@@ -20,10 +21,15 @@ export class ArtistProvider implements IArtistProvider {
    * @override
    */
   async search(filters: ArtistFilters): Promise<ArtistEntity[]> {
-    const { artists } = await this.spotify.search(filters.name, ['artist']);
+    try {
+      const { artists } = await this.spotify.search(filters.name, ['artist']);
 
-    return artists.items.map(
-      (e) => new ArtistEntity(e.name, e.genres.join(' ')),
-    );
+      return artists.items.map(
+        (e) => new ArtistEntity(e.name, e.genres.join(' ')),
+      );
+    } catch (e) {
+      if (!(e instanceof Error)) throw e;
+      throw new ArtistProviderError(e);
+    }
   }
 }
