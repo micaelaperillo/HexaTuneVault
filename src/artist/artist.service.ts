@@ -7,8 +7,8 @@ import { Inject, Injectable } from '@nestjs/common';
 @Injectable()
 export class ArtistService implements ISearchArtist, IGetArtist {
   constructor(
-    @Inject() private repository: IArtistRepository,
-    @Inject() private provider: IArtistProvider,
+    @Inject('IArtistRepository') private repository: IArtistRepository,
+    @Inject('IArtistProvider') private provider: IArtistProvider,
   ) {}
 
   search(name: string): Promise<ArtistModel[]> {

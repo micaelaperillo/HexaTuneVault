@@ -3,8 +3,10 @@ import { SpotifyApi } from '@spotify/web-api-ts-sdk';
 import { ArtistProviderError } from '../exceptions';
 import { type ArtistFilters, ArtistEntity } from '../entity';
 import { IArtistProvider } from '../repository/artist.provider';
+import { Injectable } from '@nestjs/common';
 
-export class ArtistProvider implements IArtistProvider {
+@Injectable()
+export class SpotifyArtistProvider implements IArtistProvider {
   /**
    * @todo This shouldn't be hardcoded like this,
    * maybe using injection once more...

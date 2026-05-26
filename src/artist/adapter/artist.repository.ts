@@ -9,7 +9,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
-export class ArtistRepository implements IArtistRepository {
+export class PostgresArtistRepository implements IArtistRepository {
   constructor(
     @InjectRepository(ArtistEntity)
     private local: Repository<ArtistEntity>,
