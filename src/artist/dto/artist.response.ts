@@ -1,7 +1,7 @@
 export type ArtistResponse = {
   readonly name: string;
   readonly avatar: string;
-  readonly albums: URL;
-  readonly reviews: URL;
+  readonly albums: `/${string}`;
+  readonly reviews: `/${string}`;
   readonly createdAt?: Date;
 };

@@ -8,7 +8,6 @@ import {
   Get,
   Param,
   Query,
-  Headers,
   NotFoundException,
 } from '@nestjs/common';
 
@@ -23,7 +22,7 @@ export class ArtistController {
   }
 
   @Get(':name')
-  async get(@Param('name') name: string, @Headers('host') host: string) {
+  async get(@Param('name') name: string) {
     const artist = await this.service.get(name);
     if (!artist) throw new NotFoundException();
 
@@ -31,8 +30,8 @@ export class ArtistController {
 
     return {
       ...artist,
-      albums: new URL(`/albums?${params}`, host),
-      reviews: new URL(`/reviews?${params}`, host),
+      albums: `/albums?${params}`,
+      reviews: `/reviews?${params}`,
     } satisfies ArtistResponse;
   }
 }
