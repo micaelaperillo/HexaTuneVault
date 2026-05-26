@@ -1,17 +1,15 @@
 import type { ArtistResponse } from './dto';
 
-import type { Request, Response } from 'express';
-
 import { ArtistService } from './artist.service';
 
 import {
+  BadRequestException,
   Controller,
   Get,
-  HttpStatus,
   Param,
   Query,
-  Req,
-  Res,
+  Headers,
+  NotFoundException,
 } from '@nestjs/common';
 
 @Controller('artists')
@@ -19,25 +17,22 @@ export class ArtistController {
   constructor(private readonly service: ArtistService) {}
 
   @Get()
-  async search(@Query('q') q: string) {
+  search(@Query('q') q: string) {
+    if (!q) throw new BadRequestException();
     return this.service.search(q);
   }
 
   @Get(':name')
-  async get(
-    @Param('name') name: string,
-    @Req() req: Request,
-    @Res() res: Response,
-  ) {
+  async get(@Param('name') name: string, @Headers('host') host: string) {
     const artist = await this.service.get(name);
-    if (!artist) return res.sendStatus(HttpStatus.NOT_FOUND);
+    if (!artist) throw new NotFoundException();
 
     const params = new URLSearchParams({ artist: artist.name }).toString();
 
     return {
       ...artist,
-      albums: new URL(`/albums?${params}`, req.url),
-      reviews: new URL(`/reviews?${params}`, req.url),
+      albums: new URL(`/albums?${params}`, host),
+      reviews: new URL(`/reviews?${params}`, host),
     } satisfies ArtistResponse;
   }
 }
