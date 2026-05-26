@@ -6,13 +6,13 @@ export class ArtistEntity {
   name: string;
 
   @Column({ length: 2048 })
-  description: string;
+  avatar: string;
 
   @CreateDateColumn()
   createdAt?: Date;
 
-  constructor(name: string, description: string) {
+  constructor(name: string, avatar: string) {
     this.name = name;
-    this.description = description;
+    this.avatar = avatar;
   }
 }

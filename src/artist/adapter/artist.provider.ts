@@ -33,7 +33,7 @@ export class SpotifyArtistProvider implements IArtistProvider {
       this.logger.debug(artists.items.at(0));
 
       return artists.items.map(
-        (e) => new ArtistEntity(e.name, e.genres.join(' ')),
+        (e) => new ArtistEntity(e.name, e.images[0].url),
       );
     } catch (e) {
       if (!(e instanceof Error)) throw e;

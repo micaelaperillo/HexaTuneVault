@@ -1,5 +1,5 @@
 export type ArtistModel = {
   readonly name: string;
-  readonly description: string;
+  readonly avatar: string;
   readonly createdAt?: Date;
 };
