@@ -2,7 +2,7 @@ import type { ArtistEntity } from '../entity';
 
 // Documentation import
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { ArtistRepositoryError } from '../exceptions';
+import type { ArtistRepositoryError } from '../errors';
 
 export interface IArtistRepository {
   /**

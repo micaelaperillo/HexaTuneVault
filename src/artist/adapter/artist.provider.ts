@@ -1,6 +1,6 @@
 import { SpotifyApi } from '@spotify/web-api-ts-sdk';
 
-import { ArtistProviderError } from '../exceptions';
+import { ArtistProviderError } from '../errors';
 import { type ArtistFilters, ArtistEntity } from '../entity';
 import { IArtistProvider } from '../repository/artist.provider';
 import { Injectable, Logger } from '@nestjs/common';

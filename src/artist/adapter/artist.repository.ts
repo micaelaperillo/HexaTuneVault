@@ -3,7 +3,7 @@ import type { IArtistRepository } from '../repository';
 import type { Repository } from 'typeorm';
 
 import { ArtistEntity } from '../entity';
-import { ArtistRepositoryError } from '../exceptions/repository.error';
+import { ArtistRepositoryError } from '../errors/repository.error';
 
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
