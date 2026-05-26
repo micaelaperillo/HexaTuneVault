@@ -1,4 +1,4 @@
-import { ArtistFilters, ArtistEntity } from '../entity';
+import type { ArtistFilters, ArtistEntity } from '../entity';
 
 // Documentation import
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
