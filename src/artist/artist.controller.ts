@@ -30,6 +30,7 @@ export class ArtistController {
 
     return {
       ...artist,
+      self: `/artists/${encodeURIComponent(artist.name)}`,
       albums: `/albums?${params}`,
       reviews: `/reviews?${params}`,
     } satisfies ArtistResponse;
