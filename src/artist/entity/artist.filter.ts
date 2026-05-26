@@ -1,3 +1,3 @@
-export class ArtistFilters {
-  constructor(readonly name: string) {}
-}
+export type ArtistFilters = {
+  readonly name: string;
+};
