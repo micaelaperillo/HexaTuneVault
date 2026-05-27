@@ -68,6 +68,10 @@
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
+    "moduleNameMapper": {
+      "^@review/(.*)\\.js$": "<rootDir>/review/$1",
+      "^(\\.{1,2}/.*)\\.js$": "$1"
+    },
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
