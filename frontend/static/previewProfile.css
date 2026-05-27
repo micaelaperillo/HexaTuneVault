@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+:root {
+    --fonts: 'Poppins', Arial, widthlvetica, sans-serif;
+    --fondo: #1C1C1C;
+}
+
+.profilePrev {
+    width: 145px;
+    height: 190px;
+    background-color: var(--fondo);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+}
+
+ .profile-image {
+    border-radius: 100%;
+    height: 110px;
+    width: 110px;
+    margin: 18px;
+ }
+
+.profile-username-grid {
+    margin-inline: 0px;
+    display: grid;
+    justify-content: center;
+
+}
+
+ .profile-username {
+    color: white;
+    font-weight: 700;
+    font-size: 16px;
+    font-family: var(--fonts);
+ }
+
+
+ .text-profile-container {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 80%;
+}
+
+ 

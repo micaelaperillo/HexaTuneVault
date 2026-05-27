@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'home.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'globals.css' %}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  </head>
+
+  <body>
+    <div class='all'>
+        <div class='BasicsHome'>
+          {% include 'NavBar.html' %}
+          <div class='container'>
+            <div class='homeBox'> 
+              <div class='Header'>
+                <h1 class='Header'>Join our music <span style="color: #FF00FF;">lover</span> community</h1>
+                <div>
+                  <a href="/create_account">
+                  <button class="createAccount">
+                        <p class="createAccountp">Create an account</p> 
+                  </button>
+                  </a>
+                </div>
+              </div>
+                <img src="{% static 'resources/home.png' %}" class="homeImage" alt="home"></Image>
+            </div>
+          </div>
+          <div class='Black'> 
+            <div class="posts-container">
+              <h2 class="subTitle">Recent activity from your following</h2> 
+              {% if user.is_authenticated %}
+                {% if timeline %}
+                  {% for post in timeline %}
+                  <div class="home-post">
+                    {% with content="@"|add:post.user|add:" said \""|add:post.content|add:"\"" %}
+                    {% include 'commentBox.html' with username=post.vault_name date=post.date title=content type=post.vault_vtype id=post.vault_id post_id=post.post_id rating=post.rating img=post.vault_image with_likes="" %}
+                    {% endwith %}
+                  </div>
+                  {% endfor %}
+                {% else %}
+                  <div class="no-results" style="color:white;">
+                    <div style="text-align: center;">
+                      <div style="display: flex; align-items: center;">
+                        <i class="material-icons noResultsIcon">search_off</i>
+                        <p style="margin:0;">It looks like your followed users haven't posted anything this week...</p>
+                      </div>
+                    <p style="color:white; margin:5px;">Stay tuned for updates!</p>
+                    </div>
+                  </div>
+                {% endif %}
+              {% else %}
+                <a href="/login" class="signin-text">
+                  <div class="no-results">
+                    <p><span style="text-decoration: underline;">Sign in</span> to see your friends activity & more...</p>   
+                  </div>
+                </a>
+              {% endif %}
+            </div>
+           
+          </div>
+        </div>
+      </div>
+    </body>
+</html>

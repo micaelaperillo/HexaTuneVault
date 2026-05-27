@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'previewProfile.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'globals.css' %}">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    </head>
+    <body>  
+            <div class="profilePrev">
+                <a href="/profile/{{user_data.user}}" style="text-decoration: none; color: white;">
+                    <img src="{{user_data.profileimg}}" alt="profile" class="profile-image"/>
+                    <div class="profile-username-grid text-vault-container" style="display: flex; align-items: center;">
+                            <label class="profile-username">{{ user_data.user }}</label>
+                            {% if user_data.isArtist %}
+                                <i class="material-icons" style="color: rgb(0, 128, 255); margin-left: 10px;">verified</i>
+                            {% endif %}
+                    </div>
+                </a>
+            </div>
+
+    </body>
+</html>

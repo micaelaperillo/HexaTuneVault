@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'basicsSections.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'globals.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'members.css' %}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  </head>
+<body>
+    <div class='BasicsMembers'>
+        {% include 'NavBar.html' %}
+        <div class='HeaderMP'>
+          <div>
+            <h1 class="Title">Members</h1>
+            <form method="POST"> 
+              {% csrf_token %}
+              <div class="Search">
+                  <input class="InputSearch" placeholder='Who are you looking for?' type="text" name="query" style="color: white"/>
+                  <button type='submit' class="searchButton">
+                      <i class="material-icons SearchIcon">search</i>
+                  </button> 
+              </div>
+          </form>
+          </div>
+        </div>
+
+        <div class="BlackMP">
+            <div class="GlobalPadding">
+            <h1 class='TrendingTittle'>Recomended</h1>
+
+            {% if membersList|length < 5 %}
+            <div>
+              <div class='gallery' style="margin-top: 50px;">
+                {% for user_data in membersList %}
+                  <div class='gallery2-item'>
+                    {% include 'previewProfile.html' with user_data=user_data %}
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+            {% else %}
+            <div class="media-container">
+              <div class="media-scroller">
+                <!--   Group 1 -->
+                <div class="media-group" id="group-1">
+                  {% for user_data in membersList|slice:"0:4" %}
+                    <div class="media-element">
+                      {% include 'previewProfile.html' with user_data=user_data %}
+                    </div>
+                  {% endfor %}
+                  {% if membersList|length > 4 %}
+                  <a class="next" href="#group-2" aria-label="next">
+                    <svg>
+                      <use href="#next"></use>
+                    </svg>
+                  </a>
+                  {% endif %}
+                </div>
+                <!-- Group 2   -->
+                <div class="media-group" id="group-2">
+                  <a class="previous" href="#group-1">
+                    <svg>
+                      <use href="#previous"></use>
+                    </svg>
+                  </a>
+                  {% for user_data in membersList|slice:"4:8" %}
+                    <div class="media-element">
+                      {% include 'previewProfile.html' with user_data=user_data %}
+                    </div>
+                  {% endfor %}
+                  {% if membersList|length > 8 %}
+                  <a class="next" href="#group-3" aria-label="next">
+                    <svg>
+                      <use href="#next"></use>
+                    </svg>
+                  </a>
+                  {% endif %}
+                </div>
+                <!-- Group 3   -->
+                <div class="media-group" id="group-3">
+                  <a class="previous" href="#group-2">
+                    <svg>
+                      <use href="#previous"></use>
+                    </svg>
+                  </a>
+                  {% for user_data in membersList|slice:"8:12" %}
+                  <div class="media-element">
+                    {% include 'previewProfile.html' with user_data=user_data %}
+                  </div>
+                  {% endfor %}
+                </div>
+                
+              </div>
+            </div>
+            
+            <svg>
+              <symbol id="next" viewBox="0 0 256 512">
+                <path fill="white"
+                  d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z" />
+              </symbol>
+              <symbol id="previous" viewBox="0 0 256 512">
+                <path fill="white"
+                  d="M31.7 239l136-136c9.4-9.4 24.6-9.4 33.9 0l22.6 22.6c9.4 9.4 9.4 24.6 0 33.9L127.9 256l96.4 96.4c9.4 9.4 9.4 24.6 0 33.9L201.7 409c-9.4 9.4-24.6 9.4-33.9 0l-136-136c-9.5-9.4-9.5-24.6-.1-34z" />
+              </symbol>
+            </svg>
+            {% endif %}
+
+        </div>
+      </div>
+    </div>
+
+<script>
+
+</script>
+  
+</body>
+</html>

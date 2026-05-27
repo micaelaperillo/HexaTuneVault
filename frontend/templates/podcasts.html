@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'basicsSections.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'globals.css' %}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  </head>
+<body>
+    <div class='BasicsPodcast'>
+        {% include 'NavBar.html' %}
+        <div class='HeaderMP'>
+            <div>
+                <h1 class="Title">Podcasts</h1>
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="Search">
+                        <input type="hidden" value="" id="contentSelectInput" name="content" />
+                        <input type="hidden" value="" id="mediaSelectInput" name="media_type" />
+                        <input class="InputSearch" placeholder='What do you want to talk about?' type="text" name="query" style="color: white"/>
+                        <button type='submit' class="searchButton">
+                            <i class="material-icons SearchIcon">search</i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="Filters">
+            <label class='Label'>FILTER BY</label>
+            <select class='SelectPodcast' id="contentSelect">
+                <option value="">Content</option>
+                <option value="true">Explicit</option>
+                <option value="false">Non-explicit</option>
+                <option value="">All</option>
+            </select>
+            <select class='SelectPodcast' id="mediaSelect">
+                <option value="">Media type</option>
+                <option value="audio">Audio</option>
+                <option value="video">Video</option>
+                <option value="mixed">Mixed</option>
+            </select>
+        </div>
+
+        <div class='BlackMP'>
+        <div class="GlobalPadding">
+
+            <h1 class='TrendingTittle'>Trending Vaults</h1>
+            <div class='gallery'>
+                {% for artist_id, artist_data in top.items %}
+                    <div class='gallery-item'>
+                        {% with artist_description="/vault/podcast/"|add:artist_id %}
+                            {% include 'previewVault.html' with vtype='Podcast' spotifyimg=artist_data.image description=artist_description likes=artist_data.likes  title=artist_data.artist %}
+                        {% endwith %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <script>
+
+        document.getElementById('contentSelect').addEventListener('change', function() {
+            var selectedContent = this.value;
+            document.getElementById('contentSelectInput').value = selectedContent;  
+        });
+
+        document.getElementById('mediaSelect').addEventListener('change', function() {
+            var mediaContent = this.value;
+            document.getElementById('mediaSelectInput').value = mediaContent;  
+        });
+
+    </script>
+
+</body>
+</html>

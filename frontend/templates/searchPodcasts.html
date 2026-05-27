@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'basicsSections.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'globals.css' %}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  </head>
+<body>
+<div class='BasicsPodcast'>
+    {% include 'NavBar.html' %}
+    <div class='HeaderMP'>
+        <div>
+            <h1 class="Title">Podcasts</h1>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="Search">
+                    <input type="hidden" value="" id="contentSelectInput" name="content" />
+                    <input type="hidden" value="" id="mediaSelectInput" name="media_type" />
+                    <input class="InputSearch" placeholder='What do you want to talk about?' type="text" name="query" style="color: white"/>
+                    <button type='submit' class="searchButton">
+                        <i class="material-icons SearchIcon">search</i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="Filters">
+        <label class='Label'>FILTER BY</label>
+        <select class='SelectPodcast' id="contentSelect">
+            <option value="">Content</option>
+            <option value="true">Explicit</option>
+            <option value="false">Non-explicit</option>
+            <option value="">All</option>
+        </select>
+        <select class='SelectPodcast' id="mediaSelect">
+            <option value="">Media type</option>
+            <option value="audio">Audio</option>
+            <option value="video">Video</option>
+            <option value="mixed">Mixed</option>
+        </select>
+    </div>
+
+    <div class='BlackMP'>
+    <div class="GlobalPadding">
+
+        {% if result.0.vaults %}
+        <h1 class='TrendingTittle'>Results found for {{ result.0.query }}:</h1>
+        {% else %}
+        <h1 class='TrendingTittle'></h1>
+        {% endif %}
+        <div class="btn-group">
+            <button onclick="showContent('podcasts')" id="artistsBtn" class = "btn-left activeButton">Podcasts</button>
+            <button onclick="showContent('episodes')" id="albumsBtn" class = "btn-right">Episodes</button>
+        </div>
+
+
+        <div id="artistsContent" class="content">
+            {% if result.0.vaults %}
+            <div class='gallery'>
+                {% for podcast in result.0.vaults %}
+                    {% with podcast_id=podcast.id %}
+                    <div class='gallery-item'>
+                        {% with podcast_description="/vault/podcast/"|add:podcast_id %}
+                            {% include 'previewVault.html' with vtype='Podcast' spotifyimg=podcast.image description=podcast_description likes=podcast.likes  title=podcast.show %}
+                        {% endwith %}
+                    </div>
+                    {% endwith %}
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-results">
+                <i class="material-icons noResultsIcon">search_off</i>
+                <p>No results found in Podcasts</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div id="albumsContent" class="content" style="display: none;">
+            {% if result.1.vaults %}
+            <div class='gallery'>
+                {% for episode in result.1.vaults %}
+                    {% with episode_id=episode.id %}
+                        <div class='gallery-item'>
+                            {% with episode_description="/vault/episode/"|add:episode_id %}
+                                {% include 'previewVault.html' with vtype='Episode' spotifyimg=episode.image description=episode_description likes=episode.likes  title=episode.episode %}
+                            {% endwith %}
+                        </div>
+                    {% endwith %}
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-results">
+                <i class="material-icons noResultsIcon">search_off</i>
+                <p>No results found in Episodes</p>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+    </div>
+</div>
+
+<script>
+    function showContent(contentType) {
+        var artistsBtn = document.getElementById('artistsBtn');
+        var albumsBtn = document.getElementById('albumsBtn');
+
+        var artistsContent = document.getElementById('artistsContent');
+        var albumsContent = document.getElementById('albumsContent');
+
+        if (contentType === 'podcasts') {
+            artistsBtn.classList.add('activeButton');
+            albumsBtn.classList.remove('activeButton');
+
+            artistsContent.style.display = 'block';
+            albumsContent.style.display = 'none';
+
+        } else if (contentType === 'episodes') {
+            artistsBtn.classList.remove('activeButton');
+            albumsBtn.classList.add('activeButton');
+
+            artistsContent.style.display = 'none';
+            albumsContent.style.display = 'block';
+        }
+    }
+
+    document.getElementById('contentSelect').addEventListener('change', function() {
+            var selectedContent = this.value;
+            document.getElementById('contentSelectInput').value = selectedContent;  
+    });
+
+    document.getElementById('mediaSelect').addEventListener('change', function() {
+            var mediaContent = this.value;
+            document.getElementById('mediaSelectInput').value = mediaContent;  
+    });
+
+    </script>
+</body>
+</html>

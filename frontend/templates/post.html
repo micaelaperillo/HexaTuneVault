@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'vault.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'commentBox.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'post.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'globals.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'custom.css' %}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    </head>
+    <body>
+        <div class="Back">
+            {% include 'NavBar.html' %}
+            <div class="vault">
+                <button id="goBack" class="back-button">
+                    <i class="material-icons">arrow_back_ios</i>
+                    <p>Back to vault</p>
+                </button>
+
+                <div class="post">
+                    <div style="display: flex;">
+                        <img class="image-comment" height="40" width="40" src="{{post_user.profileimg.url}}">
+                        <div class="comment">
+                            <div class="comment-header">
+                                <h4 class="comment-title">@{{ post.user }}</h4>
+                                {% if post_user.isArtist %} 
+                                    <i class="material-icons" style="color: rgb(0, 128, 255); margin-left: 10px;">verified</i>
+                                {% endif %}
+                                <p class="date" style="margin-right: 20px;" >{{ post.date }}</p>
+                                {% with rating=post.rating %}
+                                {% if rating != 0 %}
+                                    <span class="star-rating">  
+                                        <i class="fa fa-star{% if rating >= 1 %} rated{% endif %}" aria-hidden="true"></i>
+                                        <i class="fa fa-star{% if rating >= 2 %} rated{% endif %}" aria-hidden="true"></i>
+                                        <i class="fa fa-star{% if rating >= 3 %} rated{% endif %}" aria-hidden="true"></i>
+                                        <i class="fa fa-star{% if rating >= 4 %} rated{% endif %}" aria-hidden="true"></i>
+                                        <i class="fa fa-star{% if rating >= 5 %} rated{% endif %}" aria-hidden="true"></i>
+                                    </span>
+                                {% endif %}
+                                {% endwith %}
+                            </div>
+                            <p class="post-comment">{{post.title}}</p>
+                        </div>
+                        
+                        <div class="rate-right">
+                            <p style="margin: 0 8px 0 0; padding: 0px;">{{post.likes}}</p>
+
+                            {% if user.is_authenticated %}
+                            <form action="{% url 'like_post' %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" value="{{post.id}}" name="post_id" />
+                                <input type="hidden" value="{{path}}" name="path" />
+                                <button type="submit" style="background-color: transparent; border: none; color: white; display: flex; align-items: center;">
+                                    {% if is_liked %}
+                                    <i class="material-icons" style="cursor: pointer; margin-right: 20px; color:rgb(255, 70, 70);">favorite</i>
+                                    {% else %}
+                                    <i class="material-icons" style="cursor: pointer; margin-right: 20px;">favorite_border</i>
+                                    {% endif %}
+                                </button>
+                            </form>
+                            {% else %}
+                                <a href="/login" style="text-decoration: none;">
+                                    <button style="background-color: transparent; border: none; color: white; display: flex; align-items: center;">
+                                        <i class="material-icons" style="cursor: pointer; margin-right: 20px;">favorite_border</i>
+                                    </button>
+                                </a>
+                            {% endif %}
+                        </div>
+    
+                    </div>
+                    <div class="buttons" style="margin: 20px 0 0 10px">
+                        <button class="replies-button" data-target="0" onclick="toggleReplies(this)" style="cursor:default">
+                            {{comment_count}} responses
+                        </button>
+    
+                        {% if user.is_authenticated %}
+                        <button class="makeReply-button" data-target="0" onclick="toggleMakeReply(this)">
+                            <i class="material-icons" style="margin-right: 10px;">reply</i>
+                            Reply
+                        </button>
+                        {% else %}
+                        <a href="/login" style="text-decoration: none;">
+                        <button class="makeReply-button">
+                            <i class="material-icons" style="margin-right: 10px;">reply</i>
+                            Reply
+                        </button>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+ 
+                <div class="reply-box">
+                    <form method="POST" id="comment-form" class="hidden-makeReply" style="width: 100%; margin-top:0; display: none;" data-comment-id="0">
+                            <div class="reply-header">
+                                <p class="reply-text">Replying to @{{post.user}}</p>
+                            </div>
+                            <div style="display: flex; align-items: center;">
+                            {% csrf_token %}
+                            {{ form.content }}
+                            <button class="submit-button" type="submit">
+                                <i class="material-icons">send</i>
+                            </button>
+                        </div>
+                        <input type="hidden" name="comment_answer_id" value="0">
+                    </form>
+                </div>
+
+                <div class="commentaries">
+                    {% for a_comment in comments %}
+                        {% with comment=a_comment.comment %}
+                        {% include 'commentBox.html' with username=comment.user date=comment.date title=comment.content type="false" id="false" post_id="false" rating=0 img=a_comment.user.profileimg.url is_post=is_post comment_id=comment.id path=path is_liked=a_comment.is_liked likes=a_comment.likes with_likes="true" is_artist=a_comment.user.isArtist %}
+
+                        <div class="buttons">
+                            <button class="replies-button" data-target="{{ comment.id }}" onclick="toggleReplies(this)">
+                                {{ a_comment.replies_count }} {% if a_comment.replies_count == 1 %}response{% else %}responses{% endif %}
+                                {% if a_comment.replies_count != 0%}
+                                <i onclick="toggleIcon(this)" class="material-icons">expand_more</i>
+                                {% endif %}
+                            </button>
+
+                            {% if user.is_authenticated %}
+                            <button class="makeReply-button" data-target="{{ comment.id }}" onclick="toggleMakeReply(this)">
+                                <i class="material-icons" style="margin-right: 10px;">reply</i>
+                                Reply
+                            </button>
+                            {% else %}
+                            <a href="/login" style="text-decoration: none;">
+                            <button class="makeReply-button">
+                                <i class="material-icons" style="margin-right: 10px;">reply</i>
+                                Reply
+                            </button>
+                            </a>
+                            {% endif %}
+                        </div>
+
+                        <div class="buttons-functionalities">
+                            <form method="POST" class="hidden-makeReply" data-comment-id="{{ comment.id }}" style="width: 100%; margin-top:0; display:none;" id="reply-form">
+                                <div class="reply-header">
+                                    <p class="reply-text">Replying to @{{comment.user}}</p>
+                                </div>
+                                    <div style="display: flex">
+                                    {% csrf_token %}
+                                    {{ form.content }}
+                                    <button class="submit-button" type="submit">
+                                        <i class="material-icons">send</i>
+                                    </button>
+                                </div>
+                                <input type="hidden" name="comment_answer_id" value="{{ comment.id }}">
+                            </form> 
+                            <div class="hidden-replies" style="display: none;" data-comment-id="{{ comment.id }}">
+                            {% for reply in a_comment.replies %}
+                            <div style="margin: 20px 0;">
+                                {% include 'commentBox.html' with username=reply.comment.user date=reply.comment.date title=reply.comment.content type="false" id="false" post_id="false" rating=0 img=reply.user.profileimg.url is_post=is_post comment_id=reply.comment.id path=path is_liked=reply.is_liked likes=reply.likes with_likes="true" is_artist=reply.user.isArtist %}
+                            </div>
+                            {% endfor %}
+                            </div>
+                        </div>
+
+                        {% endwith %}
+                        <hr>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+
+        <script>
+
+            function toggleReplies(button) {
+                const commentId = button.getAttribute('data-target');
+                const repliesContainer = document.querySelector(`.hidden-replies[data-comment-id="${commentId}"]`);
+
+                if (repliesContainer) {
+                    if (repliesContainer.style.display === 'none' || repliesContainer.style.display === '') {
+                        repliesContainer.style.display = 'block';
+                    } else {
+                        repliesContainer.style.display = 'none';
+                    }
+                }
+            }
+
+            function toggleMakeReply(button) {
+                const commentId = button.getAttribute('data-target');
+                const repliesContainer = document.querySelector(`.hidden-makeReply[data-comment-id="${commentId}"]`);
+
+                if (repliesContainer) {
+                    if (repliesContainer.style.display === 'none' || repliesContainer.style.display === '') {
+                        repliesContainer.style.display = 'block';
+                    } else {
+                        repliesContainer.style.display = 'none';
+                    }
+                }
+            }
+
+            function toggleIcon(x) {
+                if (x.textContent === 'expand_more') {
+                    x.textContent = 'expand_less';
+                } else {
+                    x.textContent = 'expand_more';
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const backButton = document.getElementById('goBack');
+
+                backButton.addEventListener('click', function () {
+                    const currentUrl = window.location.href;
+                    const urlParts = currentUrl.split('/');
+                    urlParts.splice(-2);
+                    const newUrl = urlParts.join('/');
+                    window.location.href = newUrl;
+                })
+            })
+       </script>
+    </body>
+</html>

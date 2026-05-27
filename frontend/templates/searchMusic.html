@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'basicsSections.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'globals.css' %}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  </head>
+<body>
+<div class='BasicsMusic'>
+    {% include 'NavBar.html' %}
+    <div class='HeaderMP'>
+        <div>
+            <h1 class="Title">Music</h1>
+            <form method="POST"> 
+                {% csrf_token %}
+
+                <div class="Search">
+                    <input type="hidden" value="" id="genreSelectInput" name="genre" />
+                    <input class="InputSearch" placeholder='What do you want to talk about?' type="text" name="query" style="color: white"/>
+                    <button type='submit' class="searchButton">
+                        <i class="material-icons SearchIcon">search</i>
+                    </button> 
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="Filters">
+        <label class='Label'>FILTER BY</label>
+        <select class='SelectMusic' id="genreSelect">
+            <option value="">Genre</option>
+            <option value="hip hop">Hip hop</option>
+            <option value="reggaeton">Reggaeton</option>
+            <option value="classic">Classic</option>
+            <option value="rock">Rock</option>
+            <option value="pop">Pop</option>
+            <option value="salsa">Salsa</option>
+        </select>
+    </div>
+
+    <div class='BlackMP'>
+    <div class="GlobalPadding">
+
+        {% if result.0.vaults %}
+        <h1 class='TrendingTittle'>Results found for {{ result.0.query }}:</h1>
+        {% else %}
+        <h1 class='TrendingTittle'></h1>
+        {% endif %}
+        <div class="btn-group">
+            <button onclick="showContent('artists')" id="artistsBtn" class = "btn-left activeButton">Artists</button>
+            <button onclick="showContent('albums')" id="albumsBtn" class = "btn-right">Albums</button>
+        </div>
+        
+        
+        <div id="artistsContent" class="content">
+            {% if result.0.vaults %}
+            <div class='gallery'>
+                {% for artist in result.0.vaults %}
+                    {% with artist_id=artist.id %}
+                    <div class='gallery-item'>
+                        {% with artist_description="/vault/artist/"|add:artist_id %}
+                            {% include 'previewVault.html' with vtype='Artist' spotifyimg=artist.image description=artist_description likes=artist.likes  title=artist.artist %}
+                        {% endwith %}
+                    </div>
+                    {% endwith %}
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-results">
+                <i class="material-icons noResultsIcon">search_off</i>
+                <p>No results found in Artists</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div id="albumsContent" class="content" style="display: none;">
+            {% if result.1.vaults %}
+            <div class='gallery'>
+                {% for album in result.1.vaults %}
+                    {% with album_id=album.id %}
+                        <div class='gallery-item'>
+                            {% with album_description="/vault/album/"|add:album_id %}
+                                {% include 'previewVault.html' with vtype='Album' spotifyimg=album.image description=album_description likes=album.likes  title=album.album %}
+                            {% endwith %}
+                        </div>
+                    {% endwith %}
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-results">
+                <i class="material-icons noResultsIcon">search_off</i>
+                <p>No results found in Albums</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    </div>
+</div>
+
+<script>
+    function showContent(contentType) {
+        var artistsBtn = document.getElementById('artistsBtn');
+        var albumsBtn = document.getElementById('albumsBtn');
+
+        var artistsContent = document.getElementById('artistsContent');
+        var albumsContent = document.getElementById('albumsContent');
+
+        if (contentType === 'artists') {
+            artistsBtn.classList.add('activeButton');
+            albumsBtn.classList.remove('activeButton');
+
+            artistsContent.style.display = 'block';
+            albumsContent.style.display = 'none';
+
+        } else if (contentType === 'albums') {
+            artistsBtn.classList.remove('activeButton');
+            albumsBtn.classList.add('activeButton');
+
+            artistsContent.style.display = 'none';
+            albumsContent.style.display = 'block';
+        }
+    }
+
+    document.getElementById('genreSelect').addEventListener('change', function() {
+            var selectedGenre = this.value;
+            document.getElementById('genreSelectInput').value = selectedGenre;  
+    });
+    </script>
+</body>
+</html>
