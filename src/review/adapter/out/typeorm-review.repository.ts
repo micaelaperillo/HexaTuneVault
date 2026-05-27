@@ -60,7 +60,7 @@ export class TypeOrmReviewRepository implements IReviewRepository {
 
   async delete(id: number): Promise<void> {
     const result = await this.repo.delete(id);
-    if (result.affected === 0) {
+    if (!result.affected) {
       throw new ReviewNotFoundException();
     }
   }
