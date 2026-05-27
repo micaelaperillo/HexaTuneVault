@@ -1,0 +1,69 @@
+import { DeleteReviewService } from './delete-review.service.js';
+import type { IReviewRepository } from '@review/port/out/review-repository.port.js';
+import {
+  SubjectReference,
+  SubjectType,
+} from '@review/domain/model/subject-reference.js';
+import { ReviewModel } from '@review/domain/model/review.model.js';
+import { ReviewNotFoundException } from '@review/domain/exception/review-not-found.exception.js';
+import { UnauthorizedDeletionException } from '@review/domain/exception/unauthorized-deletion.exception.js';
+
+describe('DeleteReviewService', () => {
+  let service: DeleteReviewService;
+  let reviewRepo: jest.Mocked<IReviewRepository>;
+
+  beforeEach(() => {
+    reviewRepo = {
+      save: jest.fn(),
+      findById: jest.fn(),
+      findByAuthorAndSubject: jest.fn(),
+      delete: jest.fn(),
+      search: jest.fn(),
+    };
+
+    service = new DeleteReviewService(reviewRepo);
+  });
+
+  it('should throw ReviewNotFoundException if review does not exist', async () => {
+    reviewRepo.findById.mockResolvedValue(null);
+
+    await expect(
+      service.execute({ reviewId: 1, requesterId: 1 }),
+    ).rejects.toThrow(ReviewNotFoundException);
+  });
+
+  it('should throw UnauthorizedDeletionException if requester is not the author', async () => {
+    const review = ReviewModel.reconstitute({
+      id: 1,
+      subjectRef: new SubjectReference(SubjectType.TRACK, 1),
+      content: 'Nice',
+      rating: 5,
+      createdAt: new Date(),
+      authorId: 2, // different author
+      updatedAt: null,
+    });
+    reviewRepo.findById.mockResolvedValue(review);
+
+    await expect(
+      service.execute({ reviewId: 1, requesterId: 1 }),
+    ).rejects.toThrow(UnauthorizedDeletionException);
+  });
+
+  it('should delete the review if requester is the owner', async () => {
+    const review = ReviewModel.reconstitute({
+      id: 1,
+      subjectRef: new SubjectReference(SubjectType.TRACK, 1),
+      content: 'Nice',
+      rating: 5,
+      createdAt: new Date(),
+      authorId: 1,
+      updatedAt: null,
+    });
+    reviewRepo.findById.mockResolvedValue(review);
+
+    await service.execute({ reviewId: 1, requesterId: 1 });
+
+    expect(reviewRepo.findById).toHaveBeenCalledWith(1);
+    expect(reviewRepo.delete).toHaveBeenCalledWith(1);
+  });
+});
