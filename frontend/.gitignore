@@ -3,3 +3,7 @@ __pycache__/
 Lib/
 Scripts/
 pyvenv.cfg
+*.py[cod]
+.env
+staticfiles/
+*.log
