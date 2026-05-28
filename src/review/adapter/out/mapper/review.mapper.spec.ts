@@ -1,12 +1,10 @@
 import { ReviewMapper } from './review.mapper.js';
-import { ReviewEntity } from '@review/entity/review.entity.js';
+import { ReviewEntity } from '../entity/review.entity.js';
 import { ReviewModel } from '@review/domain/model/review.model.js';
 import {
   SubjectReference,
   SubjectType,
 } from '@review/domain/model/subject-reference.js';
-import { InvalidReviewException } from '@review/domain/exception/invalid-review.exception.js';
-
 describe('ReviewMapper', () => {
   const now = new Date();
 
@@ -49,22 +47,6 @@ describe('ReviewMapper', () => {
       const model = ReviewMapper.toDomain(entity);
 
       expect(model.updatedAt).toBe(updatedAt);
-    });
-
-    it('should throw InvalidReviewException for unrecognized subject type', () => {
-      const entity = new ReviewEntity();
-      entity.id = 1;
-      entity.content = 'Test';
-      entity.rating = 3;
-      entity.subjectType = 'unknown';
-      entity.subjectId = 1;
-      entity.authorId = 1;
-      entity.createdAt = now;
-      entity.updatedAt = null;
-
-      expect(() => ReviewMapper.toDomain(entity)).toThrow(
-        InvalidReviewException,
-      );
     });
   });
 
@@ -137,7 +119,7 @@ describe('ReviewMapper', () => {
       expect(entity.updatedAt).toBe(updatedAt);
     });
 
-    it('should skip updatedAt when null', () => {
+    it('should set updatedAt to null when null', () => {
       const model = ReviewModel.reconstitute({
         id: 1,
         subjectRef: new SubjectReference(SubjectType.ALBUM, 1),
@@ -150,7 +132,7 @@ describe('ReviewMapper', () => {
 
       const entity = ReviewMapper.toEntity(model);
 
-      expect(entity.updatedAt).toBeUndefined();
+      expect(entity.updatedAt).toBeNull();
     });
   });
 });

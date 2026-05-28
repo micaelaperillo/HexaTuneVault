@@ -1,6 +1,7 @@
+import type { PaginatedResult } from '@review/port/paginated-result.js';
 import type { ReviewModel } from '@review/domain/model/review.model.js';
 import type { SubjectReference } from '@review/domain/model/subject-reference.js';
-import type { SearchCriteria } from '@review/domain/model/search-criteria.js';
+import type { SearchCriteria } from '@review/port/search-criteria.js';
 
 export interface IReviewRepository {
   save(review: ReviewModel): Promise<ReviewModel>;
@@ -11,7 +12,5 @@ export interface IReviewRepository {
     since: Date,
   ): Promise<ReviewModel | null>;
   delete(id: number): Promise<void>;
-  search(
-    criteria: SearchCriteria,
-  ): Promise<{ data: ReviewModel[]; total: number }>;
+  search(criteria: SearchCriteria): Promise<PaginatedResult<ReviewModel>>;
 }

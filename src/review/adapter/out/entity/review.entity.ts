@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   Index,
 } from 'typeorm';
+import type { SubjectType } from '@review/domain/model/subject-reference.js';
 
 @Entity('reviews')
 @Index(['subjectType', 'subjectId'])
@@ -26,7 +27,7 @@ export class ReviewEntity {
     type: 'enum',
     enum: ['album', 'track', 'artist', 'podcast'],
   })
-  subjectType!: string;
+  subjectType!: SubjectType;
 
   @Column({ name: 'subject_id', type: 'int' })
   subjectId!: number;

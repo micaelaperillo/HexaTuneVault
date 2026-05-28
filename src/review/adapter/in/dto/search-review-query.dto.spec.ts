@@ -3,7 +3,7 @@ import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
 import { SearchReviewQueryDto } from './search-review-query.dto.js';
 import { SubjectType } from '@review/domain/model/subject-reference.js';
-import { SortField, SortOrder } from '@review/domain/model/search-criteria.js';
+import { SortField, SortOrder } from '@review/port/search-criteria.js';
 
 describe('SearchReviewQueryDto', () => {
   function validate(data: Record<string, unknown>): string[] {
@@ -46,6 +46,10 @@ describe('SearchReviewQueryDto', () => {
     expect(validate({ min_rating: 3 })).toHaveLength(0);
   });
 
+  it('should pass when only max_rating set', () => {
+    expect(validate({ max_rating: 4 })).toHaveLength(0);
+  });
+
   it('should fail when date_from > date_to', () => {
     const msgs = validate({
       date_from: new Date('2025-06-01'),
@@ -58,6 +62,10 @@ describe('SearchReviewQueryDto', () => {
 
   it('should pass when only date_from set', () => {
     expect(validate({ date_from: new Date('2025-01-01') })).toHaveLength(0);
+  });
+
+  it('should pass when only date_to set', () => {
+    expect(validate({ date_to: new Date('2025-06-01') })).toHaveLength(0);
   });
 
   it('should fail when subject_id provided without subject_type', () => {

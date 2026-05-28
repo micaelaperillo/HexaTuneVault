@@ -1,5 +1,4 @@
 import type { ReviewModel } from '@review/domain/model/review.model.js';
-import type { SubjectSummary } from '@review/domain/model/subject-summary.js';
 import type { SubjectType } from '@review/domain/model/subject-reference.js';
 
 export interface CreateReviewCommand {
@@ -11,7 +10,5 @@ export interface CreateReviewCommand {
 }
 
 export interface ICreateReview {
-  execute(
-    cmd: CreateReviewCommand,
-  ): Promise<{ review: ReviewModel; subject: SubjectSummary }>;
+  execute(cmd: CreateReviewCommand): Promise<ReviewModel>;
 }

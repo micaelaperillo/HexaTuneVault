@@ -1,13 +1,14 @@
 import { SearchCriteriaMapper } from './search-criteria.mapper.js';
 import { SubjectType } from '@review/domain/model/subject-reference.js';
-import { SortField, SortOrder } from '@review/domain/model/search-criteria.js';
+import { SortField, SortOrder } from '@review/port/search-criteria.js';
+import type { SearchReviewQueryDto } from '../dto/search-review-query.dto.js';
 
 describe('SearchCriteriaMapper', () => {
   it('should successfully map valid dto to SearchCriteria', () => {
-    const dto = {
+    const dto: SearchReviewQueryDto = {
       page: 1,
       page_size: 10,
-      content: 'test',
+      content_contains: 'test',
       min_rating: 1,
       max_rating: 5,
       subject_type: SubjectType.ALBUM,
@@ -30,11 +31,13 @@ describe('SearchCriteriaMapper', () => {
   it('should pass through Date objects for date_from and date_to', () => {
     const dateFrom = new Date('2025-01-01');
     const dateTo = new Date('2025-06-01');
-    const dto = {
+    const dto: SearchReviewQueryDto = {
       page: 1,
       page_size: 20,
       date_from: dateFrom,
       date_to: dateTo,
+      sort_by: SortField.CREATED_AT,
+      sort_order: SortOrder.DESC,
     };
 
     const criteria = SearchCriteriaMapper.fromDto(dto);
@@ -46,7 +49,12 @@ describe('SearchCriteriaMapper', () => {
   });
 
   it('should map minimal dto with only defaults', () => {
-    const dto = { page: 1, page_size: 20 };
+    const dto: SearchReviewQueryDto = {
+      page: 1,
+      page_size: 20,
+      sort_by: SortField.CREATED_AT,
+      sort_order: SortOrder.DESC,
+    };
 
     const criteria = SearchCriteriaMapper.fromDto(dto);
 
@@ -65,10 +73,10 @@ describe('SearchCriteriaMapper', () => {
   });
 
   it('should map all fields including subject and sort', () => {
-    const dto = {
+    const dto: SearchReviewQueryDto = {
       page: 2,
       page_size: 50,
-      content: 'test',
+      content_contains: 'test',
       author_id: 5,
       min_rating: 1,
       max_rating: 5,

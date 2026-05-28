@@ -1,13 +1,19 @@
 import { IsString, Length, IsEnum, IsInt, Min, Max } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { SubjectType } from '@review/domain/model/subject-reference.js';
+import {
+  RATING_MIN,
+  RATING_MAX,
+  CONTENT_MIN_LENGTH,
+  CONTENT_MAX_LENGTH,
+} from '@review/domain/review-constraints.js';
 
 export class CreateReviewRequest {
   @IsString()
   @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? value.trim() : value,
   )
-  @Length(1, 500)
+  @Length(CONTENT_MIN_LENGTH, CONTENT_MAX_LENGTH)
   content!: string;
 
   @IsEnum(SubjectType)
@@ -18,7 +24,7 @@ export class CreateReviewRequest {
   subject_id!: number;
 
   @IsInt()
-  @Min(1)
-  @Max(5)
+  @Min(RATING_MIN)
+  @Max(RATING_MAX)
   rating!: number;
 }

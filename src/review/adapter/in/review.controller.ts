@@ -10,9 +10,10 @@ import {
   HttpCode,
   HttpStatus,
   Res,
+  Req,
   ParseIntPipe,
 } from '@nestjs/common';
-import type { Response } from 'express';
+import type { Response, Request } from 'express';
 import type { ICreateReview } from '@review/port/in/create-review.port.js';
 import type { IDeleteReview } from '@review/port/in/delete-review.port.js';
 import type { ISearchReview } from '@review/port/in/search-review.port.js';
@@ -41,18 +42,22 @@ export class ReviewController {
   async create(
     @Body() dto: CreateReviewRequest,
     @Res({ passthrough: true }) res: Response,
+    @Req() req: Request,
   ): Promise<ReviewResponse> {
     // TODO: replace hardcoded userId with @CurrentUser() from AuthGuard
     const userId = 1;
-    const { review, subject } = await this.createReview.execute({
+    const review = await this.createReview.execute({
       content: dto.content,
       rating: dto.rating,
       subjectType: dto.subject_type,
       subjectId: dto.subject_id,
       authorId: userId,
     });
-    const response = ReviewResponse.fromDomain(review, subject);
-    res.header('Location', `/reviews/${response.id}`);
+    const response = ReviewResponse.fromDomain(review);
+    res.header(
+      'Location',
+      `${req.protocol}://${req.get('host')}/reviews/${response.id}`,
+    );
     return response;
   }
 
@@ -64,15 +69,15 @@ export class ReviewController {
     const criteria = SearchCriteriaMapper.fromDto(dto);
     const { data, total } = await this.searchReview.execute(criteria);
     res.header('X-Total-Count', total.toString());
-    return data.map((r) => ReviewResponse.fromDomain(r.review, r.subject));
+    return data.map((review) => ReviewResponse.fromDomain(review));
   }
 
   @Get(':id')
   async getById(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<ReviewResponse> {
-    const { review, subject } = await this.getReview.execute(id);
-    return ReviewResponse.fromDomain(review, subject);
+    const review = await this.getReview.execute(id);
+    return ReviewResponse.fromDomain(review);
   }
 
   @Delete(':id')

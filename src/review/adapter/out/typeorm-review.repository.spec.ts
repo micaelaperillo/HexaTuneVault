@@ -1,15 +1,12 @@
 import { TypeOrmReviewRepository } from './typeorm-review.repository.js';
-import { ReviewEntity } from '@review/entity/review.entity.js';
+import { ReviewEntity } from './entity/review.entity.js';
 import { ReviewModel } from '@review/domain/model/review.model.js';
 import {
   SubjectReference,
   SubjectType,
 } from '@review/domain/model/subject-reference.js';
-import {
-  SearchCriteria,
-  SortField,
-  SortOrder,
-} from '@review/domain/model/search-criteria.js';
+import type { SearchCriteria } from '@review/port/search-criteria.js';
+import { SortField, SortOrder } from '@review/port/search-criteria.js';
 import type { Repository } from 'typeorm';
 
 describe('TypeOrmReviewRepository', () => {
@@ -161,8 +158,15 @@ describe('TypeOrmReviewRepository', () => {
   });
 
   describe('search', () => {
+    const baseCriteria: SearchCriteria = {
+      page: 1,
+      pageSize: 20,
+      sortBy: SortField.CREATED_AT,
+      sortOrder: SortOrder.DESC,
+    };
+
     it('should not apply filters when criteria is empty', async () => {
-      await repository.search(new SearchCriteria());
+      await repository.search(baseCriteria);
 
       expect(mockRepo.createQueryBuilder).toHaveBeenCalledWith('review');
       expect(mockQb.andWhere).not.toHaveBeenCalled();
@@ -173,10 +177,10 @@ describe('TypeOrmReviewRepository', () => {
     });
 
     it('should apply content filter with ILIKE escaping', async () => {
-      const criteria = new SearchCriteria();
-      criteria.content = '100% off_sale\\test';
-
-      await repository.search(criteria);
+      await repository.search({
+        ...baseCriteria,
+        content: '100% off_sale\\test',
+      });
 
       expect(mockQb.andWhere).toHaveBeenCalledWith(
         'review.content ILIKE :content',
@@ -185,10 +189,7 @@ describe('TypeOrmReviewRepository', () => {
     });
 
     it('should apply authorId filter', async () => {
-      const criteria = new SearchCriteria();
-      criteria.authorId = 42;
-
-      await repository.search(criteria);
+      await repository.search({ ...baseCriteria, authorId: 42 });
 
       expect(mockQb.andWhere).toHaveBeenCalledWith(
         'review.authorId = :authorId',
@@ -197,10 +198,7 @@ describe('TypeOrmReviewRepository', () => {
     });
 
     it('should apply minRating filter', async () => {
-      const criteria = new SearchCriteria();
-      criteria.minRating = 3;
-
-      await repository.search(criteria);
+      await repository.search({ ...baseCriteria, minRating: 3 });
 
       expect(mockQb.andWhere).toHaveBeenCalledWith(
         'review.rating >= :minRating',
@@ -209,10 +207,7 @@ describe('TypeOrmReviewRepository', () => {
     });
 
     it('should apply maxRating filter', async () => {
-      const criteria = new SearchCriteria();
-      criteria.maxRating = 4;
-
-      await repository.search(criteria);
+      await repository.search({ ...baseCriteria, maxRating: 4 });
 
       expect(mockQb.andWhere).toHaveBeenCalledWith(
         'review.rating <= :maxRating',
@@ -222,10 +217,7 @@ describe('TypeOrmReviewRepository', () => {
 
     it('should apply dateFrom filter', async () => {
       const date = new Date('2025-01-01');
-      const criteria = new SearchCriteria();
-      criteria.dateFrom = date;
-
-      await repository.search(criteria);
+      await repository.search({ ...baseCriteria, dateFrom: date });
 
       expect(mockQb.andWhere).toHaveBeenCalledWith(
         'review.createdAt >= :dateFrom',
@@ -235,10 +227,7 @@ describe('TypeOrmReviewRepository', () => {
 
     it('should apply dateTo filter', async () => {
       const date = new Date('2025-06-01');
-      const criteria = new SearchCriteria();
-      criteria.dateTo = date;
-
-      await repository.search(criteria);
+      await repository.search({ ...baseCriteria, dateTo: date });
 
       expect(mockQb.andWhere).toHaveBeenCalledWith(
         'review.createdAt <= :dateTo',
@@ -247,10 +236,10 @@ describe('TypeOrmReviewRepository', () => {
     });
 
     it('should apply subjectType filter', async () => {
-      const criteria = new SearchCriteria();
-      criteria.subjectType = SubjectType.ALBUM;
-
-      await repository.search(criteria);
+      await repository.search({
+        ...baseCriteria,
+        subjectType: SubjectType.ALBUM,
+      });
 
       expect(mockQb.andWhere).toHaveBeenCalledWith(
         'review.subjectType = :subjectType',
@@ -259,11 +248,16 @@ describe('TypeOrmReviewRepository', () => {
     });
 
     it('should apply subjectId filter', async () => {
-      const criteria = new SearchCriteria();
-      criteria.subjectId = 10;
+      await repository.search({
+        ...baseCriteria,
+        subjectType: SubjectType.ALBUM,
+        subjectId: 10,
+      });
 
-      await repository.search(criteria);
-
+      expect(mockQb.andWhere).toHaveBeenCalledWith(
+        'review.subjectType = :subjectType',
+        { subjectType: 'album' },
+      );
       expect(mockQb.andWhere).toHaveBeenCalledWith(
         'review.subjectId = :subjectId',
         { subjectId: 10 },
@@ -271,27 +265,23 @@ describe('TypeOrmReviewRepository', () => {
     });
 
     it('should sort by rating ASC', async () => {
-      const criteria = new SearchCriteria();
-      criteria.sortBy = SortField.RATING;
-      criteria.sortOrder = SortOrder.ASC;
-
-      await repository.search(criteria);
+      await repository.search({
+        ...baseCriteria,
+        sortBy: SortField.RATING,
+        sortOrder: SortOrder.ASC,
+      });
 
       expect(mockQb.orderBy).toHaveBeenCalledWith('review.rating', 'ASC');
     });
 
     it('should sort by createdAt DESC by default', async () => {
-      await repository.search(new SearchCriteria());
+      await repository.search(baseCriteria);
 
       expect(mockQb.orderBy).toHaveBeenCalledWith('review.createdAt', 'DESC');
     });
 
     it('should apply pagination', async () => {
-      const criteria = new SearchCriteria();
-      criteria.page = 3;
-      criteria.pageSize = 10;
-
-      await repository.search(criteria);
+      await repository.search({ ...baseCriteria, page: 3, pageSize: 10 });
 
       expect(mockQb.skip).toHaveBeenCalledWith(20);
       expect(mockQb.take).toHaveBeenCalledWith(10);
@@ -300,7 +290,7 @@ describe('TypeOrmReviewRepository', () => {
     it('should map entities to domain models', async () => {
       mockQb.getManyAndCount.mockResolvedValue([[makeEntity()], 1]);
 
-      const result = await repository.search(new SearchCriteria());
+      const result = await repository.search(baseCriteria);
 
       expect(result.total).toBe(1);
       expect(result.data).toHaveLength(1);

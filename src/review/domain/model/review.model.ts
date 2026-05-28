@@ -1,5 +1,11 @@
 import { SubjectReference } from './subject-reference.js';
 import { InvalidReviewException } from '@review/domain/exception/invalid-review.exception.js';
+import {
+  RATING_MIN,
+  RATING_MAX,
+  CONTENT_MIN_LENGTH,
+  CONTENT_MAX_LENGTH,
+} from '@review/domain/review-constraints.js';
 
 export class ReviewModel {
   private constructor(
@@ -20,17 +26,20 @@ export class ReviewModel {
   }): ReviewModel {
     if (
       !Number.isInteger(params.rating) ||
-      params.rating < 1 ||
-      params.rating > 5
+      params.rating < RATING_MIN ||
+      params.rating > RATING_MAX
     ) {
       throw new InvalidReviewException(
-        'Rating must be an integer between 1 and 5',
+        `Rating must be an integer between ${RATING_MIN} and ${RATING_MAX}`,
       );
     }
     const trimmedContent = params.content.trim();
-    if (trimmedContent.length === 0 || trimmedContent.length > 500) {
+    if (
+      trimmedContent.length < CONTENT_MIN_LENGTH ||
+      trimmedContent.length > CONTENT_MAX_LENGTH
+    ) {
       throw new InvalidReviewException(
-        'Content must be between 1 and 500 characters',
+        `Content must be between ${CONTENT_MIN_LENGTH} and ${CONTENT_MAX_LENGTH} characters`,
       );
     }
     return new ReviewModel(
@@ -53,6 +62,16 @@ export class ReviewModel {
     authorId: number;
     updatedAt: Date | null;
   }): ReviewModel {
+    if (!Number.isInteger(params.id) || params.id < 1) {
+      throw new InvalidReviewException('Persisted review has invalid id');
+    }
+    if (
+      !Number.isInteger(params.rating) ||
+      params.rating < RATING_MIN ||
+      params.rating > RATING_MAX
+    ) {
+      throw new InvalidReviewException('Persisted review has invalid rating');
+    }
     return new ReviewModel(
       params.id,
       params.subjectRef,

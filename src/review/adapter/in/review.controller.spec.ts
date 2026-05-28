@@ -15,8 +15,8 @@ import {
   SubjectReference,
 } from '@review/domain/model/subject-reference.js';
 import { ReviewModel } from '@review/domain/model/review.model.js';
-import { SubjectSummary } from '@review/domain/model/subject-summary.js';
-import type { Response } from 'express';
+import { SortField, SortOrder } from '@review/port/search-criteria.js';
+import type { Response, Request } from 'express';
 
 describe('ReviewController', () => {
   let controller: ReviewController;
@@ -26,6 +26,7 @@ describe('ReviewController', () => {
   let getReview: jest.Mocked<IGetReview>;
 
   let mockResponse: { header: jest.Mock };
+  let mockRequest: { protocol: string; get: jest.Mock };
 
   beforeEach(async () => {
     createReview = { execute: jest.fn() };
@@ -35,6 +36,10 @@ describe('ReviewController', () => {
 
     mockResponse = {
       header: jest.fn(),
+    };
+    mockRequest = {
+      protocol: 'http',
+      get: jest.fn().mockReturnValue('localhost:3000'),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -51,7 +56,7 @@ describe('ReviewController', () => {
   });
 
   describe('create', () => {
-    it('should return created review with subject and set Location header', async () => {
+    it('should return created review and set Location header', async () => {
       const dto = {
         content: 'Great stuff',
         rating: 5,
@@ -68,13 +73,13 @@ describe('ReviewController', () => {
         authorId: 1,
         updatedAt: null,
       });
-      const subject = new SubjectSummary(1, 'Great Album', SubjectType.ALBUM);
 
-      createReview.execute.mockResolvedValue({ review: createdModel, subject });
+      createReview.execute.mockResolvedValue(createdModel);
 
       const result = await controller.create(
         dto,
         mockResponse as unknown as Response,
+        mockRequest as unknown as Request,
       );
 
       expect(createReview.execute).toHaveBeenCalledWith({
@@ -86,7 +91,7 @@ describe('ReviewController', () => {
       });
       expect(mockResponse.header).toHaveBeenCalledWith(
         'Location',
-        '/reviews/123',
+        'http://localhost:3000/reviews/123',
       );
       expect(result.id).toBe(123);
       expect(result.content).toBe('Great stuff');
@@ -96,10 +101,6 @@ describe('ReviewController', () => {
       expect(result.author_id).toBe(1);
       expect(result.created_at).toEqual(new Date('2023-01-01T00:00:00Z'));
       expect(result.updated_at).toBeNull();
-      expect(result.subject).not.toBeNull();
-      expect(result.subject!.id).toBe(1);
-      expect(result.subject!.name).toBe('Great Album');
-      expect(result.subject!.type).toBe('album');
     });
   });
 
@@ -115,11 +116,7 @@ describe('ReviewController', () => {
         updatedAt: null,
       });
 
-      const subject = new SubjectSummary(1, 'Album', SubjectType.ALBUM);
-      getReview.execute.mockResolvedValue({
-        review: reviewModel,
-        subject,
-      });
+      getReview.execute.mockResolvedValue(reviewModel);
 
       const result = await controller.getById(123);
 
@@ -127,8 +124,6 @@ describe('ReviewController', () => {
       expect(result.id).toBe(123);
       expect(result.content).toBe('Great stuff');
       expect(result.rating).toBe(5);
-      expect(result.subject).not.toBeNull();
-      expect(result.subject!.name).toBe('Album');
     });
   });
 
@@ -144,14 +139,18 @@ describe('ReviewController', () => {
         updatedAt: null,
       });
 
-      const subject = new SubjectSummary(1, 'Album', SubjectType.ALBUM);
       searchReview.execute.mockResolvedValue({
-        data: [{ review: reviewModel, subject }],
+        data: [reviewModel],
         total: 10,
       });
 
       const result = await controller.search(
-        { page: 1, page_size: 10 },
+        {
+          page: 1,
+          page_size: 10,
+          sort_by: SortField.CREATED_AT,
+          sort_order: SortOrder.DESC,
+        },
         mockResponse as unknown as Response,
       );
 

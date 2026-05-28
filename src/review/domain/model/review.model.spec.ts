@@ -155,6 +155,48 @@ describe('ReviewModel', () => {
       });
       expect(review.updatedAt).toBe(updatedAt);
     });
+
+    it('should throw for invalid id', () => {
+      expect(() =>
+        ReviewModel.reconstitute({
+          id: 0,
+          subjectRef: new SubjectReference(SubjectType.ALBUM, 1),
+          content: 'Test',
+          rating: 3,
+          createdAt: new Date(),
+          authorId: 1,
+          updatedAt: null,
+        }),
+      ).toThrow(InvalidReviewException);
+    });
+
+    it('should throw for invalid rating', () => {
+      expect(() =>
+        ReviewModel.reconstitute({
+          id: 1,
+          subjectRef: new SubjectReference(SubjectType.ALBUM, 1),
+          content: 'Test',
+          rating: 0,
+          createdAt: new Date(),
+          authorId: 1,
+          updatedAt: null,
+        }),
+      ).toThrow(InvalidReviewException);
+    });
+
+    it('should reconstitute valid persisted review', () => {
+      const review = ReviewModel.reconstitute({
+        id: 1,
+        subjectRef: new SubjectReference(SubjectType.ALBUM, 1),
+        content: 'Test',
+        rating: 5,
+        createdAt: new Date(),
+        authorId: 1,
+        updatedAt: null,
+      });
+      expect(review.id).toBe(1);
+      expect(review.rating).toBe(5);
+    });
   });
 
   describe('isOwnedBy', () => {

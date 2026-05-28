@@ -1,14 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThan } from 'typeorm';
-import { ReviewEntity } from '@review/entity/review.entity.js';
+import { ReviewEntity } from './entity/review.entity.js';
 import { ReviewModel } from '@review/domain/model/review.model.js';
 import { SubjectReference } from '@review/domain/model/subject-reference.js';
-import {
-  SearchCriteria,
-  SortField,
-  SortOrder,
-} from '@review/domain/model/search-criteria.js';
+import type { PaginatedResult } from '@review/port/paginated-result.js';
+import type { SearchCriteria } from '@review/port/search-criteria.js';
+import { SortField, SortOrder } from '@review/port/search-criteria.js';
 import type { IReviewRepository } from '@review/port/out/review-repository.port.js';
 import { ReviewMapper } from './mapper/review.mapper.js';
 
@@ -57,7 +55,7 @@ export class TypeOrmReviewRepository implements IReviewRepository {
 
   async search(
     criteria: SearchCriteria,
-  ): Promise<{ data: ReviewModel[]; total: number }> {
+  ): Promise<PaginatedResult<ReviewModel>> {
     const qb = this.repo.createQueryBuilder('review');
 
     if (criteria.content) {

@@ -1,4 +1,5 @@
 import { DeleteReviewService } from './delete-review.service.js';
+import { createMockReviewRepository } from '@review/__test__/mock-review-repository.js';
 import type { IReviewRepository } from '@review/port/out/review-repository.port.js';
 import {
   SubjectReference,
@@ -13,13 +14,7 @@ describe('DeleteReviewService', () => {
   let reviewRepo: jest.Mocked<IReviewRepository>;
 
   beforeEach(() => {
-    reviewRepo = {
-      save: jest.fn(),
-      findById: jest.fn(),
-      findRecentByAuthorAndSubject: jest.fn(),
-      delete: jest.fn(),
-      search: jest.fn(),
-    };
+    reviewRepo = createMockReviewRepository();
 
     service = new DeleteReviewService(reviewRepo);
   });

@@ -1,26 +1,12 @@
-import { ReviewEntity } from '@review/entity/review.entity.js';
+import { ReviewEntity } from '../entity/review.entity.js';
 import { ReviewModel } from '@review/domain/model/review.model.js';
-import {
-  SubjectReference,
-  SubjectType,
-} from '@review/domain/model/subject-reference.js';
-import { InvalidReviewException } from '@review/domain/exception/invalid-review.exception.js';
-
-const VALID_SUBJECT_TYPES = new Set<string>(Object.values(SubjectType));
+import { SubjectReference } from '@review/domain/model/subject-reference.js';
 
 export class ReviewMapper {
   static toDomain(entity: ReviewEntity): ReviewModel {
-    if (!VALID_SUBJECT_TYPES.has(entity.subjectType)) {
-      throw new InvalidReviewException(
-        'Review contains an unrecognized subject type',
-      );
-    }
     return ReviewModel.reconstitute({
       id: entity.id,
-      subjectRef: new SubjectReference(
-        entity.subjectType as SubjectType,
-        entity.subjectId,
-      ),
+      subjectRef: new SubjectReference(entity.subjectType, entity.subjectId),
       content: entity.content,
       rating: entity.rating,
       createdAt: entity.createdAt,
@@ -42,9 +28,7 @@ export class ReviewMapper {
     if (model.createdAt !== undefined) {
       entity.createdAt = model.createdAt;
     }
-    if (model.updatedAt !== null) {
-      entity.updatedAt = model.updatedAt;
-    }
+    entity.updatedAt = model.updatedAt;
     return entity;
   }
 }

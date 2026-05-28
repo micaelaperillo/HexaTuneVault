@@ -15,8 +15,9 @@ import type {
   ValidationArguments,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { SortField, SortOrder } from '@review/domain/model/search-criteria.js';
+import { SortField, SortOrder } from '@review/port/search-criteria.js';
 import { SubjectType } from '@review/domain/model/subject-reference.js';
+import { RATING_MIN, RATING_MAX } from '@review/domain/review-constraints.js';
 
 @ValidatorConstraint({ async: false })
 class MaxRatingDtoConstraint implements ValidatorConstraintInterface {
@@ -72,7 +73,7 @@ export class SearchReviewQueryDto {
   @IsOptional()
   @IsString()
   @MaxLength(200)
-  content?: string;
+  content_contains?: string;
 
   @IsOptional()
   @Type(() => Number)
@@ -83,15 +84,15 @@ export class SearchReviewQueryDto {
   @IsOptional()
   @Type(() => Number)
   @IsInt()
-  @Min(1)
-  @Max(5)
+  @Min(RATING_MIN)
+  @Max(RATING_MAX)
   min_rating?: number;
 
   @IsOptional()
   @Type(() => Number)
   @IsInt()
-  @Min(1)
-  @Max(5)
+  @Min(RATING_MIN)
+  @Max(RATING_MAX)
   @Validate(MaxRatingDtoConstraint)
   max_rating?: number;
 
@@ -119,9 +120,9 @@ export class SearchReviewQueryDto {
 
   @IsOptional()
   @IsEnum(SortField)
-  sort_by?: SortField;
+  sort_by: SortField = SortField.CREATED_AT;
 
   @IsOptional()
   @IsEnum(SortOrder)
-  sort_order?: SortOrder;
+  sort_order: SortOrder = SortOrder.DESC;
 }

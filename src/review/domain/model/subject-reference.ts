@@ -1,3 +1,5 @@
+import { InvalidReviewException } from '@review/domain/exception/invalid-review.exception.js';
+
 export const SubjectType = {
   ALBUM: 'album',
   TRACK: 'track',
@@ -11,9 +13,9 @@ export class SubjectReference {
   constructor(
     public readonly type: SubjectType,
     public readonly id: number,
-  ) {}
-
-  key(): string {
-    return `${this.type}:${this.id}`;
+  ) {
+    if (!Number.isInteger(id) || id < 1) {
+      throw new InvalidReviewException('Subject ID must be a positive integer');
+    }
   }
 }
