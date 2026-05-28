@@ -5,6 +5,8 @@ import type { ISubjectResolver } from '@review/port/out/subject-resolver.port.js
 import type { ReviewModel } from '@review/domain/model/review.model.js';
 import type { SubjectSummary } from '@review/domain/model/subject-summary.js';
 import type { SearchCriteria } from '@review/domain/model/search-criteria.js';
+import type { SubjectReference } from '@review/domain/model/subject-reference.js';
+import { SubjectNotFoundException } from '@review/domain/exception/subject-not-found.exception.js';
 import { REVIEW_REPOSITORY, SUBJECT_RESOLVER } from '@review/port/tokens.js';
 
 @Injectable()
@@ -19,12 +21,27 @@ export class SearchReviewService implements ISearchReview {
     total: number;
   }> {
     const { data, total } = await this.repo.search(criteria);
-    const results = await Promise.all(
-      data.map(async (review) => ({
-        review,
-        subject: await this.resolver.resolve(review.subjectRef),
-      })),
+
+    const uniqueRefs = new Map<string, SubjectReference>();
+    for (const review of data) {
+      uniqueRefs.set(review.subjectRef.key(), review.subjectRef);
+    }
+
+    const resolved = new Map<string, SubjectSummary>();
+    await Promise.all(
+      [...uniqueRefs.entries()].map(async ([key, ref]) => {
+        resolved.set(key, await this.resolver.resolve(ref));
+      }),
     );
+
+    const results = data.map((review) => {
+      const subject = resolved.get(review.subjectRef.key());
+      if (!subject) {
+        throw new SubjectNotFoundException();
+      }
+      return { review, subject };
+    });
+
     return { data: results, total };
   }
 }

@@ -4,3 +4,4 @@ export const SEARCH_REVIEW = Symbol('ISearchReview');
 export const GET_REVIEW = Symbol('IGetReview');
 export const REVIEW_REPOSITORY = Symbol('IReviewRepository');
 export const SUBJECT_RESOLVER = Symbol('ISubjectResolver');
+export const REVIEW_CONFIG = Symbol('IReviewConfig');

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, MoreThan } from 'typeorm';
 import { ReviewEntity } from '@review/entity/review.entity.js';
 import { ReviewModel } from '@review/domain/model/review.model.js';
 import { SubjectReference } from '@review/domain/model/subject-reference.js';
@@ -10,8 +10,6 @@ import {
   SortOrder,
 } from '@review/domain/model/search-criteria.js';
 import type { IReviewRepository } from '@review/port/out/review-repository.port.js';
-import { DuplicateReviewException } from '@review/domain/exception/duplicate-review.exception.js';
-import { ReviewNotFoundException } from '@review/domain/exception/review-not-found.exception.js';
 import { ReviewMapper } from './mapper/review.mapper.js';
 
 const SORT_FIELD_COLUMN: Record<SortField, string> = {
@@ -28,19 +26,8 @@ export class TypeOrmReviewRepository implements IReviewRepository {
 
   async save(review: ReviewModel): Promise<ReviewModel> {
     const entity = ReviewMapper.toEntity(review);
-    try {
-      const saved = await this.repo.save(entity);
-      return ReviewMapper.toDomain(saved);
-    } catch (error: unknown) {
-      if (
-        error instanceof Error &&
-        'code' in error &&
-        (error as { code: string }).code === '23505'
-      ) {
-        throw new DuplicateReviewException();
-      }
-      throw error;
-    }
+    const saved = await this.repo.save(entity);
+    return ReviewMapper.toDomain(saved);
   }
 
   async findById(id: number): Promise<ReviewModel | null> {
@@ -48,21 +35,24 @@ export class TypeOrmReviewRepository implements IReviewRepository {
     return entity ? ReviewMapper.toDomain(entity) : null;
   }
 
-  async findByAuthorAndSubject(
+  async findRecentByAuthorAndSubject(
     authorId: number,
     ref: SubjectReference,
+    since: Date,
   ): Promise<ReviewModel | null> {
     const entity = await this.repo.findOne({
-      where: { authorId, subjectType: ref.type, subjectId: ref.id },
+      where: {
+        authorId,
+        subjectType: ref.type,
+        subjectId: ref.id,
+        createdAt: MoreThan(since),
+      },
     });
     return entity ? ReviewMapper.toDomain(entity) : null;
   }
 
   async delete(id: number): Promise<void> {
-    const result = await this.repo.delete(id);
-    if (!result.affected) {
-      throw new ReviewNotFoundException();
-    }
+    await this.repo.delete(id);
   }
 
   async search(

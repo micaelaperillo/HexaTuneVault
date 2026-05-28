@@ -35,6 +35,7 @@ describe('ReviewResponse', () => {
     expect(response.subject_id).toBe(10);
     expect(response.author_id).toBe(42);
     expect(response.created_at).toBe(now);
+    expect(response.updated_at).toBeNull();
     expect(response.subject).toEqual({
       id: 10,
       name: 'Album Name',
@@ -47,6 +48,7 @@ describe('ReviewResponse', () => {
     const response = ReviewResponse.fromDomain(savedModel);
 
     expect(response.subject).toBeNull();
+    expect(response.updated_at).toBeNull();
   });
 
   it('should throw when model has no id (unsaved)', () => {

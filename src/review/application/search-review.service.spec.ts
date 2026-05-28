@@ -18,7 +18,7 @@ describe('SearchReviewService', () => {
     reviewRepo = {
       save: jest.fn(),
       findById: jest.fn(),
-      findByAuthorAndSubject: jest.fn(),
+      findRecentByAuthorAndSubject: jest.fn(),
       delete: jest.fn(),
       search: jest.fn(),
     };
@@ -70,7 +70,7 @@ describe('SearchReviewService', () => {
     expect(subjectResolver.resolve).not.toHaveBeenCalled();
   });
 
-  it('should resolve subjects for multiple reviews in parallel', async () => {
+  it('should resolve subjects for multiple reviews with different subjects', async () => {
     const criteria = new SearchCriteria();
     const review1 = ReviewModel.reconstitute({
       id: 1,
@@ -109,6 +109,42 @@ describe('SearchReviewService', () => {
     expect(result.data[0].subject.name).toBe('Album 1');
     expect(result.data[1].subject.name).toBe('Track 2');
     expect(subjectResolver.resolve).toHaveBeenCalledTimes(2);
+  });
+
+  it('should call resolver once per review even when two reviews share the same subject', async () => {
+    const criteria = new SearchCriteria();
+    const sharedRef = new SubjectReference(SubjectType.ALBUM, 5);
+    const review1 = ReviewModel.reconstitute({
+      id: 1,
+      subjectRef: sharedRef,
+      content: 'First take',
+      rating: 5,
+      createdAt: new Date(),
+      authorId: 1,
+      updatedAt: null,
+    });
+    const review2 = ReviewModel.reconstitute({
+      id: 2,
+      subjectRef: new SubjectReference(SubjectType.ALBUM, 5),
+      content: 'Second take',
+      rating: 4,
+      createdAt: new Date(),
+      authorId: 2,
+      updatedAt: null,
+    });
+
+    reviewRepo.search.mockResolvedValue({ data: [review1, review2], total: 2 });
+    const subject = new SubjectSummary(5, 'Shared Album', SubjectType.ALBUM);
+    subjectResolver.resolve.mockResolvedValue(subject);
+
+    const result = await service.execute(criteria);
+
+    expect(result.data).toHaveLength(2);
+    // Both reviews should have the subject resolved
+    expect(result.data[0].subject).toEqual(subject);
+    expect(result.data[1].subject).toEqual(subject);
+    // resolver is called only once for the shared subject (deduplication)
+    expect(subjectResolver.resolve).toHaveBeenCalledTimes(1);
   });
 
   it('should propagate resolver failure during batch resolution', async () => {

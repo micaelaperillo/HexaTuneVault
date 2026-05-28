@@ -4,15 +4,13 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  Unique,
   Index,
 } from 'typeorm';
 
 @Entity('reviews')
-@Unique(['authorId', 'subjectType', 'subjectId'])
 @Index(['subjectType', 'subjectId'])
-@Index(['authorId'])
 @Index(['createdAt'])
+@Index(['authorId', 'subjectType', 'subjectId', 'createdAt'])
 export class ReviewEntity {
   @PrimaryGeneratedColumn()
   id!: number;

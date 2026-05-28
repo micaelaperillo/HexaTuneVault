@@ -19,7 +19,7 @@ describe('GetReviewService', () => {
     reviewRepo = {
       save: jest.fn(),
       findById: jest.fn(),
-      findByAuthorAndSubject: jest.fn(),
+      findRecentByAuthorAndSubject: jest.fn(),
       delete: jest.fn(),
       search: jest.fn(),
     };

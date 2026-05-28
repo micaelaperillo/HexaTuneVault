@@ -44,15 +44,16 @@ export class ReviewController {
   ): Promise<ReviewResponse> {
     // TODO: replace hardcoded userId with @CurrentUser() from AuthGuard
     const userId = 1;
-    const result = await this.createReview.execute({
+    const { review, subject } = await this.createReview.execute({
       content: dto.content,
       rating: dto.rating,
       subjectType: dto.subject_type,
       subjectId: dto.subject_id,
       authorId: userId,
     });
-    res.header('Location', `/reviews/${result.id}`);
-    return ReviewResponse.fromDomain(result);
+    const response = ReviewResponse.fromDomain(review, subject);
+    res.header('Location', `/reviews/${response.id}`);
+    return response;
   }
 
   @Get()

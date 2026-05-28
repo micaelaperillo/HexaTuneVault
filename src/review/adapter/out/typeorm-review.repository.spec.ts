@@ -10,8 +10,6 @@ import {
   SortField,
   SortOrder,
 } from '@review/domain/model/search-criteria.js';
-import { DuplicateReviewException } from '@review/domain/exception/duplicate-review.exception.js';
-import { ReviewNotFoundException } from '@review/domain/exception/review-not-found.exception.js';
 import type { Repository } from 'typeorm';
 
 describe('TypeOrmReviewRepository', () => {
@@ -77,38 +75,12 @@ describe('TypeOrmReviewRepository', () => {
       expect(mockRepo.save).toHaveBeenCalled();
     });
 
-    it('should throw DuplicateReviewException on unique constraint violation', async () => {
-      const error = new Error('duplicate key') as Error & { code: string };
-      error.code = '23505';
-      mockRepo.save.mockRejectedValue(error);
-
-      await expect(repository.save(createModel())).rejects.toThrow(
-        DuplicateReviewException,
-      );
-    });
-
     it('should rethrow Error without code property', async () => {
       mockRepo.save.mockRejectedValue(new Error('connection lost'));
 
       await expect(repository.save(createModel())).rejects.toThrow(
         'connection lost',
       );
-    });
-
-    it('should rethrow Error with non-duplicate code', async () => {
-      const error = new Error('FK violation') as Error & { code: string };
-      error.code = '23503';
-      mockRepo.save.mockRejectedValue(error);
-
-      await expect(repository.save(createModel())).rejects.toThrow(
-        'FK violation',
-      );
-    });
-
-    it('should rethrow non-Error thrown values', async () => {
-      mockRepo.save.mockRejectedValue('string error');
-
-      await expect(repository.save(createModel())).rejects.toBe('string error');
     });
   });
 
@@ -132,51 +104,59 @@ describe('TypeOrmReviewRepository', () => {
     });
   });
 
-  describe('findByAuthorAndSubject', () => {
-    it('should return domain model when found', async () => {
+  describe('findRecentByAuthorAndSubject', () => {
+    it('should return domain model when a recent review is found', async () => {
+      const since = new Date(Date.now() - 60 * 1000);
       mockRepo.findOne.mockResolvedValue(makeEntity());
 
       const ref = new SubjectReference(SubjectType.ALBUM, 10);
-      const result = await repository.findByAuthorAndSubject(42, ref);
+      const result = await repository.findRecentByAuthorAndSubject(
+        42,
+        ref,
+        since,
+      );
 
       expect(result).not.toBeNull();
-      expect(mockRepo.findOne).toHaveBeenCalledWith({
-        where: { authorId: 42, subjectType: 'album', subjectId: 10 },
-      });
+      expect(result!.id).toBe(1);
+      expect(mockRepo.findOne).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            authorId: 42,
+            subjectType: 'album',
+            subjectId: 10,
+          }),
+        }),
+      );
     });
 
-    it('should return null when not found', async () => {
+    it('should return null when no recent review exists', async () => {
+      const since = new Date(Date.now() - 60 * 1000);
       mockRepo.findOne.mockResolvedValue(null);
 
       const ref = new SubjectReference(SubjectType.TRACK, 1);
-      const result = await repository.findByAuthorAndSubject(1, ref);
+      const result = await repository.findRecentByAuthorAndSubject(
+        1,
+        ref,
+        since,
+      );
 
       expect(result).toBeNull();
     });
   });
 
   describe('delete', () => {
-    it('should succeed when row affected', async () => {
+    it('should call repo.delete with id', async () => {
       mockRepo.delete.mockResolvedValue({ affected: 1, raw: [] });
 
       await expect(repository.delete(1)).resolves.toBeUndefined();
       expect(mockRepo.delete).toHaveBeenCalledWith(1);
     });
 
-    it('should throw ReviewNotFoundException when no row affected', async () => {
+    it('should be idempotent when no row affected', async () => {
       mockRepo.delete.mockResolvedValue({ affected: 0, raw: [] });
 
-      await expect(repository.delete(999)).rejects.toThrow(
-        ReviewNotFoundException,
-      );
-    });
-
-    it('should throw ReviewNotFoundException when affected is null', async () => {
-      mockRepo.delete.mockResolvedValue({ affected: null, raw: [] });
-
-      await expect(repository.delete(999)).rejects.toThrow(
-        ReviewNotFoundException,
-      );
+      await expect(repository.delete(999)).resolves.toBeUndefined();
+      expect(mockRepo.delete).toHaveBeenCalledWith(999);
     });
   });
 
@@ -189,6 +169,7 @@ describe('TypeOrmReviewRepository', () => {
       expect(mockQb.orderBy).toHaveBeenCalledWith('review.createdAt', 'DESC');
       expect(mockQb.skip).toHaveBeenCalledWith(0);
       expect(mockQb.take).toHaveBeenCalledWith(20);
+      expect(mockQb.getManyAndCount).toHaveBeenCalledTimes(1);
     });
 
     it('should apply content filter with ILIKE escaping', async () => {

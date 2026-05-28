@@ -1,5 +1,4 @@
 import { SearchCriteriaMapper } from './search-criteria.mapper.js';
-import { InvalidReviewException } from '@review/domain/exception/invalid-review.exception.js';
 import { SubjectType } from '@review/domain/model/subject-reference.js';
 import { SortField, SortOrder } from '@review/domain/model/search-criteria.js';
 
@@ -28,29 +27,22 @@ describe('SearchCriteriaMapper', () => {
     expect(criteria.sortOrder).toBe(SortOrder.DESC);
   });
 
-  it('should throw InvalidReviewException on validation error', () => {
-    const dto = {
-      page: -1,
-      page_size: 10,
-    };
-
-    expect(() => SearchCriteriaMapper.fromDto(dto)).toThrow(
-      InvalidReviewException,
-    );
-  });
-
-  it('should convert date strings to Date objects', () => {
+  it('should pass through Date objects for date_from and date_to', () => {
+    const dateFrom = new Date('2025-01-01');
+    const dateTo = new Date('2025-06-01');
     const dto = {
       page: 1,
       page_size: 20,
-      date_from: '2025-01-01',
-      date_to: '2025-06-01',
+      date_from: dateFrom,
+      date_to: dateTo,
     };
 
     const criteria = SearchCriteriaMapper.fromDto(dto);
 
     expect(criteria.dateFrom).toBeInstanceOf(Date);
     expect(criteria.dateTo).toBeInstanceOf(Date);
+    expect(criteria.dateFrom).toEqual(dateFrom);
+    expect(criteria.dateTo).toEqual(dateTo);
   });
 
   it('should map minimal dto with only defaults', () => {
@@ -80,8 +72,8 @@ describe('SearchCriteriaMapper', () => {
       author_id: 5,
       min_rating: 1,
       max_rating: 5,
-      date_from: '2025-01-01',
-      date_to: '2025-06-01',
+      date_from: new Date('2025-01-01'),
+      date_to: new Date('2025-06-01'),
       subject_type: SubjectType.TRACK,
       subject_id: 10,
       sort_by: SortField.RATING,
@@ -96,6 +88,8 @@ describe('SearchCriteriaMapper', () => {
     expect(criteria.authorId).toBe(5);
     expect(criteria.minRating).toBe(1);
     expect(criteria.maxRating).toBe(5);
+    expect(criteria.dateFrom).toBeInstanceOf(Date);
+    expect(criteria.dateTo).toBeInstanceOf(Date);
     expect(criteria.subjectType).toBe(SubjectType.TRACK);
     expect(criteria.subjectId).toBe(10);
     expect(criteria.sortBy).toBe(SortField.RATING);

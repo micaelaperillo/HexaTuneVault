@@ -12,4 +12,8 @@ export class SubjectReference {
     public readonly type: SubjectType,
     public readonly id: number,
   ) {}
+
+  key(): string {
+    return `${this.type}:${this.id}`;
+  }
 }

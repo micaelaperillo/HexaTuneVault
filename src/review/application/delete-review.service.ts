@@ -5,7 +5,7 @@ import type {
 } from '@review/port/in/delete-review.port.js';
 import type { IReviewRepository } from '@review/port/out/review-repository.port.js';
 import { ReviewNotFoundException } from '@review/domain/exception/review-not-found.exception.js';
-import { UnauthorizedDeletionException } from '@review/domain/exception/unauthorized-deletion.exception.js';
+import { ForbiddenDeletionException } from '@review/domain/exception/forbidden-deletion.exception.js';
 import { REVIEW_REPOSITORY } from '@review/port/tokens.js';
 
 @Injectable()
@@ -21,7 +21,7 @@ export class DeleteReviewService implements IDeleteReview {
     }
 
     if (!review.isOwnedBy(cmd.requesterId)) {
-      throw new UnauthorizedDeletionException();
+      throw new ForbiddenDeletionException();
     }
 
     await this.repo.delete(cmd.reviewId);

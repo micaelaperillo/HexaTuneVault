@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ReviewEntity } from '@review/entity/review.entity.js';
 import { TypeOrmReviewRepository } from '@review/adapter/out/typeorm-review.repository.js';
@@ -15,14 +16,22 @@ import {
   GET_REVIEW,
   REVIEW_REPOSITORY,
   SUBJECT_RESOLVER,
+  REVIEW_CONFIG,
 } from '@review/port/tokens.js';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ReviewEntity])],
+  imports: [ConfigModule, TypeOrmModule.forFeature([ReviewEntity])],
   controllers: [ReviewController],
   providers: [
     { provide: REVIEW_REPOSITORY, useClass: TypeOrmReviewRepository },
     { provide: SUBJECT_RESOLVER, useClass: SubjectResolverAdapter },
+    {
+      provide: REVIEW_CONFIG,
+      useFactory: (config: ConfigService) => ({
+        cooldownSeconds: config.get<number>('REVIEW_COOLDOWN_SECONDS', 60),
+      }),
+      inject: [ConfigService],
+    },
     { provide: CREATE_REVIEW, useClass: CreateReviewService },
     { provide: DELETE_REVIEW, useClass: DeleteReviewService },
     { provide: SEARCH_REVIEW, useClass: SearchReviewService },

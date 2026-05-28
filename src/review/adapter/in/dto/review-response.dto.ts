@@ -15,6 +15,7 @@ export class ReviewResponse {
   } | null;
   author_id!: number;
   created_at!: Date;
+  updated_at!: Date | null;
 
   static fromDomain(
     model: ReviewModel,
@@ -39,6 +40,7 @@ export class ReviewResponse {
       : null;
     response.author_id = model.authorId;
     response.created_at = model.createdAt;
+    response.updated_at = model.updatedAt;
     return response;
   }
 }

@@ -5,7 +5,7 @@ import {
   Max,
   IsString,
   MaxLength,
-  IsISO8601,
+  IsDate,
   IsEnum,
   ValidatorConstraint,
   Validate,
@@ -36,7 +36,7 @@ class DateRangeDtoConstraint implements ValidatorConstraintInterface {
   validate(_: unknown, args: ValidationArguments): boolean {
     const obj = args.object as SearchReviewQueryDto;
     if (!obj.date_from || !obj.date_to) return true;
-    return obj.date_from <= obj.date_to;
+    return obj.date_from.getTime() <= obj.date_to.getTime();
   }
   defaultMessage(): string {
     return 'date_from must not be after date_to';
@@ -96,13 +96,15 @@ export class SearchReviewQueryDto {
   max_rating?: number;
 
   @IsOptional()
-  @IsISO8601()
-  date_from?: string;
+  @Type(() => Date)
+  @IsDate()
+  date_from?: Date;
 
   @IsOptional()
-  @IsISO8601()
+  @Type(() => Date)
+  @IsDate()
   @Validate(DateRangeDtoConstraint)
-  date_to?: string;
+  date_to?: Date;
 
   @IsOptional()
   @IsEnum(SubjectType)

@@ -51,7 +51,7 @@ describe('ReviewController', () => {
   });
 
   describe('create', () => {
-    it('should return created review and set Location header', async () => {
+    it('should return created review with subject and set Location header', async () => {
       const dto = {
         content: 'Great stuff',
         rating: 5,
@@ -68,8 +68,9 @@ describe('ReviewController', () => {
         authorId: 1,
         updatedAt: null,
       });
+      const subject = new SubjectSummary(1, 'Great Album', SubjectType.ALBUM);
 
-      createReview.execute.mockResolvedValue(createdModel);
+      createReview.execute.mockResolvedValue({ review: createdModel, subject });
 
       const result = await controller.create(
         dto,
@@ -94,7 +95,11 @@ describe('ReviewController', () => {
       expect(result.subject_id).toBe(1);
       expect(result.author_id).toBe(1);
       expect(result.created_at).toEqual(new Date('2023-01-01T00:00:00Z'));
-      expect(result.subject).toBeNull();
+      expect(result.updated_at).toBeNull();
+      expect(result.subject).not.toBeNull();
+      expect(result.subject!.id).toBe(1);
+      expect(result.subject!.name).toBe('Great Album');
+      expect(result.subject!.type).toBe('album');
     });
   });
 

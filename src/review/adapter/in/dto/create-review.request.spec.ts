@@ -85,6 +85,11 @@ describe('CreateReviewRequest', () => {
     expect(msgs.length).toBeGreaterThan(0);
   });
 
+  it('should fail when all required fields are missing', () => {
+    const msgs = validate({});
+    expect(msgs.length).toBeGreaterThan(0);
+  });
+
   it('should fail when subject_id is less than 1', () => {
     const msgs = validate({
       content: 'Test',

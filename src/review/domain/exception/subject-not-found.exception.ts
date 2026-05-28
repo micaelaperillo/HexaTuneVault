@@ -1,4 +1,4 @@
-import { DomainException } from './domain.exception.js';
+import { DomainException } from '@domain/exception/domain.exception.js';
 
 export class SubjectNotFoundException extends DomainException {
   constructor() {

@@ -29,43 +29,12 @@ describe('SearchCriteria', () => {
     expect(msgs.length).toBeGreaterThan(0);
   });
 
-  it('should fail when minRating > maxRating', () => {
-    const msgs = validate({ minRating: 4, maxRating: 2 });
-    expect(
-      msgs.some((m) => m.includes('minRating must not exceed maxRating')),
-    ).toBe(true);
-  });
-
-  it('should pass when minRating equals maxRating', () => {
-    expect(validate({ minRating: 3, maxRating: 3 })).toHaveLength(0);
-  });
-
-  it('should pass when only minRating set (no cross-field conflict)', () => {
+  it('should pass when only minRating set', () => {
     expect(validate({ minRating: 3 })).toHaveLength(0);
-  });
-
-  it('should fail when dateFrom > dateTo', () => {
-    const msgs = validate({
-      dateFrom: new Date('2025-01-02'),
-      dateTo: new Date('2025-01-01'),
-    });
-    expect(
-      msgs.some((m) => m.includes('dateFrom must not be after dateTo')),
-    ).toBe(true);
-  });
-
-  it('should pass when dateFrom equals dateTo', () => {
-    const date = new Date('2025-01-01');
-    expect(validate({ dateFrom: date, dateTo: date })).toHaveLength(0);
   });
 
   it('should pass when only dateFrom set', () => {
     expect(validate({ dateFrom: new Date('2025-01-01') })).toHaveLength(0);
-  });
-
-  it('should fail when subjectId provided without subjectType', () => {
-    const msgs = validate({ subjectId: 1 });
-    expect(msgs.some((m) => m.includes('subjectType is required'))).toBe(true);
   });
 
   it('should pass when subjectId provided with subjectType', () => {

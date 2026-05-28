@@ -25,8 +25,8 @@ describe('SearchReviewQueryDto', () => {
         author_id: 5,
         min_rating: 1,
         max_rating: 5,
-        date_from: '2025-01-01',
-        date_to: '2025-06-01',
+        date_from: new Date('2025-01-01'),
+        date_to: new Date('2025-06-01'),
         subject_type: SubjectType.ALBUM,
         subject_id: 10,
         sort_by: SortField.RATING,
@@ -47,14 +47,17 @@ describe('SearchReviewQueryDto', () => {
   });
 
   it('should fail when date_from > date_to', () => {
-    const msgs = validate({ date_from: '2025-06-01', date_to: '2025-01-01' });
+    const msgs = validate({
+      date_from: new Date('2025-06-01'),
+      date_to: new Date('2025-01-01'),
+    });
     expect(
       msgs.some((m) => m.includes('date_from must not be after date_to')),
     ).toBe(true);
   });
 
   it('should pass when only date_from set', () => {
-    expect(validate({ date_from: '2025-01-01' })).toHaveLength(0);
+    expect(validate({ date_from: new Date('2025-01-01') })).toHaveLength(0);
   });
 
   it('should fail when subject_id provided without subject_type', () => {

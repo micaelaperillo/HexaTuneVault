@@ -5,9 +5,10 @@ import type { SearchCriteria } from '@review/domain/model/search-criteria.js';
 export interface IReviewRepository {
   save(review: ReviewModel): Promise<ReviewModel>;
   findById(id: number): Promise<ReviewModel | null>;
-  findByAuthorAndSubject(
+  findRecentByAuthorAndSubject(
     authorId: number,
     ref: SubjectReference,
+    since: Date,
   ): Promise<ReviewModel | null>;
   delete(id: number): Promise<void>;
   search(

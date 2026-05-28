@@ -6,7 +6,7 @@ import {
 } from '@review/domain/model/subject-reference.js';
 import { ReviewModel } from '@review/domain/model/review.model.js';
 import { ReviewNotFoundException } from '@review/domain/exception/review-not-found.exception.js';
-import { UnauthorizedDeletionException } from '@review/domain/exception/unauthorized-deletion.exception.js';
+import { ForbiddenDeletionException } from '@review/domain/exception/forbidden-deletion.exception.js';
 
 describe('DeleteReviewService', () => {
   let service: DeleteReviewService;
@@ -16,7 +16,7 @@ describe('DeleteReviewService', () => {
     reviewRepo = {
       save: jest.fn(),
       findById: jest.fn(),
-      findByAuthorAndSubject: jest.fn(),
+      findRecentByAuthorAndSubject: jest.fn(),
       delete: jest.fn(),
       search: jest.fn(),
     };
@@ -32,7 +32,7 @@ describe('DeleteReviewService', () => {
     ).rejects.toThrow(ReviewNotFoundException);
   });
 
-  it('should throw UnauthorizedDeletionException if requester is not the author', async () => {
+  it('should throw ForbiddenDeletionException if requester is not the author', async () => {
     const review = ReviewModel.reconstitute({
       id: 1,
       subjectRef: new SubjectReference(SubjectType.TRACK, 1),
@@ -46,7 +46,7 @@ describe('DeleteReviewService', () => {
 
     await expect(
       service.execute({ reviewId: 1, requesterId: 1 }),
-    ).rejects.toThrow(UnauthorizedDeletionException);
+    ).rejects.toThrow(ForbiddenDeletionException);
   });
 
   it('should delete the review if requester is the owner', async () => {
