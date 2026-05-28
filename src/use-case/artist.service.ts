@@ -1,6 +1,6 @@
-import type { IGetArtist, ISearchArtist } from './port';
-import type { ArtistFilters, ArtistModel } from './model';
-import type { IArtistProvider } from './repository';
+import type { IGetArtist, ISearchArtist } from '../port/artist';
+import type { ArtistFilters, ArtistModel } from '../model';
+import type { IArtistProvider } from '../repository';
 
 import { Inject, Injectable } from '@nestjs/common';
 

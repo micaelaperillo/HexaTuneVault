@@ -2,7 +2,7 @@ import type { ArtistModel, ArtistFilters } from '../model';
 
 // Documentation import
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { ArtistProviderError } from '../errors';
+import type { ArtistProviderError } from '../error/artist';
 
 export interface IArtistProvider {
   /**

@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
 
 export const postgres = {
-  provide: 'SQL_DATA_SOURCE',
+  provide: 'POSTGRES_DB',
   useFactory: async () => {
     const dataSource = new DataSource({
       type: 'postgres',
@@ -11,7 +11,7 @@ export const postgres = {
       password: process.env.DB_PASSWORD ?? 'postgres',
       database: process.env.DB_NAME ?? 'hexatunevault',
       synchronize: process.env.NODE_ENV !== 'production',
-      entities: [__dirname + '/../../../**/*.entity.ts'],
+      entities: [__dirname + '/../../../entity/**/*.entity.ts'],
     });
 
     return dataSource.initialize();

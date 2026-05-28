@@ -1,29 +1,17 @@
+import type { SpotifyApi, Artist } from '@spotify/web-api-ts-sdk';
+
 import type { IArtistProvider } from '../repository/artist.provider';
 import type { ArtistModel, ArtistFilters } from '../model';
 
-import { SpotifyApi, type Artist } from '@spotify/web-api-ts-sdk';
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 
-import { ArtistProviderError } from '../errors';
+import { ArtistProviderError } from '../error/artist';
 
 @Injectable()
 export class SpotifyArtistProvider implements IArtistProvider {
   private readonly logger = new Logger(SpotifyArtistProvider.name);
 
-  /**
-   * @todo This shouldn't be hardcoded like this,
-   * maybe using injection once more...
-   *
-   * Injection-ception :)
-   */
-  private readonly spotify: SpotifyApi;
-
-  constructor() {
-    this.spotify = SpotifyApi.withClientCredentials(
-      process.env.SPOTIFY_CLIENT_ID!,
-      process.env.SPOTIFY_CLIENT_SECRET!,
-    );
-  }
+  constructor(@Inject('SPOTIFY_API') readonly spotify: SpotifyApi) {}
 
   /**
    * @override

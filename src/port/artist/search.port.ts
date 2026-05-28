@@ -1,4 +1,4 @@
-import type { ArtistModel, ArtistFilters } from '../model';
+import type { ArtistModel, ArtistFilters } from '../../model';
 
 export interface ISearchArtist {
   /**

@@ -1,7 +1,7 @@
-import type { ArtistResponse } from './dto';
-import type { ArtistModel } from './model';
+import type { ArtistResponse } from '../dto';
+import type { ArtistModel } from '../model';
 
-import { ArtistService } from './artist.service';
+import { ArtistService } from '../use-case/artist.service';
 
 import {
   BadRequestException,
@@ -13,7 +13,7 @@ import {
   Logger,
 } from '@nestjs/common';
 
-@Controller(['api', 'artists'])
+@Controller('api/artists')
 export class ArtistController {
   private readonly logger = new Logger(ArtistController.name);
 
