@@ -26,17 +26,26 @@ export class AllExceptionsFilter implements ExceptionFilter {
         'Unhandled exception',
         exception instanceof Error ? exception.stack : String(exception),
       );
-      response
-        .status(status)
-        .json({ statusCode: status, message: 'Internal server error' });
+      response.status(status).json({
+        statusCode: status,
+        code: 'INTERNAL_ERROR',
+        message: 'Internal server error',
+      });
       return;
     }
 
     const body = exception.getResponse();
-    response
-      .status(status)
-      .json(
-        typeof body === 'string' ? { statusCode: status, message: body } : body,
-      );
+    if (typeof body === 'string') {
+      response
+        .status(status)
+        .json({ statusCode: status, code: 'ERROR', message: body });
+    } else {
+      const obj = body as Record<string, unknown>;
+      response.status(status).json({
+        statusCode: status,
+        code: (obj.code as string) ?? 'ERROR',
+        message: obj.message ?? exception.message,
+      });
+    }
   }
 }

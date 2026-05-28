@@ -5,7 +5,6 @@ import { DomainException } from '@domain/exception/domain.exception.js';
 import { ReviewNotFoundException } from '@review/domain/exception/review-not-found.exception.js';
 import { ForbiddenDeletionException } from '@review/domain/exception/forbidden-deletion.exception.js';
 import { ReviewCooldownException } from '@review/domain/exception/review-cooldown.exception.js';
-import { SubjectNotFoundException } from '@review/domain/exception/subject-not-found.exception.js';
 import { InvalidReviewException } from '@review/domain/exception/invalid-review.exception.js';
 
 describe('DomainExceptionFilter', () => {
@@ -39,7 +38,10 @@ describe('DomainExceptionFilter', () => {
   });
 
   it('should map SUBJECT_NOT_FOUND specifically to 422', () => {
-    filter.catch(new SubjectNotFoundException(), mockHost);
+    filter.catch(
+      new DomainException('Subject not found', 'SUBJECT_NOT_FOUND'),
+      mockHost,
+    );
 
     expect(mockStatus).toHaveBeenCalledWith(HttpStatus.UNPROCESSABLE_ENTITY);
     expect(mockJson).toHaveBeenCalledWith(
@@ -105,6 +107,21 @@ describe('DomainExceptionFilter', () => {
         statusCode: 400,
         code: 'INVALID_REVIEW',
         message: 'Bad rating',
+      }),
+    );
+  });
+
+  it('should map DUPLICATE_* codes to 409', () => {
+    filter.catch(
+      new DomainException('Already exists', 'DUPLICATE_ENTRY'),
+      mockHost,
+    );
+    expect(mockStatus).toHaveBeenCalledWith(HttpStatus.CONFLICT);
+    expect(mockJson).toHaveBeenCalledWith(
+      expect.objectContaining({
+        statusCode: 409,
+        code: 'DUPLICATE_ENTRY',
+        message: 'Already exists',
       }),
     );
   });
