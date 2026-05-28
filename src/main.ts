@@ -17,6 +17,9 @@ function flattenValidationErrors(errors: ValidationError[]): string[] {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors({
+    exposedHeaders: ['X-Total-Count', 'Location'],
+  });
   // NestJS evaluates global filters in reverse order — DomainExceptionFilter runs first
   app.useGlobalFilters(new AllExceptionsFilter(), new DomainExceptionFilter());
   app.useGlobalPipes(
