@@ -2,8 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import type { ValidationError } from 'class-validator';
 import { AppModule } from './app.module.js';
-import { AllExceptionsFilter } from './common/filter/all-exceptions.filter.js';
-import { DomainExceptionFilter } from '@review/adapter/in/filter/domain-exception.filter.js';
+import { AllExceptionsFilter } from '@infrastructure/filter/all-exceptions.filter.js';
+import { DomainExceptionFilter } from '@infrastructure/filter/domain-exception.filter.js';
 
 function flattenValidationErrors(errors: ValidationError[]): string[] {
   return errors.flatMap((error) => {
@@ -17,6 +17,7 @@ function flattenValidationErrors(errors: ValidationError[]): string[] {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  // NestJS evaluates global filters in reverse order — DomainExceptionFilter runs first
   app.useGlobalFilters(new AllExceptionsFilter(), new DomainExceptionFilter());
   app.useGlobalPipes(
     new ValidationPipe({

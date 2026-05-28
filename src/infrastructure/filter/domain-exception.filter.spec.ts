@@ -1,10 +1,10 @@
 import { HttpStatus } from '@nestjs/common';
 import type { ArgumentsHost } from '@nestjs/common';
-import { DomainExceptionFilter } from './domain-exception.filter.js';
-import { DomainException } from '@review/domain/exception/domain.exception.js';
+import { DomainExceptionFilter } from '@infrastructure/filter/domain-exception.filter.js';
+import { DomainException } from '@domain/exception/domain.exception.js';
 import { ReviewNotFoundException } from '@review/domain/exception/review-not-found.exception.js';
-import { UnauthorizedDeletionException } from '@review/domain/exception/unauthorized-deletion.exception.js';
-import { DuplicateReviewException } from '@review/domain/exception/duplicate-review.exception.js';
+import { ForbiddenDeletionException } from '@review/domain/exception/forbidden-deletion.exception.js';
+import { ReviewCooldownException } from '@review/domain/exception/review-cooldown.exception.js';
 import { SubjectNotFoundException } from '@review/domain/exception/subject-not-found.exception.js';
 import { InvalidReviewException } from '@review/domain/exception/invalid-review.exception.js';
 
@@ -25,7 +25,7 @@ describe('DomainExceptionFilter', () => {
     } as unknown as ArgumentsHost;
   });
 
-  it('should map ReviewNotFoundException to 404', () => {
+  it('should map *_NOT_FOUND codes to 404', () => {
     filter.catch(new ReviewNotFoundException(), mockHost);
 
     expect(mockStatus).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
@@ -33,38 +33,12 @@ describe('DomainExceptionFilter', () => {
       expect.objectContaining({
         statusCode: 404,
         code: 'REVIEW_NOT_FOUND',
-        message: 'Resource not found',
+        message: 'Review not found',
       }),
     );
   });
 
-  it('should map UnauthorizedDeletionException to 403', () => {
-    filter.catch(new UnauthorizedDeletionException(), mockHost);
-
-    expect(mockStatus).toHaveBeenCalledWith(HttpStatus.FORBIDDEN);
-    expect(mockJson).toHaveBeenCalledWith(
-      expect.objectContaining({
-        statusCode: 403,
-        code: 'UNAUTHORIZED_DELETION',
-        message: 'Action not permitted',
-      }),
-    );
-  });
-
-  it('should map DuplicateReviewException to 409', () => {
-    filter.catch(new DuplicateReviewException(), mockHost);
-
-    expect(mockStatus).toHaveBeenCalledWith(HttpStatus.CONFLICT);
-    expect(mockJson).toHaveBeenCalledWith(
-      expect.objectContaining({
-        statusCode: 409,
-        code: 'DUPLICATE_REVIEW',
-        message: 'Resource already exists',
-      }),
-    );
-  });
-
-  it('should map SubjectNotFoundException to 422', () => {
+  it('should map SUBJECT_NOT_FOUND specifically to 422', () => {
     filter.catch(new SubjectNotFoundException(), mockHost);
 
     expect(mockStatus).toHaveBeenCalledWith(HttpStatus.UNPROCESSABLE_ENTITY);
@@ -72,12 +46,57 @@ describe('DomainExceptionFilter', () => {
       expect.objectContaining({
         statusCode: 422,
         code: 'SUBJECT_NOT_FOUND',
-        message: 'Referenced subject does not exist',
+        message: 'Subject not found',
       }),
     );
   });
 
-  it('should map InvalidReviewException to 400 with exception message', () => {
+  it('should map FORBIDDEN_* codes to 403', () => {
+    filter.catch(new ForbiddenDeletionException(), mockHost);
+
+    expect(mockStatus).toHaveBeenCalledWith(HttpStatus.FORBIDDEN);
+    expect(mockJson).toHaveBeenCalledWith(
+      expect.objectContaining({
+        statusCode: 403,
+        code: 'FORBIDDEN_DELETION',
+        message: 'Not authorized to delete this review',
+      }),
+    );
+  });
+
+  it('should map UNAUTHORIZED_* codes to 401', () => {
+    class UnauthorizedTestException extends DomainException {
+      constructor() {
+        super('Not logged in', 'UNAUTHORIZED_ACCESS');
+      }
+    }
+
+    filter.catch(new UnauthorizedTestException(), mockHost);
+
+    expect(mockStatus).toHaveBeenCalledWith(HttpStatus.UNAUTHORIZED);
+    expect(mockJson).toHaveBeenCalledWith(
+      expect.objectContaining({
+        statusCode: 401,
+        code: 'UNAUTHORIZED_ACCESS',
+        message: 'Not logged in',
+      }),
+    );
+  });
+
+  it('should map *_COOLDOWN codes to 429', () => {
+    filter.catch(new ReviewCooldownException(), mockHost);
+
+    expect(mockStatus).toHaveBeenCalledWith(HttpStatus.TOO_MANY_REQUESTS);
+    expect(mockJson).toHaveBeenCalledWith(
+      expect.objectContaining({
+        statusCode: 429,
+        code: 'REVIEW_COOLDOWN',
+        message: 'Please wait before reviewing this subject again',
+      }),
+    );
+  });
+
+  it('should map INVALID_* codes to 400 with exception message', () => {
     filter.catch(new InvalidReviewException('Bad rating'), mockHost);
 
     expect(mockStatus).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
@@ -90,10 +109,10 @@ describe('DomainExceptionFilter', () => {
     );
   });
 
-  it('should map unmapped DomainException to 500', () => {
+  it('should map unrecognized codes to 500 with generic message', () => {
     class UnknownDomainException extends DomainException {
       constructor() {
-        super('Something broke');
+        super('Something broke', 'UNKNOWN_CODE');
       }
     }
 
