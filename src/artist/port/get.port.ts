@@ -1,11 +1,11 @@
-import { ArtistModel } from '../model';
+import type { ArtistModel, ArtistFilters } from '../model';
 
 export interface IGetArtist {
   /**
-   * Get an artist by name
+   * Get an artist by id (name)
    *
    * @param id The artist name
    * @returns The artists, null if not found
    */
-  get(name: string): Promise<ArtistModel | null>;
+  get(name: ArtistFilters): Promise<ArtistModel | null>;
 }

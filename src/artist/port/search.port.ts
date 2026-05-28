@@ -1,11 +1,11 @@
-import { ArtistModel } from '../model';
+import type { ArtistModel, ArtistFilters } from '../model';
 
 export interface ISearchArtist {
   /**
-   * Search an artist by name
+   * Search an artist
    *
-   * @param name The artist name
+   * @param filters The search filters
    * @returns The artists found
    */
-  search(name: string): Promise<ArtistModel[]>;
+  search(filters: ArtistFilters): Promise<ArtistModel[]>;
 }

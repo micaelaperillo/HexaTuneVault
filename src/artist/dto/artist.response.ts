@@ -4,5 +4,4 @@ export type ArtistResponse = {
   readonly self: `/${string}`;
   readonly albums: `/${string}`;
   readonly reviews: `/${string}`;
-  readonly createdAt?: Date;
 };
