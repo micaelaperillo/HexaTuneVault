@@ -1,18 +1,19 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
-@Module({
-  imports: [
-    TypeOrmModule.forRoot({
+export const postgres = {
+  provide: 'POSTGRES_DB',
+  useFactory: async () => {
+    const dataSource = new DataSource({
       type: 'postgres',
       host: process.env.DB_HOST ?? 'localhost',
       port: parseInt(process.env.DB_PORT ?? '5432', 10),
       username: process.env.DB_USER ?? 'postgres',
       password: process.env.DB_PASSWORD ?? 'postgres',
       database: process.env.DB_NAME ?? 'hexatunevault',
-      autoLoadEntities: true,
       synchronize: process.env.NODE_ENV !== 'production',
-    }),
-  ],
-})
-export class DatabaseModule {}
+      entities: [__dirname + '/../../../entity/**/*.entity.ts'],
+    });
+
+    return dataSource.initialize();
+  },
+};
