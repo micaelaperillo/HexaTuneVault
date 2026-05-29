@@ -1,3 +1,5 @@
+import { readdirSync } from 'node:fs';
+import { join } from 'node:path';
 import { HttpStatus } from '@nestjs/common';
 import type { ArgumentsHost } from '@nestjs/common';
 import { DomainExceptionFilter } from '@infrastructure/filter/domain-exception.filter.js';
@@ -6,6 +8,30 @@ import { ReviewNotFoundException } from '@review/domain/exception/review-not-fou
 import { ForbiddenDeletionException } from '@review/domain/exception/forbidden-deletion.exception.js';
 import { ReviewCooldownException } from '@review/domain/exception/review-cooldown.exception.js';
 import { InvalidReviewException } from '@review/domain/exception/invalid-review.exception.js';
+
+function collectExceptionFiles(dir: string): string[] {
+  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) return collectExceptionFiles(full);
+    // Exclude the shared-kernel base by exact basename so the guard survives
+    // the base file being relocated between directories.
+    return entry.name.endsWith('.exception.ts') &&
+      entry.name !== 'domain.exception.ts'
+      ? [full]
+      : [];
+  });
+}
+
+// Every concrete domain exception must be represented here, paired with the
+// HTTP status it must resolve to. The drift guard below fails if a new
+// *.exception.ts file is added without registering it, catching codes that
+// would silently fall through resolveStatus to 500.
+const concreteExceptions: [DomainException, HttpStatus][] = [
+  [new ReviewNotFoundException(), HttpStatus.NOT_FOUND],
+  [new ForbiddenDeletionException(), HttpStatus.FORBIDDEN],
+  [new ReviewCooldownException(), HttpStatus.TOO_MANY_REQUESTS],
+  [new InvalidReviewException('test'), HttpStatus.BAD_REQUEST],
+];
 
 describe('DomainExceptionFilter', () => {
   let filter: DomainExceptionFilter;
@@ -143,5 +169,29 @@ describe('DomainExceptionFilter', () => {
         message: 'Internal server error',
       }),
     );
+  });
+
+  it.each(
+    concreteExceptions.map(
+      ([exception, status]) => [exception.code, exception, status] as const,
+    ),
+  )('maps %s to its expected status', (_code, exception, expectedStatus) => {
+    filter.catch(exception, mockHost);
+
+    expect(mockStatus).toHaveBeenCalledWith(expectedStatus);
+    expect(mockJson).toHaveBeenCalledWith(
+      expect.objectContaining({
+        statusCode: expectedStatus,
+        code: exception.code,
+        message: exception.message,
+      }),
+    );
+  });
+
+  it('registers every concrete domain exception across all modules', () => {
+    expect(concreteExceptions.length).toBeGreaterThan(0);
+    const srcRoot = join(__dirname, '../..');
+    const files = collectExceptionFiles(srcRoot);
+    expect(files.length).toBe(concreteExceptions.length);
   });
 });
