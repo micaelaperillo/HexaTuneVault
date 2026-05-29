@@ -24,8 +24,8 @@ export class ArtistController {
   private readonly logger = new Logger(ArtistController.name);
 
   constructor(
-    @Inject(GET_ARTIST) readonly getter: IGetArtist,
-    @Inject(SEARCH_ARTIST) readonly searcher: ISearchArtist,
+    @Inject(GET_ARTIST) private readonly getter: IGetArtist,
+    @Inject(SEARCH_ARTIST) private readonly searcher: ISearchArtist,
   ) {}
 
   @Get()

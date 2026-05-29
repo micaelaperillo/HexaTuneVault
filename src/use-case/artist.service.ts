@@ -9,7 +9,9 @@ export { GET_ARTIST, SEARCH_ARTIST } from '../port/artist';
 
 @Injectable()
 export class ArtistService implements ISearchArtist, IGetArtist {
-  constructor(@Inject(ARTIST_PROVIDER) private provider: IArtistProvider) {}
+  constructor(
+    @Inject(ARTIST_PROVIDER) private readonly provider: IArtistProvider,
+  ) {}
 
   search(filter: ArtistFilters): Promise<ArtistModel[]> {
     return this.provider.search(filter);

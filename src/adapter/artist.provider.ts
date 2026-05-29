@@ -14,7 +14,7 @@ export { ARTIST_PROVIDER } from '../repository';
 export class SpotifyArtistProvider implements IArtistProvider {
   private readonly logger = new Logger(SpotifyArtistProvider.name);
 
-  constructor(@Inject(SPOTIFY_API) readonly spotify: SpotifyApi) {}
+  constructor(@Inject(SPOTIFY_API) private readonly spotify: SpotifyApi) {}
 
   /**
    * @override
