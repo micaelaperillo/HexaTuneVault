@@ -1,7 +1,9 @@
 import { DataSource } from 'typeorm';
 
+export const POSTGRES_DB = Symbol('POSTGRES_DB');
+
 export const postgres = {
-  provide: 'POSTGRES_DB',
+  provide: POSTGRES_DB,
   useFactory: async () => {
     const dataSource = new DataSource({
       type: 'postgres',

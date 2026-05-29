@@ -1,7 +1,12 @@
 import type { ArtistResponse } from '../dto';
 import type { ArtistModel } from '../model';
 
-import { ArtistService } from '../use-case/artist.service';
+import {
+  type IGetArtist,
+  GET_ARTIST,
+  type ISearchArtist,
+  SEARCH_ARTIST,
+} from 'src/port';
 
 import {
   BadRequestException,
@@ -11,13 +16,17 @@ import {
   Query,
   NotFoundException,
   Logger,
+  Inject,
 } from '@nestjs/common';
 
 @Controller('api/artists')
 export class ArtistController {
   private readonly logger = new Logger(ArtistController.name);
 
-  constructor(private readonly service: ArtistService) {}
+  constructor(
+    @Inject(GET_ARTIST) readonly getter: IGetArtist,
+    @Inject(SEARCH_ARTIST) readonly searcher: ISearchArtist,
+  ) {}
 
   @Get()
   async search(@Query('q') name: string) {
@@ -25,7 +34,7 @@ export class ArtistController {
 
     if (!name) throw new BadRequestException();
 
-    const results = await this.service.search({ name });
+    const results = await this.searcher.search({ name });
 
     return results.map(ArtistController.toResponse);
   }
@@ -34,7 +43,7 @@ export class ArtistController {
   async get(@Param('name') name: string) {
     this.logger.debug(`Getting artist with name=${name}`);
 
-    const artist = await this.service.get({ name });
+    const artist = await this.getter.get({ name });
     if (!artist) throw new NotFoundException();
 
     return ArtistController.toResponse(artist);
