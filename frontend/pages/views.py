@@ -16,7 +16,8 @@ from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import redirect, render
 
-from . import api_client
+from .clients import api_client
+from .clients import artist_client
 
 
 def login_required_api(view):
@@ -155,13 +156,13 @@ def music_search(request, query):
         if genre and query:
             query += '/?genre=' + genre
         return redirect('/music/' + query)
-    params = {
-        'q': query,
-        'genre': request.GET.get('genre'),
-        'album_type': request.GET.get('album_type'),
-        'market': request.GET.get('market'),
+    artists = artist_client.search(query, request=request)
+    context = {
+        'result': [
+            {'query': query, 'vaults': artists},  
+            {'query': query, 'vaults': []},       #Albums tab (TODO: album API)
+        ],
     }
-    context = api_client.get_json('/api/music/search', request=request, params=params, default={}) or {}
     return render(request, 'searchMusic.html', context)
 
 
@@ -221,8 +222,18 @@ def members_search(request, query):
 def all_search(request, query):
     if request.method == 'POST':
         return redirect('/search/' + request.POST.get('query', ''))
-    params = {'q': query, 'market': request.GET.get('market')}
-    context = api_client.get_json('/api/search', request=request, params=params, default={}) or {}
+    # Only the artist API is live; other sections await their APIs.
+    artists = artist_client.search(query, request=request)
+    context = {
+        'result': [
+            {'query': query, 'vaults': artists},  # 0 -> Artists
+            {'query': query, 'vaults': []},       # 1 -> Albums
+            {'query': query, 'vaults': []},       # 2 -> Podcasts
+            {'query': query, 'vaults': []},       # 3 -> Episodes
+            {'query': query, 'members': []},      # 4 -> Artist members
+            {'query': query, 'members': []},      # 5 -> Members
+        ],
+    }
     return render(request, 'searchResult.html', context)
 
 
@@ -235,7 +246,21 @@ def vault(request, vtype, id):
         })
         return redirect(request.path)
 
-    context = api_client.get_json(f'/api/vaults/{vtype}/{id}', request=request, default={}) or {}
+    if vtype == 'artist':
+        artist = artist_client.get(id, request=request)
+        context = {}
+        if artist is not None:
+            context['vault'] = {
+                'type': 'artist',
+                'title': artist['artist'],
+                'spotifyimg': artist['image'],
+                'id': id,
+                # For an artist, the "author" is itself (name + avatar).
+                'authors': [{'name': artist['artist'], 'image': artist['image']}],
+            }
+    else:
+        context = api_client.get_json(f'/api/vaults/{vtype}/{id}', request=request, default={}) or {}
+
     context.update({
         'vault_id': id,
         'is_post': True,

@@ -5,7 +5,7 @@ Reads the ``token`` cookie, asks the REST API who it belongs to
 ``ApiUser``. Anonymous requests get an empty ``ApiUser``.
 """
 
-from . import api_client
+from .clients import api_client
 from .auth import ApiUser
 
 
