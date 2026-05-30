@@ -1,4 +1,5 @@
 import { DataSource } from 'typeorm';
+import * as entities from '../../../entity';
 
 export const POSTGRES_DB = Symbol('POSTGRES_DB');
 
@@ -13,7 +14,7 @@ export const postgres = {
       password: process.env.DB_PASSWORD ?? 'postgres',
       database: process.env.DB_NAME ?? 'hexatunevault',
       synchronize: process.env.NODE_ENV !== 'production',
-      entities: [__dirname + '/../../../entity/**/*.entity.ts'],
+      entities: Object.values(entities),
     });
 
     return dataSource.initialize();
