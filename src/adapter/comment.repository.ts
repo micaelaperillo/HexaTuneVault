@@ -1,5 +1,4 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { Inject, Injectable } from '@nestjs/common';
 import { ILike, Repository, QueryFailedError } from 'typeorm';
 import { CommentEntity } from '../entity/comment.entity';
 import { ICommentRepository } from '../repository/i-comment.repository';
@@ -7,11 +6,12 @@ import { AssociatedType } from '../model/associated-type.enum';
 import { CommentModel } from '../model/comment.model';
 import { CommentFilters } from '../model/comment-filters.model';
 import { CommentDBException } from '../error/comment/comment-db.exception';
+import { POSTGRES_DB } from '../infrastructure/database/provider/postgres.provider';
 
 @Injectable()
 export class CommentRepository implements ICommentRepository {
   constructor(
-    @InjectRepository(CommentEntity)
+    @Inject(POSTGRES_DB)
     private repo: Repository<CommentEntity>,
   ) {}
 
