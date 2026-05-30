@@ -34,7 +34,7 @@ export class CommentRepository implements ICommentRepository {
   }
 
   async findByAssociatedId(
-    associatedId: number,
+    associatedId: string,
     associatedType: AssociatedType,
   ): Promise<CommentModel[]> {
     return this.run(() =>
@@ -42,7 +42,7 @@ export class CommentRepository implements ICommentRepository {
     );
   }
 
-  async addLike(commentId: number, userId: number): Promise<void> {
+  async addLike(commentId: number, userId: string): Promise<void> {
     const comment = await this.run(() =>
       this.repo.findOneBy({ id: commentId }),
     );
@@ -52,7 +52,7 @@ export class CommentRepository implements ICommentRepository {
     }
   }
 
-  async removeLike(commentId: number, userId: number): Promise<void> {
+  async removeLike(commentId: number, userId: string): Promise<void> {
     const comment = await this.run(() =>
       this.repo.findOneBy({ id: commentId }),
     );

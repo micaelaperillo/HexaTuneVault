@@ -52,7 +52,7 @@ export class CommentService
     return comment;
   }
 
-  async like(commentId: number, userId: number): Promise<void> {
+  async like(commentId: number, userId: string): Promise<void> {
     const comment = await this.repo.findById(commentId);
     if (!comment) {
       throw new CommentNotFoundException(commentId);
@@ -63,7 +63,7 @@ export class CommentService
     await this.repo.addLike(commentId, userId);
   }
 
-  async unlike(commentId: number, userId: number): Promise<void> {
+  async unlike(commentId: number, userId: string): Promise<void> {
     const comment = await this.repo.findById(commentId);
     if (!comment) {
       throw new CommentNotFoundException(commentId);

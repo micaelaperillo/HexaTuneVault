@@ -10,13 +10,13 @@ export class CommentResponseDto {
   @Expose()
   createdAt!: Date;
   @Expose()
-  createdBy!: number;
+  createdBy!: string;
   @Expose()
-  associatedTo!: number;
+  associatedTo!: string;
   @Expose()
   associatedType!: AssociatedType;
   @Expose()
-  likedBy!: number[];
+  likedBy!: string[];
 
   static from(model: CommentModel): CommentResponseDto {
     return plainToInstance(CommentResponseDto, model, {

@@ -1,10 +1,4 @@
-import {
-  IsEnum,
-  IsInt,
-  IsNotEmpty,
-  IsPositive,
-  IsString,
-} from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import { AssociatedType } from '../model/associated-type.enum';
 
 export class CreateCommentDto {
@@ -14,11 +8,11 @@ export class CreateCommentDto {
 
   @IsString()
   @IsNotEmpty()
-  createdBy!: number;
+  createdBy!: string;
 
-  @IsInt()
-  @IsPositive()
-  associatedTo!: number;
+  @IsString()
+  @IsNotEmpty()
+  associatedTo!: string;
 
   @IsEnum(AssociatedType)
   associatedType!: AssociatedType;

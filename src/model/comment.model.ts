@@ -4,8 +4,8 @@ export interface CommentModel {
   id: number;
   content: string;
   createdAt: Date;
-  createdBy: number;
-  associatedTo: number;
+  createdBy: string;
+  associatedTo: string;
   associatedType: AssociatedType;
-  likedBy: number[];
+  likedBy: string[];
 }

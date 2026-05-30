@@ -1,10 +1,10 @@
-import { IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { AssociatedType } from '../model/associated-type.enum';
 
 export class CommentFiltersDto {
   @IsOptional()
-  @IsInt()
-  createdBy?: number;
+  @IsString()
+  createdBy?: string;
 
   @IsOptional()
   @IsString()

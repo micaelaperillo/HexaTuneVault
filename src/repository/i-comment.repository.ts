@@ -11,10 +11,10 @@ export interface ICommentRepository {
   findById(id: number): Promise<CommentModel | null>;
   search(filters: CommentFilters): Promise<CommentModel[]>;
   findByAssociatedId(
-    associatedId: number,
+    associatedId: string,
     associatedType: AssociatedType,
   ): Promise<CommentModel[]>;
   deleteById(id: number): Promise<void>;
-  addLike(commentId: number, userId: number): Promise<void>;
-  removeLike(commentId: number, userId: number): Promise<void>;
+  addLike(commentId: number, userId: string): Promise<void>;
+  removeLike(commentId: number, userId: string): Promise<void>;
 }

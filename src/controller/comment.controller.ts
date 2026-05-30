@@ -84,7 +84,7 @@ export class CommentController {
   @Patch(':id/like')
   async like(
     @Param('id', ParseIntPipe) id: number,
-    @Body('user_id', ParseIntPipe) userId: number,
+    @Body('user_id', ParseIntPipe) userId: string,
   ): Promise<void> {
     await this.likeComment.like(id, userId);
   }
@@ -92,7 +92,7 @@ export class CommentController {
   @Patch(':id/unlike')
   async unlike(
     @Param('id', ParseIntPipe) id: number,
-    @Body('user_id', ParseIntPipe) userId: number,
+    @Body('user_id', ParseIntPipe) userId: string,
   ): Promise<void> {
     await this.unlikeComment.unlike(id, userId);
   }

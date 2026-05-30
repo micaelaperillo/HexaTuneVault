@@ -17,11 +17,11 @@ export class CommentEntity {
   @CreateDateColumn()
   createdAt!: Date;
 
-  @Column()
-  createdBy!: number;
+  @Column({ default: '' })
+  createdBy!: string;
 
-  @Column()
-  associatedTo!: number;
+  @Column({ default: '' })
+  associatedTo!: string;
 
   @Column({
     type: 'enum',
@@ -29,6 +29,6 @@ export class CommentEntity {
   })
   associatedType!: AssociatedType;
 
-  @Column('int', { array: true, default: '{}' })
-  likedBy!: number[];
+  @Column('text', { array: true, default: '{}' })
+  likedBy!: string[];
 }
