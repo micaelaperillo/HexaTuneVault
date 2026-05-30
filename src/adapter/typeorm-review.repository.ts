@@ -8,7 +8,6 @@ import type { PaginatedResult } from '../port/paginated-result';
 import type { SearchCriteria } from '../model/search-criteria';
 import { SortField, SortOrder } from '../model/search-criteria';
 import type { IReviewRepository } from '../repository/review-repository.port';
-import { ReviewMapper } from '../repository/review.mapper';
 
 const SORT_FIELD_COLUMN: Record<SortField, string> = {
   [SortField.CREATED_AT]: 'review.createdAt',
@@ -23,14 +22,14 @@ export class TypeOrmReviewRepository implements IReviewRepository {
   ) {}
 
   async save(review: ReviewModel): Promise<ReviewModel> {
-    const entity = ReviewMapper.toEntity(review);
+    const entity = this.toEntity(review);
     const saved = await this.repo.save(entity);
-    return ReviewMapper.toDomain(saved);
+    return this.toModel(saved);
   }
 
   async findById(id: number): Promise<ReviewModel | null> {
     const entity = await this.repo.findOne({ where: { id } });
-    return entity ? ReviewMapper.toDomain(entity) : null;
+    return entity ? this.toModel(entity) : null;
   }
 
   async findRecentByAuthorAndSubject(
@@ -46,7 +45,7 @@ export class TypeOrmReviewRepository implements IReviewRepository {
         createdAt: MoreThan(since),
       },
     });
-    return entity ? ReviewMapper.toDomain(entity) : null;
+    return entity ? this.toModel(entity) : null;
   }
 
   async delete(id: number): Promise<void> {
@@ -106,6 +105,35 @@ export class TypeOrmReviewRepository implements IReviewRepository {
     qb.take(criteria.pageSize);
 
     const [entities, total] = await qb.getManyAndCount();
-    return { data: entities.map((e) => ReviewMapper.toDomain(e)), total };
+    return { data: entities.map((e) => this.toModel(e)), total };
+  }
+
+  private toModel(entity: ReviewEntity): ReviewModel {
+    return ReviewModel.reconstitute({
+      id: entity.id,
+      subjectRef: new SubjectReference(entity.subjectType, entity.subjectId),
+      content: entity.content,
+      rating: entity.rating,
+      createdAt: entity.createdAt,
+      authorId: entity.authorId,
+      updatedAt: entity.updatedAt,
+    });
+  }
+
+  private toEntity(model: ReviewModel): ReviewEntity {
+    const entity = new ReviewEntity();
+    if (model.id !== undefined) {
+      entity.id = model.id;
+    }
+    entity.content = model.content;
+    entity.rating = model.rating;
+    entity.subjectType = model.subjectRef.type;
+    entity.subjectId = model.subjectRef.id;
+    entity.authorId = model.authorId;
+    if (model.createdAt !== undefined) {
+      entity.createdAt = model.createdAt;
+    }
+    entity.updatedAt = model.updatedAt;
+    return entity;
   }
 }
