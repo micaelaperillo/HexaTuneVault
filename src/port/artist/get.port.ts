@@ -1,5 +1,7 @@
 import type { ArtistModel, ArtistFilters } from '../../model';
 
+export const GET_ARTIST = Symbol('IGetArtist');
+
 export interface IGetArtist {
   /**
    * Get an artist by filter

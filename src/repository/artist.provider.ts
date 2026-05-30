@@ -4,6 +4,8 @@ import type { ArtistModel, ArtistFilters } from '../model';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { ArtistProviderError } from '../error/artist';
 
+export const ARTIST_PROVIDER = Symbol('IArtistProvider');
+
 export interface IArtistProvider {
   /**
    * Search for an artist given a filter

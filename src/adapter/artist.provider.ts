@@ -1,17 +1,20 @@
 import type { SpotifyApi, Artist } from '@spotify/web-api-ts-sdk';
 
-import type { IArtistProvider } from '../repository/artist.provider';
 import type { ArtistModel, ArtistFilters } from '../model';
+import type { IArtistProvider } from '../repository';
 
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
+import { SPOTIFY_API } from '../infrastructure/api/provider';
 import { ArtistProviderError } from '../error/artist';
+
+export { ARTIST_PROVIDER } from '../repository';
 
 @Injectable()
 export class SpotifyArtistProvider implements IArtistProvider {
   private readonly logger = new Logger(SpotifyArtistProvider.name);
 
-  constructor(@Inject('SPOTIFY_API') readonly spotify: SpotifyApi) {}
+  constructor(@Inject(SPOTIFY_API) private readonly spotify: SpotifyApi) {}
 
   /**
    * @override

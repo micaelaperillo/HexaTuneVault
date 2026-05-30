@@ -1,5 +1,7 @@
 import type { ArtistModel, ArtistFilters } from '../../model';
 
+export const SEARCH_ARTIST = Symbol('ISearchArtist');
+
 export interface ISearchArtist {
   /**
    * Search an artist
