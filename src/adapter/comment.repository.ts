@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ILike, Repository, QueryFailedError } from 'typeorm';
+import { DataSource, ILike, Repository, QueryFailedError } from 'typeorm';
 import { CommentEntity } from '../entity/comment.entity';
 import { ICommentRepository } from '../repository/i-comment.repository';
 import { AssociatedType } from '../model/associated-type.enum';
@@ -10,10 +10,14 @@ import { POSTGRES_DB } from '../infrastructure/database/provider/postgres.provid
 
 @Injectable()
 export class CommentRepository implements ICommentRepository {
+  private repo: Repository<CommentEntity>;
+
   constructor(
     @Inject(POSTGRES_DB)
-    private repo: Repository<CommentEntity>,
-  ) {}
+    dataSource: DataSource,
+  ) {
+    this.repo = dataSource.getRepository(CommentEntity);
+  }
 
   async create(
     comment: Omit<CommentModel, 'id' | 'createdAt' | 'likedBy'>,
