@@ -156,7 +156,8 @@ def music_search(request, query):
         if genre and query:
             query += '/?genre=' + genre
         return redirect('/music/' + query)
-    artists = artist_client.search(query, request=request)
+    genre = request.GET.get('genre', '')
+    artists = artist_client.search(query, genre, request=request)
     context = {
         'result': [
             {'query': query, 'vaults': artists},  

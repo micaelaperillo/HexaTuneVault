@@ -1,10 +1,16 @@
 from . import api_client
 
 
-def search(query: str, request=None) -> list[dict]:
-    """Search artists by name. Returns template-ready dicts (possibly empty)."""
+def search(query: str, genre: str = '', request=None) -> list[dict]:
+    """Search artists by name, optionally filtered by ``genre``.
+
+    Returns template-ready dicts (possibly empty).
+    """
+    params = {'q': query}
+    if genre:
+        params['genre'] = genre
     data = api_client.get_json(
-        '/api/artists', request=request, params={'q': query}, default=[]
+        '/api/artists', request=request, params=params, default=[]
     )
     if not isinstance(data, list):
         return []
