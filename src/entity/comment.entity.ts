@@ -4,7 +4,7 @@ import {
   Column,
   CreateDateColumn,
 } from 'typeorm';
-import { AssociatedType } from '../model/associated-type';
+import { AssociatedType } from '../model/comment.associated.type';
 
 @Entity('comments')
 export class CommentEntity {

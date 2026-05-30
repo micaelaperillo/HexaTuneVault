@@ -1,4 +1,4 @@
-import { AssociatedType } from './associated-type';
+import { AssociatedType } from './comment.associated.type';
 
 export interface CommentFilters {
   createdBy?: string;

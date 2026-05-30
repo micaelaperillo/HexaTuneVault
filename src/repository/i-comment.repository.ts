@@ -1,4 +1,4 @@
-import type { AssociatedType } from '../model/associated-type';
+import type { AssociatedType } from '../model/comment.associated.type';
 import type { CommentFilters } from '../model/comment.filter';
 import type { CommentModel } from '../model';
 

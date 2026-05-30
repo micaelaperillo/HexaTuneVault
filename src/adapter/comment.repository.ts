@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { DataSource, ILike, Repository, QueryFailedError } from 'typeorm';
 import { CommentEntity } from '../entity/comment.entity';
 import { ICommentRepository } from '../repository/i-comment.repository';
-import { AssociatedType } from '../model/associated-type';
+import { AssociatedType } from '../model/comment.associated.type';
 import { CommentModel } from '../model/comment.model';
 import { CommentFilters } from '../model/comment.filter';
 import { CommentDBException } from '../error/comment/comment-db.exception';

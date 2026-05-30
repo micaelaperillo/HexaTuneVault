@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { AssociatedType } from '../model/associated-type';
+import { AssociatedType } from '../model/comment.associated.type';
 
 export class CreateCommentDto {
   @IsString()

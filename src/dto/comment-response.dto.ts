@@ -1,4 +1,4 @@
-import { AssociatedType } from '../model/associated-type';
+import { AssociatedType } from '../model/comment.associated.type';
 import { Expose, plainToInstance } from 'class-transformer';
 import { CommentModel } from '../model/comment.model';
 
