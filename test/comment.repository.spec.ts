@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { QueryFailedError } from 'typeorm';
-import { CommentRepository } from '../adapter/comment.repository';
-import { POSTGRES_DB } from '../infrastructure/database/provider/postgres.provider';
-import { CommentDBException } from '../error/comment/comment-db.exception';
-import { AssociatedType } from '../model/comment.associated.type';
+import { CommentRepository } from '../src/adapter/comment.repository';
+import { POSTGRES_DB } from '../src/infrastructure/database/provider/postgres.provider';
+import { CommentDBException } from '../src/error/comment/comment-db.exception';
+import { AssociatedType } from '../src/model/comment.associated.type';
 
 describe('CommentRepository', () => {
   let repository: CommentRepository;

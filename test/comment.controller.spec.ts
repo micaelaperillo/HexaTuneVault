@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CommentController } from '../controller/comment.controller';
+import { CommentController } from '../src/controller/comment.controller';
 import {
   CREATE_COMMENT,
   DELETE_COMMENT,
@@ -8,12 +8,12 @@ import {
   GET_COMMENT_LIKES,
   LIKE_COMMENT,
   UNLIKE_COMMENT,
-} from '../port/comment/';
-import { CommentModel } from '../model/comment.model';
-import { AssociatedType } from '../model/comment.associated.type';
-import { CommentResponseDto } from '../dto/comment-response.dto';
-import { UserLinkDto } from '../dto/user-link.dto';
-import { CreateCommentDto } from '../dto/create-comment.dto';
+} from '../src/port/comment';
+import { CommentModel } from '../src/model/comment.model';
+import { AssociatedType } from '../src/model/comment.associated.type';
+import { CommentResponseDto } from '../src/dto/comment-response.dto';
+import { UserLinkDto } from '../src/dto/user-link.dto';
+import { CreateCommentDto } from '../src/dto/create-comment.dto';
 
 describe('CommentController', () => {
   let controller: CommentController;

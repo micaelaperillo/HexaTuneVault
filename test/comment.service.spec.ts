@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CommentService } from '../use-case/comment.service';
-import { COMMENT_REPOSITORY } from '../repository/i-comment.repository';
-import { CommentModel } from '../model/comment.model';
-import { AssociatedType } from '../model/comment.associated.type';
-import { CommentNotFoundException } from '../error/comment/comment-not-found.exception';
-import { AlreadyLikedException } from '../error/comment/already-liked.exception';
-import { NotLikedException } from '../error/comment/not-liked.exception';
+import { CommentService } from '../src/use-case/comment.service';
+import { COMMENT_REPOSITORY } from '../src/repository/i-comment.repository';
+import { CommentModel } from '../src/model/comment.model';
+import { AssociatedType } from '../src/model/comment.associated.type';
+import { CommentNotFoundException } from '../src/error/comment/comment-not-found.exception';
+import { AlreadyLikedException } from '../src/error/comment/already-liked.exception';
+import { NotLikedException } from '../src/error/comment/not-liked.exception';
 
 describe('CommentService', () => {
   let service: CommentService;
