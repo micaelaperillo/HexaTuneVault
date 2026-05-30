@@ -34,7 +34,7 @@ export class TypeOrmReviewRepository implements IReviewRepository {
   }
 
   async findRecentByAuthorAndSubject(
-    authorId: number,
+    authorId: string,
     ref: SubjectReference,
     since: Date,
   ): Promise<ReviewModel | null> {

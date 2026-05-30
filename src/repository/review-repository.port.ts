@@ -7,7 +7,7 @@ export interface IReviewRepository {
   save(review: ReviewModel): Promise<ReviewModel>;
   findById(id: number): Promise<ReviewModel | null>;
   findRecentByAuthorAndSubject(
-    authorId: number,
+    authorId: string,
     ref: SubjectReference,
     since: Date,
   ): Promise<ReviewModel | null>;

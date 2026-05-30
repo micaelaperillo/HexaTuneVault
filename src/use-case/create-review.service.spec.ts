@@ -24,33 +24,33 @@ describe('CreateReviewService', () => {
     reviewRepo.findRecentByAuthorAndSubject.mockResolvedValue(null);
     const mockCreatedReview = ReviewModel.reconstitute({
       id: 1,
-      subjectRef: new SubjectReference(SubjectType.ALBUM, 1),
+      subjectRef: new SubjectReference(SubjectType.ALBUM, '1'),
       content: 'Great stuff',
       rating: 5,
       createdAt: new Date(),
-      authorId: 1,
+      authorId: '1',
       updatedAt: null,
     });
     reviewRepo.save.mockResolvedValue(mockCreatedReview);
 
     const result = await service.execute({
       subjectType: SubjectType.ALBUM,
-      subjectId: 1,
+      subjectId: '1',
       content: 'Great stuff',
       rating: 5,
-      authorId: 1,
+      authorId: '1',
     });
 
     expect(reviewRepo.findRecentByAuthorAndSubject).toHaveBeenCalledWith(
-      1,
-      expect.objectContaining({ type: SubjectType.ALBUM, id: 1 }),
+      '1',
+      expect.objectContaining({ type: SubjectType.ALBUM, id: '1' }),
       expect.any(Date),
     );
     expect(reviewRepo.save).toHaveBeenCalledWith(
       expect.objectContaining({
         content: 'Great stuff',
         rating: 5,
-        authorId: 1,
+        authorId: '1',
       }),
     );
     expect(result).toEqual(mockCreatedReview);
@@ -58,20 +58,20 @@ describe('CreateReviewService', () => {
 
   it('should throw ReviewCooldownException if user reviewed this subject recently', async () => {
     const existingReview = ReviewModel.create({
-      subjectRef: new SubjectReference(SubjectType.ALBUM, 1),
+      subjectRef: new SubjectReference(SubjectType.ALBUM, '1'),
       content: 'Old',
       rating: 4,
-      authorId: 1,
+      authorId: '1',
     });
     reviewRepo.findRecentByAuthorAndSubject.mockResolvedValue(existingReview);
 
     await expect(
       service.execute({
         subjectType: SubjectType.ALBUM,
-        subjectId: 1,
+        subjectId: '1',
         content: 'New content',
         rating: 3,
-        authorId: 1,
+        authorId: '1',
       }),
     ).rejects.toThrow(ReviewCooldownException);
 
@@ -83,10 +83,10 @@ describe('CreateReviewService', () => {
     await expect(
       service.execute({
         subjectType: SubjectType.ALBUM,
-        subjectId: 1,
+        subjectId: '1',
         content: 'Great stuff',
         rating: 0,
-        authorId: 1,
+        authorId: '1',
       }),
     ).rejects.toThrow(InvalidReviewException);
 

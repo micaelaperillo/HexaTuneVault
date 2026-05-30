@@ -24,11 +24,11 @@ describe('GetReviewService', () => {
   it('should return the review when found', async () => {
     const review = ReviewModel.reconstitute({
       id: 1,
-      subjectRef: new SubjectReference(SubjectType.ALBUM, 1),
+      subjectRef: new SubjectReference(SubjectType.ALBUM, '1'),
       content: 'Okay',
       rating: 3,
       createdAt: new Date(),
-      authorId: 1,
+      authorId: '1',
       updatedAt: null,
     });
 

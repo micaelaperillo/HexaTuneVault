@@ -1,4 +1,12 @@
-import { IsString, Length, IsEnum, IsInt, Min, Max } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  Length,
+  IsEnum,
+  IsInt,
+  Min,
+  Max,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 import { SubjectType } from '@model/subject-reference.js';
 import {
@@ -19,9 +27,9 @@ export class CreateReviewRequest {
   @IsEnum(SubjectType)
   subject_type!: SubjectType;
 
-  @IsInt()
-  @Min(1)
-  subject_id!: number;
+  @IsString()
+  @IsNotEmpty()
+  subject_id!: string;
 
   @IsInt()
   @Min(RATING_MIN)

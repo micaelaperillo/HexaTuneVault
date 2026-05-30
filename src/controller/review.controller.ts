@@ -29,7 +29,7 @@ import {
   GET_REVIEW,
 } from '@port/review/tokens.js';
 
-@Controller('reviews')
+@Controller('api/reviews')
 export class ReviewController {
   constructor(
     @Inject(CREATE_REVIEW) private readonly createReview: ICreateReview,
@@ -45,7 +45,7 @@ export class ReviewController {
     @Req() req: Request,
   ): Promise<ReviewResponse> {
     // TODO: replace hardcoded userId with @CurrentUser() from AuthGuard
-    const userId = 1;
+    const userId = '1';
     const review = await this.createReview.execute({
       content: dto.content,
       rating: dto.rating,
@@ -56,7 +56,7 @@ export class ReviewController {
     const response = ReviewResponse.fromDomain(review);
     res.header(
       'Location',
-      `${req.protocol}://${req.get('host')}/reviews/${response.id}`,
+      `${req.protocol}://${req.get('host')}/api/reviews/${response.id}`,
     );
     return response;
   }
@@ -84,7 +84,7 @@ export class ReviewController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     // TODO: replace hardcoded userId with @CurrentUser() from AuthGuard
-    const userId = 1;
+    const userId = '1';
     await this.deleteReview.execute({ reviewId: id, requesterId: userId });
   }
 }

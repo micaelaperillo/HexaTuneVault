@@ -14,7 +14,7 @@ export class ReviewModel {
     public readonly content: string,
     public readonly rating: number,
     public readonly createdAt: Date | undefined,
-    public readonly authorId: number,
+    public readonly authorId: string,
     public readonly updatedAt: Date | null,
   ) {}
 
@@ -22,7 +22,7 @@ export class ReviewModel {
     subjectRef: SubjectReference;
     content: string;
     rating: number;
-    authorId: number;
+    authorId: string;
   }): ReviewModel {
     if (
       !Number.isInteger(params.rating) ||
@@ -59,7 +59,7 @@ export class ReviewModel {
     content: string;
     rating: number;
     createdAt: Date;
-    authorId: number;
+    authorId: string;
     updatedAt: Date | null;
   }): ReviewModel {
     if (!Number.isInteger(params.id) || params.id < 1) {
@@ -83,7 +83,7 @@ export class ReviewModel {
     );
   }
 
-  isOwnedBy(userId: number): boolean {
+  isOwnedBy(userId: string): boolean {
     return this.authorId === userId;
   }
 }

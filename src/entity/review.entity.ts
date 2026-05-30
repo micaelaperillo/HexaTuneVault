@@ -29,11 +29,11 @@ export class ReviewEntity {
   })
   subjectType!: SubjectType;
 
-  @Column({ name: 'subject_id', type: 'int' })
-  subjectId!: number;
+  @Column({ name: 'subject_id', type: 'varchar', default: '' })
+  subjectId!: string;
 
-  @Column({ name: 'author_id', type: 'int' })
-  authorId!: number;
+  @Column({ name: 'author_id', type: 'varchar', default: '' })
+  authorId!: string;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt!: Date;

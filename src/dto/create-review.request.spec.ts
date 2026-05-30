@@ -18,7 +18,7 @@ describe('CreateReviewRequest', () => {
     const dto = transform({
       content: '  Great album!  ',
       subject_type: SubjectType.ALBUM,
-      subject_id: 1,
+      subject_id: '1',
       rating: 5,
     });
     expect(dto.content).toBe('Great album!');
@@ -28,7 +28,7 @@ describe('CreateReviewRequest', () => {
     const dto = transform({
       content: 123,
       subject_type: SubjectType.ALBUM,
-      subject_id: 1,
+      subject_id: '1',
       rating: 5,
     });
     expect(dto.content).toBe(123);
@@ -39,7 +39,7 @@ describe('CreateReviewRequest', () => {
       validate({
         content: 'Great album!',
         subject_type: SubjectType.ALBUM,
-        subject_id: 1,
+        subject_id: '1',
         rating: 5,
       }),
     ).toHaveLength(0);
@@ -49,7 +49,7 @@ describe('CreateReviewRequest', () => {
     const msgs = validate({
       content: 'Test',
       subject_type: SubjectType.ALBUM,
-      subject_id: 1,
+      subject_id: '1',
       rating: 6,
     });
     expect(msgs.length).toBeGreaterThan(0);
@@ -59,7 +59,7 @@ describe('CreateReviewRequest', () => {
     const msgs = validate({
       content: 'Test',
       subject_type: SubjectType.ALBUM,
-      subject_id: 1,
+      subject_id: '1',
       rating: 0,
     });
     expect(msgs.length).toBeGreaterThan(0);
@@ -69,7 +69,7 @@ describe('CreateReviewRequest', () => {
     const msgs = validate({
       content: '',
       subject_type: SubjectType.ALBUM,
-      subject_id: 1,
+      subject_id: '1',
       rating: 5,
     });
     expect(msgs.length).toBeGreaterThan(0);
@@ -79,7 +79,7 @@ describe('CreateReviewRequest', () => {
     const msgs = validate({
       content: 'Test',
       subject_type: 'invalid',
-      subject_id: 1,
+      subject_id: '1',
       rating: 5,
     });
     expect(msgs.length).toBeGreaterThan(0);
@@ -90,11 +90,11 @@ describe('CreateReviewRequest', () => {
     expect(msgs.length).toBeGreaterThan(0);
   });
 
-  it('should fail when subject_id is less than 1', () => {
+  it('should fail when subject_id is an empty string', () => {
     const msgs = validate({
       content: 'Test',
       subject_type: SubjectType.ALBUM,
-      subject_id: 0,
+      subject_id: '',
       rating: 5,
     });
     expect(msgs.length).toBeGreaterThan(0);

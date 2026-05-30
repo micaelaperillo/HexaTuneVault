@@ -3,7 +3,7 @@ import { SubjectReference, SubjectType } from './subject-reference.js';
 import { InvalidReviewException } from '@error/review/invalid-review.exception.js';
 
 describe('ReviewModel', () => {
-  const validSubjectRef = new SubjectReference(SubjectType.ALBUM, 1);
+  const validSubjectRef = new SubjectReference(SubjectType.ALBUM, '1');
 
   describe('create', () => {
     it('should create a valid ReviewModel', () => {
@@ -11,13 +11,13 @@ describe('ReviewModel', () => {
         subjectRef: validSubjectRef,
         content: 'Great album!',
         rating: 5,
-        authorId: 1,
+        authorId: '1',
       });
 
       expect(review.subjectRef).toBe(validSubjectRef);
       expect(review.content).toBe('Great album!');
       expect(review.rating).toBe(5);
-      expect(review.authorId).toBe(1);
+      expect(review.authorId).toBe('1');
       expect(review.id).toBeUndefined();
       expect(review.createdAt).toBeUndefined();
       expect(review.updatedAt).toBeNull();
@@ -29,7 +29,7 @@ describe('ReviewModel', () => {
           subjectRef: validSubjectRef,
           content: 'Awful',
           rating: 0,
-          authorId: 1,
+          authorId: '1',
         });
       }).toThrow(InvalidReviewException);
     });
@@ -40,7 +40,7 @@ describe('ReviewModel', () => {
           subjectRef: validSubjectRef,
           content: 'Amazing',
           rating: 6,
-          authorId: 1,
+          authorId: '1',
         });
       }).toThrow(InvalidReviewException);
     });
@@ -51,7 +51,7 @@ describe('ReviewModel', () => {
           subjectRef: validSubjectRef,
           content: 'Good',
           rating: 4.5,
-          authorId: 1,
+          authorId: '1',
         });
       }).toThrow(InvalidReviewException);
     });
@@ -62,7 +62,7 @@ describe('ReviewModel', () => {
           subjectRef: validSubjectRef,
           content: '   ',
           rating: 5,
-          authorId: 1,
+          authorId: '1',
         });
       }).toThrow(InvalidReviewException);
     });
@@ -73,7 +73,7 @@ describe('ReviewModel', () => {
           subjectRef: validSubjectRef,
           content: 'a'.repeat(501),
           rating: 5,
-          authorId: 1,
+          authorId: '1',
         });
       }).toThrow(InvalidReviewException);
     });
@@ -83,7 +83,7 @@ describe('ReviewModel', () => {
         subjectRef: validSubjectRef,
         content: 'a'.repeat(500),
         rating: 5,
-        authorId: 1,
+        authorId: '1',
       });
       expect(review.content).toHaveLength(500);
     });
@@ -93,7 +93,7 @@ describe('ReviewModel', () => {
         subjectRef: validSubjectRef,
         content: 'Okay',
         rating: 1,
-        authorId: 1,
+        authorId: '1',
       });
       expect(review.rating).toBe(1);
     });
@@ -103,7 +103,7 @@ describe('ReviewModel', () => {
         subjectRef: validSubjectRef,
         content: 'Amazing',
         rating: 5,
-        authorId: 1,
+        authorId: '1',
       });
       expect(review.rating).toBe(5);
     });
@@ -113,7 +113,7 @@ describe('ReviewModel', () => {
         subjectRef: validSubjectRef,
         content: '  Great album!  ',
         rating: 4,
-        authorId: 1,
+        authorId: '1',
       });
       expect(review.content).toBe('Great album!');
     });
@@ -128,7 +128,7 @@ describe('ReviewModel', () => {
         content: 'Reconstituted',
         rating: 4,
         createdAt: date,
-        authorId: 1,
+        authorId: '1',
         updatedAt: null,
       });
 
@@ -136,7 +136,7 @@ describe('ReviewModel', () => {
       expect(review.content).toBe('Reconstituted');
       expect(review.rating).toBe(4);
       expect(review.createdAt).toBe(date);
-      expect(review.authorId).toBe(1);
+      expect(review.authorId).toBe('1');
       expect(review.subjectRef).toBe(validSubjectRef);
       expect(review.updatedAt).toBeNull();
     });
@@ -150,7 +150,7 @@ describe('ReviewModel', () => {
         content: 'Updated',
         rating: 4,
         createdAt: date,
-        authorId: 1,
+        authorId: '1',
         updatedAt,
       });
       expect(review.updatedAt).toBe(updatedAt);
@@ -160,11 +160,11 @@ describe('ReviewModel', () => {
       expect(() =>
         ReviewModel.reconstitute({
           id: 0,
-          subjectRef: new SubjectReference(SubjectType.ALBUM, 1),
+          subjectRef: new SubjectReference(SubjectType.ALBUM, '1'),
           content: 'Test',
           rating: 3,
           createdAt: new Date(),
-          authorId: 1,
+          authorId: '1',
           updatedAt: null,
         }),
       ).toThrow(InvalidReviewException);
@@ -174,11 +174,11 @@ describe('ReviewModel', () => {
       expect(() =>
         ReviewModel.reconstitute({
           id: 1,
-          subjectRef: new SubjectReference(SubjectType.ALBUM, 1),
+          subjectRef: new SubjectReference(SubjectType.ALBUM, '1'),
           content: 'Test',
           rating: 0,
           createdAt: new Date(),
-          authorId: 1,
+          authorId: '1',
           updatedAt: null,
         }),
       ).toThrow(InvalidReviewException);
@@ -187,11 +187,11 @@ describe('ReviewModel', () => {
     it('should reconstitute valid persisted review', () => {
       const review = ReviewModel.reconstitute({
         id: 1,
-        subjectRef: new SubjectReference(SubjectType.ALBUM, 1),
+        subjectRef: new SubjectReference(SubjectType.ALBUM, '1'),
         content: 'Test',
         rating: 5,
         createdAt: new Date(),
-        authorId: 1,
+        authorId: '1',
         updatedAt: null,
       });
       expect(review.id).toBe(1);
@@ -205,9 +205,9 @@ describe('ReviewModel', () => {
         subjectRef: validSubjectRef,
         content: 'Test',
         rating: 3,
-        authorId: 10,
+        authorId: '10',
       });
-      expect(review.isOwnedBy(10)).toBe(true);
+      expect(review.isOwnedBy('10')).toBe(true);
     });
 
     it('should return false if authorId does not match', () => {
@@ -215,9 +215,9 @@ describe('ReviewModel', () => {
         subjectRef: validSubjectRef,
         content: 'Test',
         rating: 3,
-        authorId: 10,
+        authorId: '10',
       });
-      expect(review.isOwnedBy(99)).toBe(false);
+      expect(review.isOwnedBy('99')).toBe(false);
     });
   });
 });

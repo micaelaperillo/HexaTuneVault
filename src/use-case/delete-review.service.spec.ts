@@ -20,40 +20,40 @@ describe('DeleteReviewService', () => {
     reviewRepo.findById.mockResolvedValue(null);
 
     await expect(
-      service.execute({ reviewId: 1, requesterId: 1 }),
+      service.execute({ reviewId: 1, requesterId: '1' }),
     ).rejects.toThrow(ReviewNotFoundException);
   });
 
   it('should throw ForbiddenDeletionException if requester is not the author', async () => {
     const review = ReviewModel.reconstitute({
       id: 1,
-      subjectRef: new SubjectReference(SubjectType.TRACK, 1),
+      subjectRef: new SubjectReference(SubjectType.TRACK, '1'),
       content: 'Nice',
       rating: 5,
       createdAt: new Date(),
-      authorId: 2, // different author
+      authorId: '2', // different author
       updatedAt: null,
     });
     reviewRepo.findById.mockResolvedValue(review);
 
     await expect(
-      service.execute({ reviewId: 1, requesterId: 1 }),
+      service.execute({ reviewId: 1, requesterId: '1' }),
     ).rejects.toThrow(ForbiddenDeletionException);
   });
 
   it('should delete the review if requester is the owner', async () => {
     const review = ReviewModel.reconstitute({
       id: 1,
-      subjectRef: new SubjectReference(SubjectType.TRACK, 1),
+      subjectRef: new SubjectReference(SubjectType.TRACK, '1'),
       content: 'Nice',
       rating: 5,
       createdAt: new Date(),
-      authorId: 1,
+      authorId: '1',
       updatedAt: null,
     });
     reviewRepo.findById.mockResolvedValue(review);
 
-    await service.execute({ reviewId: 1, requesterId: 1 });
+    await service.execute({ reviewId: 1, requesterId: '1' });
 
     expect(reviewRepo.findById).toHaveBeenCalledWith(1);
     expect(reviewRepo.delete).toHaveBeenCalledWith(1);

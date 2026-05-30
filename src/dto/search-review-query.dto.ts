@@ -76,10 +76,8 @@ export class SearchReviewQueryDto {
   content_contains?: string;
 
   @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  author_id?: number;
+  @IsString()
+  author_id?: string;
 
   @IsOptional()
   @Type(() => Number)
@@ -112,11 +110,9 @@ export class SearchReviewQueryDto {
   subject_type?: SubjectType;
 
   @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
+  @IsString()
   @Validate(SubjectIdRequiresTypeDtoConstraint)
-  subject_id?: number;
+  subject_id?: string;
 
   @IsOptional()
   @IsEnum(SortField)

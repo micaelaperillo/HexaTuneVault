@@ -26,11 +26,11 @@ describe('SearchReviewService', () => {
   it('should return search results from repository', async () => {
     const review = ReviewModel.reconstitute({
       id: 1,
-      subjectRef: new SubjectReference(SubjectType.TRACK, 1),
+      subjectRef: new SubjectReference(SubjectType.TRACK, '1'),
       content: 'Okay',
       rating: 3,
       createdAt: new Date(),
-      authorId: 1,
+      authorId: '1',
       updatedAt: null,
     });
 
@@ -57,7 +57,7 @@ describe('SearchReviewService', () => {
     const criteria: SearchCriteria = {
       ...defaultCriteria,
       content: 'search term',
-      authorId: 5,
+      authorId: '5',
       minRating: 3,
     };
     reviewRepo.search.mockResolvedValue({ data: [], total: 0 });

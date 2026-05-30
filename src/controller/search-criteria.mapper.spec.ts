@@ -77,13 +77,13 @@ describe('SearchCriteriaMapper', () => {
       page: 2,
       page_size: 50,
       content_contains: 'test',
-      author_id: 5,
+      author_id: '5',
       min_rating: 1,
       max_rating: 5,
       date_from: new Date('2025-01-01'),
       date_to: new Date('2025-06-01'),
       subject_type: SubjectType.TRACK,
-      subject_id: 10,
+      subject_id: '10',
       sort_by: SortField.RATING,
       sort_order: SortOrder.ASC,
     };
@@ -93,13 +93,13 @@ describe('SearchCriteriaMapper', () => {
     expect(criteria.page).toBe(2);
     expect(criteria.pageSize).toBe(50);
     expect(criteria.content).toBe('test');
-    expect(criteria.authorId).toBe(5);
+    expect(criteria.authorId).toBe('5');
     expect(criteria.minRating).toBe(1);
     expect(criteria.maxRating).toBe(5);
     expect(criteria.dateFrom).toBeInstanceOf(Date);
     expect(criteria.dateTo).toBeInstanceOf(Date);
     expect(criteria.subjectType).toBe(SubjectType.TRACK);
-    expect(criteria.subjectId).toBe(10);
+    expect(criteria.subjectId).toBe('10');
     expect(criteria.sortBy).toBe(SortField.RATING);
     expect(criteria.sortOrder).toBe(SortOrder.ASC);
   });

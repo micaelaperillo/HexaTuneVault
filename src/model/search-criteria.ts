@@ -16,13 +16,13 @@ export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder];
 
 export type SubjectFilter =
   | { subjectType?: undefined; subjectId?: undefined }
-  | { subjectType: SubjectType; subjectId?: number };
+  | { subjectType: SubjectType; subjectId?: string };
 
 export type SearchCriteria = {
   page: number;
   pageSize: number;
   content?: string;
-  authorId?: number;
+  authorId?: string;
   minRating?: number;
   maxRating?: number;
   dateFrom?: Date;

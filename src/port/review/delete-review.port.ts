@@ -1,6 +1,6 @@
 export interface DeleteReviewCommand {
   reviewId: number;
-  requesterId: number;
+  requesterId: string;
 }
 
 export interface IDeleteReview {

@@ -22,13 +22,13 @@ describe('SearchReviewQueryDto', () => {
         page: 1,
         page_size: 50,
         content_contains: 'test',
-        author_id: 5,
+        author_id: '5',
         min_rating: 1,
         max_rating: 5,
         date_from: new Date('2025-01-01'),
         date_to: new Date('2025-06-01'),
         subject_type: SubjectType.ALBUM,
-        subject_id: 10,
+        subject_id: '10',
         sort_by: SortField.RATING,
         sort_order: SortOrder.ASC,
       }),
@@ -79,13 +79,13 @@ describe('SearchReviewQueryDto', () => {
   });
 
   it('should fail when subject_id provided without subject_type', () => {
-    const msgs = validate({ subject_id: 1 });
+    const msgs = validate({ subject_id: '1' });
     expect(msgs.some((m) => m.includes('subject_type is required'))).toBe(true);
   });
 
   it('should pass when subject_id and subject_type both provided', () => {
     expect(
-      validate({ subject_id: 1, subject_type: SubjectType.TRACK }),
+      validate({ subject_id: '1', subject_type: SubjectType.TRACK }),
     ).toHaveLength(0);
   });
 

@@ -22,8 +22,8 @@ describe('TypeOrmReviewRepository', () => {
     entity.content = 'Great album';
     entity.rating = 5;
     entity.subjectType = 'album';
-    entity.subjectId = 10;
-    entity.authorId = 42;
+    entity.subjectId = '10';
+    entity.authorId = '42';
     entity.createdAt = new Date();
     entity.updatedAt = null;
     return Object.assign(entity, overrides);
@@ -53,10 +53,10 @@ describe('TypeOrmReviewRepository', () => {
   describe('save', () => {
     const createModel = () =>
       ReviewModel.create({
-        subjectRef: new SubjectReference(SubjectType.ALBUM, 10),
+        subjectRef: new SubjectReference(SubjectType.ALBUM, '10'),
         content: 'Great album',
         rating: 5,
-        authorId: 42,
+        authorId: '42',
       });
 
     it('should save and return domain model', async () => {
@@ -103,9 +103,9 @@ describe('TypeOrmReviewRepository', () => {
       const since = new Date(Date.now() - 60 * 1000);
       mockRepo.findOne.mockResolvedValue(makeEntity());
 
-      const ref = new SubjectReference(SubjectType.ALBUM, 10);
+      const ref = new SubjectReference(SubjectType.ALBUM, '10');
       const result = await repository.findRecentByAuthorAndSubject(
-        42,
+        '42',
         ref,
         since,
       );
@@ -115,9 +115,9 @@ describe('TypeOrmReviewRepository', () => {
       expect(mockRepo.findOne).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            authorId: 42,
+            authorId: '42',
             subjectType: 'album',
-            subjectId: 10,
+            subjectId: '10',
           }),
         }),
       );
@@ -127,9 +127,9 @@ describe('TypeOrmReviewRepository', () => {
       const since = new Date(Date.now() - 60 * 1000);
       mockRepo.findOne.mockResolvedValue(null);
 
-      const ref = new SubjectReference(SubjectType.TRACK, 1);
+      const ref = new SubjectReference(SubjectType.TRACK, '1');
       const result = await repository.findRecentByAuthorAndSubject(
-        1,
+        '1',
         ref,
         since,
       );
@@ -186,11 +186,11 @@ describe('TypeOrmReviewRepository', () => {
     });
 
     it('should apply authorId filter', async () => {
-      await repository.search({ ...baseCriteria, authorId: 42 });
+      await repository.search({ ...baseCriteria, authorId: '42' });
 
       expect(mockQb.andWhere).toHaveBeenCalledWith(
         'review.authorId = :authorId',
-        { authorId: 42 },
+        { authorId: '42' },
       );
     });
 
@@ -248,7 +248,7 @@ describe('TypeOrmReviewRepository', () => {
       await repository.search({
         ...baseCriteria,
         subjectType: SubjectType.ALBUM,
-        subjectId: 10,
+        subjectId: '10',
       });
 
       expect(mockQb.andWhere).toHaveBeenCalledWith(
@@ -257,7 +257,7 @@ describe('TypeOrmReviewRepository', () => {
       );
       expect(mockQb.andWhere).toHaveBeenCalledWith(
         'review.subjectId = :subjectId',
-        { subjectId: 10 },
+        { subjectId: '10' },
       );
     });
 

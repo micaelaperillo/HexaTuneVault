@@ -6,10 +6,14 @@ export class ReviewResponse {
   content!: string;
   rating!: number;
   subject_type!: SubjectType;
-  subject_id!: number;
-  author_id!: number;
+  subject_id!: string;
+  author_id!: string;
   created_at!: Date;
   updated_at!: Date | null;
+  self!: `/${string}`;
+  collection!: `/${string}`;
+  subject!: `/${string}`;
+  author!: `/${string}`;
 
   static fromDomain(model: ReviewModel): ReviewResponse {
     if (model.id === undefined || model.createdAt === undefined) {
@@ -24,6 +28,10 @@ export class ReviewResponse {
     response.author_id = model.authorId;
     response.created_at = model.createdAt;
     response.updated_at = model.updatedAt;
+    response.self = `/api/reviews/${model.id}`;
+    response.collection = `/api/reviews`;
+    response.subject = `/api/${model.subjectRef.type}s/${model.subjectRef.id}`;
+    response.author = `/api/users/${model.authorId}`;
     return response;
   }
 }

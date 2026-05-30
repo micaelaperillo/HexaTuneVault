@@ -58,16 +58,16 @@ describe('ReviewController', () => {
         content: 'Great stuff',
         rating: 5,
         subject_type: SubjectType.ALBUM,
-        subject_id: 1,
+        subject_id: '1',
       };
 
       const createdModel = ReviewModel.reconstitute({
         id: 123,
-        subjectRef: new SubjectReference(SubjectType.ALBUM, 1),
+        subjectRef: new SubjectReference(SubjectType.ALBUM, '1'),
         content: 'Great stuff',
         rating: 5,
         createdAt: new Date('2023-01-01T00:00:00Z'),
-        authorId: 1,
+        authorId: '1',
         updatedAt: null,
       });
 
@@ -84,18 +84,18 @@ describe('ReviewController', () => {
         rating: dto.rating,
         subjectType: dto.subject_type,
         subjectId: dto.subject_id,
-        authorId: 1,
+        authorId: '1',
       });
       expect(mockResponse.header).toHaveBeenCalledWith(
         'Location',
-        'http://localhost:3000/reviews/123',
+        'http://localhost:3000/api/reviews/123',
       );
       expect(result.id).toBe(123);
       expect(result.content).toBe('Great stuff');
       expect(result.rating).toBe(5);
       expect(result.subject_type).toBe('album');
-      expect(result.subject_id).toBe(1);
-      expect(result.author_id).toBe(1);
+      expect(result.subject_id).toBe('1');
+      expect(result.author_id).toBe('1');
       expect(result.created_at).toEqual(new Date('2023-01-01T00:00:00Z'));
       expect(result.updated_at).toBeNull();
     });
@@ -105,11 +105,11 @@ describe('ReviewController', () => {
     it('should return a specific review', async () => {
       const reviewModel = ReviewModel.reconstitute({
         id: 123,
-        subjectRef: new SubjectReference(SubjectType.ALBUM, 1),
+        subjectRef: new SubjectReference(SubjectType.ALBUM, '1'),
         content: 'Great stuff',
         rating: 5,
         createdAt: new Date('2023-01-01T00:00:00Z'),
-        authorId: 1,
+        authorId: '1',
         updatedAt: null,
       });
 
@@ -128,11 +128,11 @@ describe('ReviewController', () => {
     it('should return search results and set X-Total-Count header', async () => {
       const reviewModel = ReviewModel.reconstitute({
         id: 123,
-        subjectRef: new SubjectReference(SubjectType.ALBUM, 1),
+        subjectRef: new SubjectReference(SubjectType.ALBUM, '1'),
         content: 'Search match',
         rating: 4,
         createdAt: new Date('2023-01-01T00:00:00Z'),
-        authorId: 1,
+        authorId: '1',
         updatedAt: null,
       });
 
@@ -166,7 +166,7 @@ describe('ReviewController', () => {
 
       expect(deleteReview.execute).toHaveBeenCalledWith({
         reviewId: 123,
-        requesterId: 1,
+        requesterId: '1',
       });
     });
   });

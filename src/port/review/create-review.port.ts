@@ -5,8 +5,8 @@ export interface CreateReviewCommand {
   content: string;
   rating: number;
   subjectType: SubjectType;
-  subjectId: number;
-  authorId: number;
+  subjectId: string;
+  authorId: string;
 }
 
 export interface ICreateReview {
