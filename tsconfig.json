@@ -14,9 +14,16 @@
     "sourceMap": true,
     "outDir": "./dist",
     "paths": {
-      "@domain/*": ["./src/domain/*"],
-      "@infrastructure/*": ["./src/infrastructure/*"],
-      "@review/*": ["./src/review/*"]
+      "@model/*": ["./src/model/*"],
+      "@port/*": ["./src/port/*"],
+      "@use-case/*": ["./src/use-case/*"],
+      "@controller/*": ["./src/controller/*"],
+      "@dto/*": ["./src/dto/*"],
+      "@error/*": ["./src/error/*"],
+      "@entity/*": ["./src/entity/*"],
+      "@adapter/*": ["./src/adapter/*"],
+      "@repository/*": ["./src/repository/*"],
+      "@infrastructure/*": ["./src/infrastructure/*"]
     },
     "incremental": true,
     "skipLibCheck": true,

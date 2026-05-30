@@ -3,11 +3,11 @@ import { join } from 'node:path';
 import { HttpStatus } from '@nestjs/common';
 import type { ArgumentsHost } from '@nestjs/common';
 import { DomainExceptionFilter } from '@infrastructure/filter/domain-exception.filter.js';
-import { DomainException } from '@domain/exception/domain.exception.js';
-import { ReviewNotFoundException } from '@review/domain/exception/review-not-found.exception.js';
-import { ForbiddenDeletionException } from '@review/domain/exception/forbidden-deletion.exception.js';
-import { ReviewCooldownException } from '@review/domain/exception/review-cooldown.exception.js';
-import { InvalidReviewException } from '@review/domain/exception/invalid-review.exception.js';
+import { DomainException } from '@error/domain.exception.js';
+import { ReviewNotFoundException } from '@error/review/review-not-found.exception.js';
+import { ForbiddenDeletionException } from '@error/review/forbidden-deletion.exception.js';
+import { ReviewCooldownException } from '@error/review/review-cooldown.exception.js';
+import { InvalidReviewException } from '@error/review/invalid-review.exception.js';
 
 function collectExceptionFiles(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {

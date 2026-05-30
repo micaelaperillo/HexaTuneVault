@@ -42,7 +42,10 @@ describe('AllExceptionsFilter', () => {
   });
 
   it('should handle HttpException with string body', () => {
-    filter.catch(new HttpException('Not allowed', HttpStatus.FORBIDDEN), mockHost);
+    filter.catch(
+      new HttpException('Not allowed', HttpStatus.FORBIDDEN),
+      mockHost,
+    );
 
     expect(mockStatus).toHaveBeenCalledWith(HttpStatus.FORBIDDEN);
     expect(mockJson).toHaveBeenCalledWith({
@@ -86,7 +89,10 @@ describe('AllExceptionsFilter', () => {
   });
 
   it('should fall back to exception.message when object body lacks message', () => {
-    const exception = new HttpException({ statusCode: 422 }, HttpStatus.UNPROCESSABLE_ENTITY);
+    const exception = new HttpException(
+      { statusCode: 422 },
+      HttpStatus.UNPROCESSABLE_ENTITY,
+    );
 
     filter.catch(exception, mockHost);
 
