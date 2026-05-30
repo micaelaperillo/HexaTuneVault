@@ -31,7 +31,7 @@ export class NotFoundMapper implements ExceptionFilter {
   }
 }
 
-@Catch(CommentNotFoundException, AlreadyLikedException, NotLikedException)
+@Catch(AlreadyLikedException, NotLikedException)
 export class ConflictMapper implements ExceptionFilter {
   catch(exception: Error, host: ArgumentsHost): void {
     return toResponse(new ConflictException(exception.message), host);
