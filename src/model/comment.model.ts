@@ -6,6 +6,6 @@ export interface CommentModel {
   createdAt: Date;
   createdBy: string;
   associatedTo: string;
-  associatedType: AssociatedType;
+  associatedType: typeof AssociatedType;
   likedBy: string[];
 }

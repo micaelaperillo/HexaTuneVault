@@ -27,7 +27,7 @@ export class CommentEntity {
     type: 'enum',
     enum: AssociatedType,
   })
-  associatedType!: AssociatedType;
+  associatedType!: typeof AssociatedType;
 
   @Column('text', { array: true, default: '{}' })
   likedBy!: string[];

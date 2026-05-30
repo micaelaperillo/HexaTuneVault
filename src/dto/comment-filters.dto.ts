@@ -12,5 +12,5 @@ export class CommentFiltersDto {
 
   @IsOptional()
   @IsEnum(AssociatedType)
-  associatedType?: AssociatedType;
+  associatedType?: typeof AssociatedType;
 }

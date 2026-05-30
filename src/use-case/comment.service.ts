@@ -10,7 +10,7 @@ import {
   type ICommentRepository,
 } from '../repository/i-comment.repository';
 import { CommentModel } from '../model/comment.model';
-import { CommentFilters } from '../model/comment-filters.model';
+import { CommentFilters } from '../model/comment.filter';
 import { CommentNotFoundException } from '../error/comment/comment-not-found.exception';
 import { NotLikedException } from '../error/comment/not-liked.exception';
 import { AlreadyLikedException } from '../error/comment/already-liked.exception';

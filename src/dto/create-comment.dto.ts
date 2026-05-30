@@ -15,5 +15,5 @@ export class CreateCommentDto {
   associatedTo!: string;
 
   @IsEnum(AssociatedType)
-  associatedType!: AssociatedType;
+  associatedType!: typeof AssociatedType;
 }

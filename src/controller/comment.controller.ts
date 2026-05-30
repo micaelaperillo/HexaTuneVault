@@ -1,5 +1,6 @@
 import {
   Controller,
+  Inject,
   Get,
   Post,
   Delete,
@@ -11,37 +12,33 @@ import {
   UseFilters,
   HttpCode,
 } from '@nestjs/common';
-import { Inject } from '@nestjs/common';
+
 import {
   CREATE_COMMENT,
   type ICreateComment,
-} from '../port/comment/i-create-comment.port';
-import {
   DELETE_COMMENT,
   type IDeleteComment,
-} from '../port/comment/i-delete-comment.port';
-import {
   SEARCH_COMMENT,
   type ISearchComment,
-} from '../port/comment/i-search-comment.port';
-import {
   GET_COMMENT,
   type IGetComment,
-} from '../port/comment/i-get-comment.port';
-import {
   LIKE_COMMENT,
   type ILikeComment,
-} from '../port/comment/i-like-comment-port';
-import {
   UNLIKE_COMMENT,
   type IUnlikeComment,
-} from '../port/comment/i-unlike-comment.port';
+} from '../port/comment/';
+
 import { CreateCommentDto } from '../dto/create-comment.dto';
 import { CommentFiltersDto } from '../dto/comment-filters.dto';
-import { CommentExceptionFilter } from './comment-exception.filter';
 import { CommentResponseDto } from '../dto/comment-response.dto';
 
-@UseFilters(CommentExceptionFilter)
+import {
+  NotFoundMapper,
+  ConflictMapper,
+  InternalServerErrorMapper,
+} from './exception.mapper';
+
+@UseFilters(NotFoundMapper, ConflictMapper, InternalServerErrorMapper)
 @Controller('comments')
 export class CommentController {
   constructor(

@@ -4,19 +4,16 @@ import { CommentEntity } from '../entity/comment.entity';
 import { ICommentRepository } from '../repository/i-comment.repository';
 import { AssociatedType } from '../model/associated-type.enum';
 import { CommentModel } from '../model/comment.model';
-import { CommentFilters } from '../model/comment-filters.model';
+import { CommentFilters } from '../model/comment.filter';
 import { CommentDBException } from '../error/comment/comment-db.exception';
 import { POSTGRES_DB } from '../infrastructure/database/provider/postgres.provider';
 
 @Injectable()
 export class CommentRepository implements ICommentRepository {
-  private repo: Repository<CommentEntity>;
+  private readonly repo: Repository<CommentEntity>;
 
-  constructor(
-    @Inject(POSTGRES_DB)
-    dataSource: DataSource,
-  ) {
-    this.repo = dataSource.getRepository(CommentEntity);
+  constructor(@Inject(POSTGRES_DB) ds: DataSource) {
+    this.repo = ds.getRepository(CommentEntity);
   }
 
   async create(
@@ -35,7 +32,7 @@ export class CommentRepository implements ICommentRepository {
 
   async findByAssociatedId(
     associatedId: string,
-    associatedType: AssociatedType,
+    associatedType: typeof AssociatedType,
   ): Promise<CommentModel[]> {
     return this.run(() =>
       this.repo.findBy({ associatedTo: associatedId, associatedType }),

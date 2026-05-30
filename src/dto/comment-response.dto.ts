@@ -14,7 +14,7 @@ export class CommentResponseDto {
   @Expose()
   associatedTo!: string;
   @Expose()
-  associatedType!: AssociatedType;
+  associatedType!: typeof AssociatedType;
   @Expose()
   likedBy!: string[];
 
