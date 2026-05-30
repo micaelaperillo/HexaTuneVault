@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'basicsSections.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'globals.css' %}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  </head>
+<body>
+<div class='BasicsMembers'>
+    {% include 'NavBar.html' %}
+    <div class='HeaderMP'>
+        <div>
+            <h1 class="Title">Members</h1>
+            <form method="POST"> 
+                {% csrf_token %}
+                <div class="Search">
+                    <input class="InputSearch" placeholder='Who are you looking for?' type="text" name="query" style="color: white"/>
+                    <button type='submit' class="searchButton">
+                        <i class="material-icons SearchIcon">search</i>
+                    </button> 
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class='BlackMP'>
+    <div class="GlobalPadding">
+
+        <h1 class='TrendingTittle'>Results found for {{ result.0.query }}:</h1>
+     
+        <div class="btn-group">
+            <button onclick="showContent('artists')" id="artistsBtn" class = "btn-left activeButton">Artists</button>
+            <button onclick="showContent('accounts')" id="accountsBtn" class = "btn-right">Accounts</button>
+        </div>
+        
+        
+        <div id="artistsContent" class="contentMembers">
+            {% if result.1.members %}
+                <div class='gallery'>
+                    {% for user_data in result.1.members %}
+                        <div class='gallery2-item'>
+                        {% include 'previewProfile.html' with user_data=user_data %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-results">
+                    <i class="material-icons noResultsIcon">search_off</i>
+                    <p>No results found in Artists</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div id="accountsContent" class="contentMembers" style="display: none;">
+            {% if result.0.members %}
+            <div class='gallery'>
+                {% for user_data in result.0.members %}
+                    <div class='gallery2-item'>
+                    {% include 'previewProfile.html' with user_data=user_data %}
+                    </div>
+                {% endfor %}
+            </div>
+            {% else %}
+                <div class="no-results">
+                    <i class="material-icons noResultsIcon">search_off</i>
+                    <p>No results found in Accounts</p>
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+    </div>
+</div>
+
+<script>
+    function showContent(contentType) {
+        var artistsBtn = document.getElementById('artistsBtn');
+        var accountsBtn = document.getElementById('accountsBtn');
+
+        var artistsContent = document.getElementById('artistsContent');
+        var accountsContent = document.getElementById('accountsContent');
+
+        if (contentType === 'artists') {
+            artistsBtn.classList.add('activeButton');
+            accountsBtn.classList.remove('activeButton');
+
+            artistsContent.style.display = 'block';
+            accountsContent.style.display = 'none';
+
+        } else if (contentType === 'accounts') {
+            artistsBtn.classList.remove('activeButton');
+            accountsBtn.classList.add('activeButton');
+
+            artistsContent.style.display = 'none';
+            accountsContent.style.display = 'block';
+        }
+        }
+    </script>
+</body>
+</html>

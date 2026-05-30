@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'settings.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'globals.css' %}">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    </head>
+
+    <body>
+        <div class="Back">
+            {% include 'NavBar.html' %}
+
+            <div class="formContainer">
+            <div class="formBox" style="padding:0;">
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div style="display: flex; margin-top: 60px;">   
+                            <div class="profileImage" style="margin-left: 20px;">
+                                <div>
+                                <figure>
+                                    <img class="image-large" src="{{user_profile.profileimg}}" alt="profile image">
+                                </figure>
+                                    <div style="margin-left: 50px; font-size: 20px;">
+                                        {% if user_profile.isArtist %}
+                                        <label style="font-weight: bold; display: flex; align-items: center;">{{ user_profile.user }} <i class="material-icons" style="color: rgb(0, 128, 255); margin-left: 10px;">verified</i></label>
+                                        {% else %}
+                                        <label style="font-weight: bold;">{{ user_profile.user }}</label>
+                                        <br>
+                                        {% endif %}
+                                        <label style="color: rgb(182, 182, 182)">Profile</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                        <div class="profileInfo">
+
+                            <div class="followers">
+                                <div class="followersItem" onclick="showFollowers()" style="cursor: pointer;"> 
+                                    <p style="margin: 0;">{{user_followers_count}}</p>
+                                    <p class="mini-text">Followers</p>
+                                </div>
+                                <div class="followersItem" onclick="showFollowing()" style="cursor: pointer;"> 
+                                    <p style="margin: 0;">{{user_following_count}}</p>
+                                    <p class="mini-text">Following</p>
+                                </div>
+                                <div class="followersItem"> 
+                                    <p style="margin: 0;">{{user_post_length}}</p>
+                                    <p class="mini-text">Comments</p>
+                                </div>
+                            </div>
+                            
+                            <div class="bio">
+                                {% if not user_profile.bio and not user_profile.location %}
+                                    <div style="text-align: center;">
+                                        <p>No data</p>
+                                    </div>
+                                    {% else %}
+                                    <p style="margin: 0 0 0 5px;">{{user_profile.bio}}</p>  
+                                    {% if user_profile.location %}
+                                        <div class="location">
+                                            <i class="material-icons" style="margin-right: 5px;">place</i>
+                                            <p style="margin: 0;">{{user_profile.location}}</p>  
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </form>
+                            
+                        <div class="buttonBox">
+                            {% if isCurrentUser %}
+                            <a href="/settings" style = "text-decoration: none">
+                                <div class="editButton"> 
+                                    Edit profile <i class="material-icons" style="margin-left: 5px;">edit</i>
+                                </div>
+                            </a>
+                            <div class="logoutButton" onclick="showPopup()"> 
+                                <div style="display: flex; align-items: center;"> 
+                                    Log out <i class="material-icons" style="margin-left: 10px;">logout</i>
+                                </div>
+                            </div> 
+                            {% else %}
+                            <form action="{% url 'follow' %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" value="{{user_profile.user}}" name="user" />
+                                    <button class="followButton" type="submit" style="display: flex; align-items: center;"> 
+                                        {{button_text}}
+                                    </button>
+                            </form> 
+                            {% endif %}                
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comments-favs">
+                    <div class="btn-group">
+                        <button onclick="showContent('comments')" id="commentsBtn" class = "btn-left activeButton">Comments</button>
+                        <button onclick="showContent('favs')" id="favsBtn" class = "btn-right">Favourites</button>
+                    </div>
+
+                    <div id="commentsContent" class="comments">
+                        {% if user_posts %}
+                            {% for post in user_posts %}
+                                <hr>
+                                <div style="margin: 15px 0;">
+                                {% include 'commentBox.html' with username=post.vault_name date=post.date title=post.content type=post.vault_vtype id=post.vault_id post_id=post.post_id rating=post.rating img=post.vault_image with_likes="" %}
+                                </div>
+                            {% endfor %}
+                            <hr>
+                        {% else %}
+                            <div style="display: flex; justify-content: center; margin: 40px 0;">
+                                <label><i class="material-icons noResultsIcon">search_off</i> No comments yet</label>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div id="favsContent" class="favs" style="display: none;">
+                        {% if user_favourites.top %}
+                            <div class='gallery-profile'>
+                                {% for fav_id, fav_data in user_favourites.top.items %}
+                                    <div class='gallery-profile-item'>
+                                    {% include 'miniPreviewVault.html' with vault=fav_data %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div style="display: flex; justify-content: center; margin: 40px 0;">
+                                <label><i class="material-icons noResultsIcon">search_off</i> No favourites yet</label>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            </div>
+            
+
+            <div id="popup" class="popup" style="display: none;">
+                <span onclick="closePopup()" class="closeButton"><i class="material-icons">close</i></span>
+                <h4>Are you sure you want to log out?</h4>
+                <p>If you do so, your session will be closed.</p>
+                <div class="buttonBox">
+                    <div class="editButton" onclick="closePopup()" style="margin-right: 25px; width: 100px;"> Cancel </div>
+                    <a href="/logout" style = "text-decoration: none">  
+                        <div class="logoutButton" style="width: 100px;"> Log out </div> 
+                    </a>
+                </div>
+            </div>
+
+            <div id="followers" class="followers-popup" style="display: none;">
+                <div style="display: flex; justify-content: end;">
+                    <span onclick="closeFollowers()" style="cursor: pointer;"><i class="material-icons">close</i></span>
+                </div>
+                <h4 style="padding: 0; margin: 0;">Followers</h4>
+                {% for follower in user_followers.followers %}
+                    <a href="/profile/{{follower.username}}" style="text-decoration: none;">
+                        <div class="follow-users">
+                            <img src="{{follower.img}}" class="follow-img">
+                            <p style="margin: 0;">{{follower.username}}</p>
+                             {% if follower.is_artist %} 
+                                <i class="material-icons" style="color: rgb(0, 128, 255); margin-left: 10px;">verified</i>
+                            {% endif %}
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+
+            <div id="following" class="followers-popup" style="display: none;">
+                <div style="display: flex; justify-content: end;">
+                    <span onclick="closeFollowing()" style="cursor: pointer;"><i class="material-icons">close</i></span>
+                </div>
+                <h4 style="padding: 0; margin: 0;">Following</h4>
+                {% for following in user_following.following %}
+                    <a href="/profile/{{following.username}}" style="text-decoration: none;">
+                        <div class="follow-users">
+                            <img src="{{following.img}}" class="follow-img">
+                            <p style="margin: 0;">{{following.username}}</p>
+                             {% if following.is_artist %} 
+                                <i class="material-icons" style="color: rgb(0, 128, 255); margin-left: 10px;">verified</i>
+                            {% endif %}
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+
+        </div>
+
+        <script>
+            function showContent(contentType) {
+                var commentsBtn = document.getElementById('commentsBtn');
+                var favsBtn = document.getElementById('favsBtn');
+
+                var commentsContent = document.getElementById('commentsContent');
+                var favsContent = document.getElementById('favsContent');
+
+                if (contentType === 'comments') {
+                    commentsBtn.classList.add('activeButton');
+                    favsBtn.classList.remove('activeButton');
+
+                    commentsContent.style.display = 'block';
+                    favsContent.style.display = 'none';
+
+                } else if (contentType === 'favs') {
+                    commentsBtn.classList.remove('activeButton');
+                    favsBtn.classList.add('activeButton');
+
+                    commentsContent.style.display = 'none';
+                    favsContent.style.display = 'block';
+                }
+            }
+
+            function showPopup() {
+              var popup = document.getElementById("popup");
+              popup.style.display = "block";
+            }
+            
+            function closePopup() {
+              var popup = document.getElementById("popup");
+              popup.style.display = "none";
+            }
+
+            function showFollowers() {
+              var followers = document.getElementById("followers");
+              followers.style.display = "block";
+            }
+            
+            function closeFollowers() {
+              var followers = document.getElementById("followers");
+              followers.style.display = "none";
+            }
+
+            function showFollowing() {
+              var following = document.getElementById("following");
+              following.style.display = "block";
+            }
+            
+            function closeFollowing() {
+              var following = document.getElementById("following");
+              following.style.display = "none";
+            }
+
+        </script>
+
+    </body>
+</html>

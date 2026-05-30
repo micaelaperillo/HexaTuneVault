@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'basicsSections.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'globals.css' %}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body class="Black">
+    <div class='BasicsMusic'>
+        {% include 'NavBar.html' %}
+        <div class='HeaderMP'>
+            <div>
+            <h1 class="Title">Music</h1>
+        
+        
+            <form method="POST"> 
+                {% csrf_token %}
+
+                <div class="Search">
+                    <input type="hidden" value="" id="genreSelectInput" name="genre" />
+                    <input class="InputSearch" placeholder='What do you want to talk about?' type="text" name="query" style="color: white"/>
+                    <button type='submit' class="searchButton">
+                        <i class="material-icons SearchIcon">search</i>
+                    </button> 
+                </div>
+            </form>
+            </div>
+        </div>
+
+        <div class="Filters">
+            <label class='Label'>FILTER BY</label>
+            <select class='SelectMusic' id="genreSelect">
+                <option value="">Genre</option>
+                <option value="hip hop">Hip hop</option>
+                <option value="reggaeton">Reggaeton</option>
+                <option value="classic">Classic</option>
+                <option value="rock">Rock</option>
+                <option value="pop">Pop</option>
+                <option value="salsa">Salsa</option>
+            </select>
+        </div>
+        <div class='BlackMP'>
+        <div class="GlobalPadding">
+            <h1 class='TrendingTittle'>Trending Vaults</h1>
+            <div class='gallery'>
+                {% for artist_id, artist_data in top.items %}
+                    <div class='gallery-item'>
+                        {% with artist_description="/vault/artist/"|add:artist_id %}
+                            {% include 'previewVault.html' with vtype='Artist' spotifyimg=artist_data.image description=artist_description likes=artist_data.likes  title=artist_data.artist %}
+                        {% endwith %}
+                    </div>
+                {% endfor %}
+            </div>  
+        </div>    
+        </div>
+    </div>
+
+    <script>
+
+        document.getElementById('genreSelect').addEventListener('change', function() {
+            var selectedGenre = this.value;
+            document.getElementById('genreSelectInput').value = selectedGenre;  
+        });
+
+    </script>
+
+</body>
+</html>

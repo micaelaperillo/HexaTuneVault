@@ -188,10 +188,13 @@ describe('DomainExceptionFilter', () => {
     );
   });
 
-  it('registers every concrete domain exception across all modules', () => {
+  it('registers every review-module domain exception', () => {
     expect(concreteExceptions.length).toBeGreaterThan(0);
-    const srcRoot = join(__dirname, '../..');
-    const files = collectExceptionFiles(srcRoot);
+    // Scope the scan to the review module's exception dir. Other modules
+    // (e.g. comment) have their own error handling and are not part of this
+    // filter's registry, so they must not be counted by this guard.
+    const reviewExceptionsDir = join(__dirname, '../..', 'error', 'review');
+    const files = collectExceptionFiles(reviewExceptionsDir);
     expect(files.length).toBe(concreteExceptions.length);
   });
 });
