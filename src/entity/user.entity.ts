@@ -6,6 +6,8 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   VersionColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 
 @Entity('users')
@@ -32,7 +34,7 @@ export class UserEntity {
   biography!: string;
 
   @Column({ default: '' })
-  pfp!: string;
+  profilePictureUrl!: string;
 
   @CreateDateColumn()
   createdAt!: Date;
@@ -45,4 +47,15 @@ export class UserEntity {
 
   @VersionColumn()
   version!: number;
+
+  @ManyToMany(() => UserEntity, (user) => user.followers)
+  @JoinTable({
+    name: 'user_follows',
+    joinColumn: { name: 'followerId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'followingId', referencedColumnName: 'id' },
+  })
+  following!: UserEntity[];
+
+  @ManyToMany(() => UserEntity, (user) => user.following)
+  followers!: UserEntity[];
 }
