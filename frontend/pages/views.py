@@ -1,14 +1,3 @@
-"""Page views for the HexaTuneVault frontend.
-
-Each view is a thin layer: fetch data from the NestJS REST API via
-``api_client`` and render an existing template with it. No database, no ORM,
-no Django auth. Pure-frontend routing logic (search/filter redirects) is kept
-from the original project since it has no backend dependency.
-
-NOTE: the ``/api/...`` paths below are the contract this frontend expects from
-the NestJS API; adjust them as the API is built. Until the API exists,
-``api_client`` returns falsy defaults and the templates still render (empty).
-"""
 
 from functools import wraps
 
@@ -18,6 +7,7 @@ from django.shortcuts import redirect, render
 
 from .clients import api_client
 from .clients import artist_client
+from .clients import comment_client
 
 
 def login_required_api(view):
@@ -256,7 +246,6 @@ def vault(request, vtype, id):
                 'title': artist['artist'],
                 'spotifyimg': artist['image'],
                 'id': id,
-                # For an artist, the "author" is itself (name + avatar).
                 'authors': [{'name': artist['artist'], 'image': artist['image']}],
             }
     else:
@@ -272,17 +261,26 @@ def vault(request, vtype, id):
 
 def vault_post(request, vtype, id, post_id):
     if request.method == 'POST':
-        api_client.post(f'/api/posts/{post_id}/comments', request=request, data={
-            'content': request.POST.get('content'),
-            'comment_answer_id': request.POST.get('comment_answer_id'),
-        })
+        # NOTE: the comments API has no threading, so comment_answer_id (the
+        # reply target) is not forwarded yet.
+        created_by = request.user.username if request.user.is_authenticated else None
+        comment_client.create(
+            content=request.POST.get('content'),
+            associated_to=post_id,
+            created_by=created_by,
+            request=request,
+        )
         return redirect(request.path)
 
-    context = api_client.get_json(f'/api/posts/{post_id}', request=request, default={}) or {}
-    context.update({
+    # The post (review) itself awaits the review/user APIs; for now we render the
+    # comments thread attached to this post.
+    comments = comment_client.list_for(post_id, request=request)
+    context = {
+        'comments': comments,
+        'comment_count': len(comments),
         'is_post': False,
         'path': request.path,
-    })
+    }
     return render(request, 'post.html', context)
 
 
@@ -322,6 +320,6 @@ def like_or_unlike_comment(request):
     if request.method == 'POST':
         comment_id = request.POST.get('comment_id')
         path = request.POST.get('path', '/')
-        api_client.post(f'/api/comments/{comment_id}/like', request=request)
+        comment_client.toggle_like(comment_id, request=request)
         return redirect(path)
     return redirect('home')

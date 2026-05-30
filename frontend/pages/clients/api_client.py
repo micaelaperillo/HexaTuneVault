@@ -20,7 +20,6 @@ def _url(path: str) -> str:
 
 
 def get(path: str, request=None, **kwargs) -> requests.Response | None:
-    """GET request to the API. Returns the Response, or None on failure."""
     try:
         return requests.get(
             _url(path), headers=_headers(request), timeout=DEFAULT_TIMEOUT, **kwargs
@@ -30,7 +29,6 @@ def get(path: str, request=None, **kwargs) -> requests.Response | None:
 
 
 def post(path: str, request=None, **kwargs) -> requests.Response | None:
-    """POST request to the API. Returns the Response, or None on failure."""
     try:
         return requests.post(
             _url(path), headers=_headers(request), timeout=DEFAULT_TIMEOUT, **kwargs
@@ -39,8 +37,16 @@ def post(path: str, request=None, **kwargs) -> requests.Response | None:
         return None
 
 
+def patch(path: str, request=None, **kwargs) -> requests.Response | None:
+    try:
+        return requests.patch(
+            _url(path), headers=_headers(request), timeout=DEFAULT_TIMEOUT, **kwargs
+        )
+    except requests.RequestException:
+        return None
+
+
 def get_json(path: str, request=None, default=None, **kwargs):
-    """GET and parse JSON. Returns ``default`` on any failure or non-2xx."""
     response = get(path, request=request, **kwargs)
     if response is not None and response.ok:
         try:

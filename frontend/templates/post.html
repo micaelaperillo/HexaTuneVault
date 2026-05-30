@@ -98,7 +98,7 @@
                             </div>
                             <div style="display: flex; align-items: center;">
                             {% csrf_token %}
-                            {{ form.content }}
+                            <textarea name="content" placeholder="Write a reply..." required></textarea>
                             <button class="submit-button" type="submit">
                                 <i class="material-icons">send</i>
                             </button>
@@ -142,7 +142,7 @@
                                 </div>
                                     <div style="display: flex">
                                     {% csrf_token %}
-                                    {{ form.content }}
+                                    <textarea name="content" placeholder="Write a reply..." required></textarea>
                                     <button class="submit-button" type="submit">
                                         <i class="material-icons">send</i>
                                     </button>

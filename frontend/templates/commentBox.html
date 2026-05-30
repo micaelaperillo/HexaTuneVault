@@ -1,13 +1,8 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        {% load static %}
-        <link rel="stylesheet" type="text/css" href="{% static 'commentBox.css' %}">
-        <link rel="stylesheet" type="text/css" href="{% static 'custom.css' %}">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    </head>
-    <body>
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'commentBox.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'custom.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <div class="box">
             <img class="image-comment" height="40px" width="40px" src="{{img}}">
             {% if type != "false" %}
@@ -15,11 +10,11 @@
             <div class="comment">
                 <div class="comment-header">
                     <h4 class="comment-title">{{username}}</h4>
-                    {% if is_artist %} 
+                    {% if is_artist %}
                         <i class="material-icons" style="color: rgb(0, 128, 255); margin-left: 10px;">verified</i>
                     {% endif %}
                     <p class="date" style="margin-right: 20px;">{{date}}</p>
-                    {% if rating != 0 and with_likes %}  
+                    {% if rating != 0 and with_likes %}
                         <span class="star-rating">
                             <i class="fa fa-star{% if rating >= 1 %} rated{% endif %}" aria-hidden="true"></i>
                             <i class="fa fa-star{% if rating >= 2 %} rated{% endif %}" aria-hidden="true"></i>
@@ -36,7 +31,7 @@
             <div class="comment">
                 <div class="comment-header">
                     <h4 class="comment-title">@{{username}}</h4>
-                    {% if is_artist %} 
+                    {% if is_artist %}
                         <i class="material-icons" style="color: rgb(0, 128, 255); margin-left: 10px;">verified</i>
                     {% endif %}
                     <p class="date">{{date}}</p>
@@ -45,7 +40,7 @@
             </div>
             {% endif %}
 
-            
+
                 <div class="rate-right">
 
                 {% if with_likes %}
@@ -87,7 +82,7 @@
                         </a>
                     {% endif %}
                 {% else %}
-                    {% if rating != 0 %}  
+                    {% if rating != 0 %}
                     <span class="star-rating">
                         <i class="fa fa-star{% if rating >= 1 %} rated{% endif %}" aria-hidden="true"></i>
                         <i class="fa fa-star{% if rating >= 2 %} rated{% endif %}" aria-hidden="true"></i>
@@ -95,7 +90,7 @@
                         <i class="fa fa-star{% if rating >= 4 %} rated{% endif %}" aria-hidden="true"></i>
                         <i class="fa fa-star{% if rating >= 5 %} rated{% endif %}" aria-hidden="true"></i>
                     </span>
-                    {% endif %} 
+                    {% endif %}
                 {% endif %}
 
                 </div>
@@ -110,5 +105,3 @@
                }
            }
        </script>
-    </body>
-</html>
