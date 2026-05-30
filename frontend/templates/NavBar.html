@@ -1,11 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'navBar.css' %}">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-</head>
-<body>
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'navBar.css' %}">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <div class="Menu">
         <a href="/">
         <button class="Logo">
@@ -71,6 +66,3 @@
         window.location.href = "/search/" + encodeURIComponent(query);
     }
     </script>
-    
-</body>
-</html>
