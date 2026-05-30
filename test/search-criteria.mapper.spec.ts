@@ -1,7 +1,7 @@
-import { SearchCriteriaMapper } from './search-criteria.mapper';
-import { SubjectType } from '../model/subject-reference';
-import { SortField, SortOrder } from '../model/search-criteria';
-import type { SearchReviewQueryDto } from '../dto/search-review-query.dto';
+import { SearchCriteriaMapper } from '../src/controller/search-criteria.mapper';
+import { SubjectType } from '../src/model/subject-reference';
+import { SortField, SortOrder } from '../src/model/search-criteria';
+import type { SearchReviewQueryDto } from '../src/dto/search-review-query.dto';
 
 describe('SearchCriteriaMapper', () => {
   it('should successfully map valid dto to SearchCriteria', () => {

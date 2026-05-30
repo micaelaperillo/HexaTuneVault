@@ -1,7 +1,7 @@
 import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
-import { CreateReviewRequest } from './create-review.request';
-import { SubjectType } from '../model/subject-reference';
+import { CreateReviewRequest } from '../src/dto/create-review.request';
+import { SubjectType } from '../src/model/subject-reference';
 
 describe('CreateReviewRequest', () => {
   function transform(data: Record<string, unknown>): CreateReviewRequest {

@@ -1,10 +1,10 @@
-import { SearchReviewService } from './search-review.service';
-import { createMockReviewRepository } from '../__test__/mock-review-repository';
-import type { IReviewRepository } from '../repository/review-repository.port';
-import type { SearchCriteria } from '../model/search-criteria';
-import { SortField, SortOrder } from '../model/search-criteria';
-import { SubjectReference, SubjectType } from '../model/subject-reference';
-import { ReviewModel } from '../model/review.model';
+import { SearchReviewService } from '../src/use-case/search-review.service';
+import { createMockReviewRepository } from './mock-review-repository';
+import type { IReviewRepository } from '../src/repository/review-repository.port';
+import type { SearchCriteria } from '../src/model/search-criteria';
+import { SortField, SortOrder } from '../src/model/search-criteria';
+import { SubjectReference, SubjectType } from '../src/model/subject-reference';
+import { ReviewModel } from '../src/model/review.model';
 
 describe('SearchReviewService', () => {
   let service: SearchReviewService;

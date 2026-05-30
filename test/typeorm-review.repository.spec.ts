@@ -1,9 +1,9 @@
-import { TypeOrmReviewRepository } from './typeorm-review.repository';
-import { ReviewEntity } from '../entity/review.entity';
-import { ReviewModel } from '../model/review.model';
-import { SubjectReference, SubjectType } from '../model/subject-reference';
-import type { SearchCriteria } from '../model/search-criteria';
-import { SortField, SortOrder } from '../model/search-criteria';
+import { TypeOrmReviewRepository } from '../src/adapter/typeorm-review.repository';
+import { ReviewEntity } from '../src/entity/review.entity';
+import { ReviewModel } from '../src/model/review.model';
+import { SubjectReference, SubjectType } from '../src/model/subject-reference';
+import type { SearchCriteria } from '../src/model/search-criteria';
+import { SortField, SortOrder } from '../src/model/search-criteria';
 import type { Repository } from 'typeorm';
 
 describe('TypeOrmReviewRepository', () => {

@@ -2,12 +2,12 @@ import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { HttpStatus } from '@nestjs/common';
 import type { ArgumentsHost } from '@nestjs/common';
-import { DomainExceptionFilter } from './domain-exception.filter';
-import { DomainException } from '../../error/domain.exception';
-import { ReviewNotFoundException } from '../../error/review/review-not-found.exception';
-import { ForbiddenDeletionException } from '../../error/review/forbidden-deletion.exception';
-import { ReviewCooldownException } from '../../error/review/review-cooldown.exception';
-import { InvalidReviewException } from '../../error/review/invalid-review.exception';
+import { DomainExceptionFilter } from '../src/infrastructure/filter/domain-exception.filter';
+import { DomainException } from '../src/error/domain.exception';
+import { ReviewNotFoundException } from '../src/error/review/review-not-found.exception';
+import { ForbiddenDeletionException } from '../src/error/review/forbidden-deletion.exception';
+import { ReviewCooldownException } from '../src/error/review/review-cooldown.exception';
+import { InvalidReviewException } from '../src/error/review/invalid-review.exception';
 
 function collectExceptionFiles(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -193,7 +193,7 @@ describe('DomainExceptionFilter', () => {
     // Scope the scan to the review module's exception dir. Other modules
     // (e.g. comment) have their own error handling and are not part of this
     // filter's registry, so they must not be counted by this guard.
-    const reviewExceptionsDir = join(__dirname, '../..', 'error', 'review');
+    const reviewExceptionsDir = join(__dirname, '..', 'src', 'error', 'review');
     const files = collectExceptionFiles(reviewExceptionsDir);
     expect(files.length).toBe(concreteExceptions.length);
   });

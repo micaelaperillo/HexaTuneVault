@@ -1,11 +1,11 @@
-import { CreateReviewService } from './create-review.service';
-import { createMockReviewRepository } from '../__test__/mock-review-repository';
-import type { IReviewConfig } from '../port/review/review-config.port';
-import type { IReviewRepository } from '../repository/review-repository.port';
-import { SubjectType, SubjectReference } from '../model/subject-reference';
-import { ReviewCooldownException } from '../error/review/review-cooldown.exception';
-import { InvalidReviewException } from '../error/review/invalid-review.exception';
-import { ReviewModel } from '../model/review.model';
+import { CreateReviewService } from '../src/use-case/create-review.service';
+import { createMockReviewRepository } from './mock-review-repository';
+import type { IReviewConfig } from '../src/port/review/review-config.port';
+import type { IReviewRepository } from '../src/repository/review-repository.port';
+import { SubjectType, SubjectReference } from '../src/model/subject-reference';
+import { ReviewCooldownException } from '../src/error/review/review-cooldown.exception';
+import { InvalidReviewException } from '../src/error/review/invalid-review.exception';
+import { ReviewModel } from '../src/model/review.model';
 
 describe('CreateReviewService', () => {
   let service: CreateReviewService;
