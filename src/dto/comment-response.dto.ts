@@ -24,7 +24,7 @@ export class CommentResponseDto {
   @Expose()
   likes!: `/${string}`;
 
-  static from(model: CommentModel): CommentResponseDto {
+  static from(this: void, model: CommentModel): CommentResponseDto {
     const dto = plainToInstance(CommentResponseDto, model, {
       excludeExtraneousValues: true,
     });
@@ -39,6 +39,6 @@ export class CommentResponseDto {
   }
 
   static fromMany(models: CommentModel[]): CommentResponseDto[] {
-    return models.map((model) => CommentResponseDto.from(model));
+    return models.map(CommentResponseDto.from);
   }
 }
