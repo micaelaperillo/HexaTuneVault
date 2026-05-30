@@ -35,7 +35,7 @@ import { EditUserDto } from '../dto/edit-user.dto';
 import { UserFiltersDto } from '../dto/user-filters.dto';
 import { LoginUserDto } from '../dto/login-user.dto';
 import { UserResponseDto } from '../dto/user-response.dto';
-import { JwtModel } from '../model/jwt.model';
+import { AuthResponseDto } from '../dto/auth-response.dto';
 
 import {
   NotFoundMapper,
@@ -72,8 +72,9 @@ export class UserController {
   }
 
   @Post('authenticate')
-  async authenticate(@Body() dto: LoginUserDto): Promise<JwtModel> {
-    return this.authenticateUser.authenticate(dto);
+  async authenticate(@Body() dto: LoginUserDto): Promise<AuthResponseDto> {
+    const token = await this.authenticateUser.authenticate(dto);
+    return AuthResponseDto.from(token);
   }
 
   @Get()
