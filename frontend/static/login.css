@@ -1,0 +1,154 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+:root {
+    --fonts: 'Poppins', Arial, Helvetica, sans-serif;
+}
+
+.formContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.formBox {
+    height: auto;
+    width: 400px;
+    background-color: rgb(37, 37, 37);
+    border-radius: 10px;
+    box-shadow: 0 0 40px rgba(8,7,16,0.6);
+    padding: 50px;
+    padding-top: 20px;
+    font-family: var(--fonts);
+    font-size: 16px;
+    color:white;
+  } 
+
+  .signInBox {
+    margin-top: 5%;
+  }
+
+  .closeIcon {
+    color: white;
+    margin-left: auto;
+  }
+
+  .close-button {
+    border: none;
+    background-color: transparent;
+    display: flex;
+    margin-left: auto;
+    cursor: pointer;
+    margin-top: 15px;
+    text-decoration: none;
+  }
+  
+  .Back {
+    width:100%;
+    height: 900px;
+    background: linear-gradient(180deg, #3D13E5 0%, #0B022D 100%);
+  }
+  
+  .Title {
+    font-size: 18px;
+    font-weight: 500;
+    text-align: center;
+    color:white;
+  }
+
+  .imageBox {
+    height: 33px;
+    width: 138px;
+    background: transparent;
+    border: transparent;
+    cursor: pointer;
+    padding-top: 33px;
+    margin-left: 15.4%;
+  }
+
+  .image {
+    height: 100%;
+    width: 100%;
+  }
+  
+  .InputItem {
+    display: block;
+    margin-top: 20px;
+    margin-left: 10px;
+    margin-bottom: 5px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  
+  .InputBox {
+    border-radius: 10px;
+    border: 1px solid #7C7C7C;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    height: 25px;
+    width: 100%;
+    background-color: rgb(37, 37, 37);
+    border-color: rgba(255, 255, 255, 0.787);
+    border-radius: 15px;
+    padding: 10px 4px;
+    margin-top: 8px;
+  }
+  
+  .Input {
+    background-color: rgb(37, 37, 37);
+    width: 100%;
+    outline: transparent;
+    border: transparent;
+    color:white;
+    font-family: var(--fonts);
+    font-size: 16px;
+  }
+  
+  .SignUpButton {
+    margin-top: 30px;
+    width: 100%;
+    height: 40px;
+    background-color: #320eb2;
+    border-radius: 50px;
+  }
+  
+  .SignUp {
+    width: 100%;
+    height: 100%;
+    color: white;
+    font-family: var(--fonts);
+    font-size: 16px;
+    cursor: pointer;
+    background-color: transparent;
+    border: transparent;
+  }
+  
+  .OtherOptionButtonBox {
+    text-align: center;
+    margin-top: 5%;
+  }
+
+  .OtherOptionButton {
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 5% 10%;
+  }
+
+  .errorMessage {
+    text-align: center;
+    color: rgb(255, 59, 59);
+    font-size: 16px;
+    font-family: var(--fonts);
+  }
+
+  .checkbox {
+    display: flex;
+    align-items: center;
+    align-content: center;
+    margin-top: 10px;
+  }
+
+  .hidden {
+    display: none;
+  }

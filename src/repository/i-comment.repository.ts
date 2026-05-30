@@ -1,4 +1,4 @@
-import type { AssociatedType } from '../model/associated-type.enum';
+import type { AssociatedType } from '../model/comment.associated.type';
 import type { CommentFilters } from '../model/comment.filter';
 import type { CommentModel } from '../model';
 
@@ -12,8 +12,9 @@ export interface ICommentRepository {
   search(filters: CommentFilters): Promise<CommentModel[]>;
   findByAssociatedId(
     associatedId: string,
-    associatedType: typeof AssociatedType,
+    associatedType: AssociatedType,
   ): Promise<CommentModel[]>;
+  findLikesByCommentId(commentId: number): Promise<string[] | null>;
   deleteById(id: number): Promise<void>;
   addLike(commentId: number, userId: string): Promise<void>;
   removeLike(commentId: number, userId: string): Promise<void>;

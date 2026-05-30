@@ -7,6 +7,8 @@ import {
   NotLikedException,
 } from '../error/comment/';
 
+import { ArtistProviderError } from '../error/artist/';
+
 import {
   Catch,
   ExceptionFilter,
@@ -29,14 +31,14 @@ export class NotFoundMapper implements ExceptionFilter {
   }
 }
 
-@Catch(CommentNotFoundException, AlreadyLikedException, NotLikedException)
+@Catch(AlreadyLikedException, NotLikedException)
 export class ConflictMapper implements ExceptionFilter {
   catch(exception: Error, host: ArgumentsHost): void {
     return toResponse(new ConflictException(exception.message), host);
   }
 }
 
-@Catch(CommentDBException)
+@Catch(CommentDBException, ArtistProviderError)
 export class InternalServerErrorMapper implements ExceptionFilter {
   catch(_: Error, host: ArgumentsHost): void {
     return toResponse(

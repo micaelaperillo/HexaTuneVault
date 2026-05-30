@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'vault.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'globals.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'custom.css' %}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    </head>
+    <body>
+        <div class="Back">
+            {% include 'NavBar.html' %}
+            <div class="vault">
+                <div class="rateBox">
+                    {% if rating == 0 %} 
+                    <p style="margin-right: 10px;">Unrated</p>
+                    {% else %}
+                    <p style="margin-right: 10px;">{{rating}}</p>
+                    {% endif %}
+                    <div>
+                        <span class="star-rating">
+                            <i class="fa fa-star{% if rating >= 1 %} rated{% endif %}" aria-hidden="true"></i>
+                            <i class="fa fa-star{% if rating >= 2 %} rated{% endif %}" aria-hidden="true"></i>
+                            <i class="fa fa-star{% if rating >= 3 %} rated{% endif %}" aria-hidden="true"></i>
+                            <i class="fa fa-star{% if rating >= 4 %} rated{% endif %}" aria-hidden="true"></i>
+                            <i class="fa fa-star{% if rating >= 5 %} rated{% endif %}" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="center">
+                    <img class="main-image" height="300" width="300" src="{{vault.spotifyimg}}">
+                </div>
+
+                <div class="info">
+                    {% if vault.type == 'album' %}
+                    <p class="type">Album</p>
+                    {% elif  vault.type == 'artist'%}
+                    <p class="type">Artist</p>
+                    {% elif  vault.type == 'podcast' %}
+                    <p class="type">Podcast</p>
+                    {% elif  vault.type == 'episode' %}
+                    <p class="type">Episode</p>
+                    {% endif %}
+                    <div class="info-header">
+                    <h2>{{vault.title}}</h2>
+                    <div class="button" style="display: flex; align-items: center;">
+
+                        <p style="margin-right: 8px;">{{likes}}</p>
+
+                        {% if user.is_authenticated %}
+                            <form action="{% url 'favourite' %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" value="{{vault.id}}" name="vault_id" />
+                                <input type="hidden" value="{{vault_id}}" name="vault_id_path" />
+                                <input type="hidden" value="{{vault.type}}" name="vtype" />
+                                <button type="submit" style="background-color: transparent; border: none; color: white; display: flex; align-items: center;">
+                                    {% if is_fav %}
+                                    <i class="material-icons" style="cursor: pointer; margin-right: 20px; color:rgb(255, 70, 70);">favorite</i>
+                                    {% else %}
+                                    <i class="material-icons" style="cursor: pointer; margin-right: 20px;">favorite_border</i>
+                                    {% endif %}
+                                </button>
+                            </form>
+                        {% else %}
+                            <a href="/login" style="text-decoration: none;">
+                                <button style="background-color: transparent; border: none; color: white; display: flex; align-items: center;">
+                                    <i class="material-icons" style="cursor: pointer; margin-right: 20px;">favorite_border</i>
+                                </button>
+                            </a>
+                        {% endif %}
+                        
+
+                        <a href="{{vault.external_url}}" style="text-decoration: none;">
+                            <button class="spotifyButton">
+                                <img height="20" width="20" class="spotifyLogo" src="{% static 'resources/spotify.png' %}">
+                                Spotify
+                            </button>
+                        </a>
+                    </div>
+                    </div>
+                    <div class="secondary-info">
+                        <img class="secondary-image" height="45" width="45" src="{{vault.authors.0.image}}">
+                        <p class="info-item">{{ vault.authors.0.name }}</p>
+                        {% if vault.type == 'album' %}
+                        <p class="info-separation">·</p>
+                        <p class="info-item-2">{{vault.date}}</p>
+                        <p class="info-separation">·</p>
+                        <p class="info-item-2" >{{vault.total_tracks}} songs</p>
+                        {% elif  vault.type == 'artist'%}
+                        <p class="info-separation">·</p>
+                        <p class="info-item-2">{{vault.genres.0}}</p>
+                        {% elif  vault.type == 'podcast' %}
+                        <p class="info-separation">·</p>
+                        <p class="info-item-2">{{vault.total_tracks}} episodes </p>
+                        {% elif  vault.type == 'episode' %}
+                        <p class="info-separation">·</p>
+                        <p class="info-item-2">{{vault.total_tracks}} min </p>
+                        {% endif %}
+                    </div>
+                    {% if vault.type == 'podcast' or vault.type == 'episode' %}
+                    <div class="description">
+                        <p>{{vault.description}}</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+
+
+                <form method="POST" id="comment-form" style="display: none;" >
+                    {% csrf_token %}
+                    <div class="rate-area">
+                        {% if first_post %}
+                        <button class="rate-text">
+                            Rate this vault:
+                        </button>
+                        <div class="rate">
+                            <input type="radio" name="rating" id="rating5" value="5" required /><label for="rating5" title="5"></label>
+                            <input type="radio" name="rating" id="rating4" value="4" required /><label for="rating4" title="4"></label>
+                            <input type="radio" name="rating" id="rating3" value="3" required /><label for="rating3" title="3"></label>
+                            <input type="radio" name="rating" id="rating2" value="2" required /><label for="rating2" title="2"></label>
+                            <input type="radio" name="rating" id="rating1" value="1" required /><label for="rating1" title="1"></label>
+                        </div>
+
+                        {% else %}
+                            <button class="rate-text">
+                                Rate this vault: <span style="color: gray; margin-left: 5px;"> you have already rated this vault. </span>
+                            </button>
+                            <input name="rating" id="rating5" value="0" required style="display: none;"/>
+                        {% endif %}
+                    </div>
+                    <div class="text-area">
+                        {{ form.title }}
+                        <button class="submit-button" type="submit">
+                            <i class="material-icons">send</i>
+                        </button>
+                    </div>
+                </form>
+
+                <div class="commentaries">
+                    {% for a_post in posts %}
+                        <hr>
+                        {% with post=a_post.post %}
+                        {% include 'commentBox.html' with username="@"|add:post.user date=post.date title=post.title type=vault.type id=post.vault_id post_id=post.id rating=post.rating img=a_post.user.profileimg.url likes=a_post.likes is_liked=a_post.is_liked is_post=is_post path=path with_likes="true" is_artist=a_post.user.isArtist %}
+                        <a href="{% url 'post' vtype=vault.type id=post.vault_id post_id=post.id %}" style="text-decoration: none;">
+                            <div class="replies-button-box">
+                                <button class="replies-button">
+                                    {{ a_post.comment_count }} {% if a_post.comment_coun == 1 %}response{% else %}responses{% endif %}
+                                </button>
+                            </div>
+                        </a>
+                        {% endwith %}
+                    {% endfor %}
+                    <hr>
+                </div>
+
+                <div class="join-vault">
+                    {% if user.is_authenticated %}
+                    <button class="join-button" id="join-button">
+                        Join the vault
+                        <img height="20" width="20" class="mini-logo" src="{% static 'resources/logo-mini.png' %}">
+                    </button>
+                    {% else %}
+                    <a href="/login">
+                        <button class="join-button">
+                            Join the vault
+                            <img height="20" width="20" class="mini-logo" src="{% static 'resources/logo-mini.png' %}">
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function toggleIcon(x) {
+                if (x.textContent === 'favorite_border') {
+                    x.textContent = 'favorite';
+                } else {
+                    x.textContent = 'favorite_border';
+                }
+            }
+
+            document.addEventListener("DOMContentLoaded", function() {
+                var joinButton = document.getElementById("join-button");
+                var commentForm = document.getElementById("comment-form");
+                joinButton.addEventListener("click", function() {
+                    if (commentForm.style.display === "none" || commentForm.style.display === "") {
+                        commentForm.style.display = "block";
+                    } else {
+                        commentForm.style.display = "none";
+                    }
+                });
+            });
+        </script>
+
+    </body>
+</html>

@@ -1,7 +1,7 @@
-import { AssociatedType } from './associated-type.enum';
+import { AssociatedType } from './comment.associated.type';
 
 export interface CommentFilters {
   createdBy?: string;
   content?: string;
-  associatedType?: typeof AssociatedType;
+  associatedType?: AssociatedType;
 }

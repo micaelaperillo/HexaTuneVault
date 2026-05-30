@@ -22,6 +22,8 @@ import {
   type ISearchComment,
   GET_COMMENT,
   type IGetComment,
+  GET_COMMENT_LIKES,
+  type IGetCommentLikes,
   LIKE_COMMENT,
   type ILikeComment,
   UNLIKE_COMMENT,
@@ -31,6 +33,7 @@ import {
 import { CreateCommentDto } from '../dto/create-comment.dto';
 import { CommentFiltersDto } from '../dto/comment-filters.dto';
 import { CommentResponseDto } from '../dto/comment-response.dto';
+import { UserLinkDto } from '../dto/user-link.dto';
 
 import {
   NotFoundMapper,
@@ -46,6 +49,8 @@ export class CommentController {
     @Inject(DELETE_COMMENT) private readonly deleteComment: IDeleteComment,
     @Inject(SEARCH_COMMENT) private readonly searchComment: ISearchComment,
     @Inject(GET_COMMENT) private readonly getComment: IGetComment,
+    @Inject(GET_COMMENT_LIKES)
+    private readonly getCommentLikes: IGetCommentLikes,
     @Inject(LIKE_COMMENT) private readonly likeComment: ILikeComment,
     @Inject(UNLIKE_COMMENT) private readonly unlikeComment: IUnlikeComment,
   ) {}
@@ -72,6 +77,14 @@ export class CommentController {
     return CommentResponseDto.from(comment);
   }
 
+  @Get(':id/likes')
+  async getLikes(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<UserLinkDto[]> {
+    const likes = await this.getCommentLikes.getLikes(id);
+    return UserLinkDto.fromMany(likes);
+  }
+
   @Delete(':id')
   @HttpCode(204)
   async delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
@@ -81,7 +94,7 @@ export class CommentController {
   @Patch(':id/like')
   async like(
     @Param('id', ParseIntPipe) id: number,
-    @Body('user_id', ParseIntPipe) userId: string,
+    @Body('user_id') userId: string,
   ): Promise<void> {
     await this.likeComment.like(id, userId);
   }
@@ -89,7 +102,7 @@ export class CommentController {
   @Patch(':id/unlike')
   async unlike(
     @Param('id', ParseIntPipe) id: number,
-    @Body('user_id', ParseIntPipe) userId: string,
+    @Body('user_id') userId: string,
   ): Promise<void> {
     await this.unlikeComment.unlike(id, userId);
   }

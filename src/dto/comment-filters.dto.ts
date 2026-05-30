@@ -1,5 +1,5 @@
 import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { AssociatedType } from '../model/associated-type.enum';
+import { AssociatedType } from '../model/comment.associated.type';
 
 export class CommentFiltersDto {
   @IsOptional()
@@ -12,5 +12,5 @@ export class CommentFiltersDto {
 
   @IsOptional()
   @IsEnum(AssociatedType)
-  associatedType?: typeof AssociatedType;
+  associatedType?: AssociatedType;
 }

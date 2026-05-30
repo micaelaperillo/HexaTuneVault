@@ -1,0 +1,99 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+:root {
+    --fonts: 'Poppins', Arial, Helvetica, sans-serif;
+}
+
+.Basics {
+    background: linear-gradient(180deg, #3D13E5 0%, #0B022D 100%);
+    height: auto;
+    min-height: 100vh;
+}
+
+html, body {
+margin: 0;
+padding: 0;
+}
+
+.Black {
+    height:auto;
+    width: 100%;
+    background-color: black;
+    min-height: 60vh;
+    padding-bottom: 50px;
+}
+
+.container {
+display: grid;
+width: 80%;
+place-content: center;
+margin: auto;
+margin-bottom: 40px;
+position: relative;
+font-family: var(--fonts);
+}
+
+
+.btn-group {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.btn-right {
+    background-color: #414141;
+    border: 1px solid #414141;
+    padding: 10px 30px;
+    cursor: pointer;
+    float: left;
+    border-radius: 0 15px 15px 0;
+    color: white;
+    font-family: var(--fonts);
+    font-weight: bold;
+}
+
+.btn-left {
+    background-color: #414141;
+    border: 1px solid #414141;
+    padding: 10px 30px;
+    cursor: pointer;
+    float: left;
+    border-radius: 15px 0 0 15px;
+    color: white;
+    font-family: var(--fonts);
+    font-weight: bold;
+}
+
+.btn-group button:hover {
+    background-color: rgb(67, 115, 203);
+}
+
+.btn-group button.activeButton {
+    background-color: rgb(39, 39, 39);
+    border: 1px solid rgb(49, 49, 49);
+}
+
+.btn-group button.activeButton:hover {
+    background-color: rgb(34, 61, 111)
+}
+
+.no-results {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    margin-top: 100px;
+    font-family: var(--fonts);
+}
+
+.noResultsIcon {
+    margin-right: 10px;
+    color: white;
+}
+
+.GlobalPadding {
+    padding: 0 15%;
+}
+
