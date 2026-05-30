@@ -4,6 +4,7 @@ export const AssociatedType = {
   PODCAST: 'podcast',
   REVIEW: 'review',
   COMMENT: 'comment',
+  ARTIST: 'artist',
 } as const;
 
 export type AssociatedType =
