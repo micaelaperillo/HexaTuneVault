@@ -21,10 +21,15 @@ export class SpotifyArtistProvider implements IArtistProvider {
    */
   async search(filters: ArtistFilters): Promise<ArtistModel[]> {
     try {
-      const { artists } = await this.spotify.search(filters.name, ['artist']);
-      this.logger.debug(artists.items.at(0));
+      const query = SpotifyArtistProvider.toQuery(filters);
+      this.logger.debug(query);
 
-      return artists.items.map(SpotifyArtistProvider.toModel);
+      const { artists } = await this.spotify.search(query, ['artist']);
+      this.logger.debug(artists.items);
+
+      return artists.items
+        .filter((a) => a.images.length)
+        .map(SpotifyArtistProvider.toModel);
     } catch (e) {
       if (!(e instanceof Error)) throw e;
       throw new ArtistProviderError(e);
@@ -38,10 +43,19 @@ export class SpotifyArtistProvider implements IArtistProvider {
     return (await this.search(filters))[0] ?? null;
   }
 
-  private static toModel(this: void, { name, images }: Artist) {
+  private static toQuery(filters: ArtistFilters) {
+    // TODO: Fix injection vulnerability
+    return (
+      filters.name +
+      (filters.genre?.length ? `,tag:${filters.genre?.join(',tag:')}` : '')
+    );
+  }
+
+  private static toModel(this: void, { name, images, external_urls }: Artist) {
     return {
       name,
       avatar: images[0].url,
-    };
+      external_urls: { ...external_urls },
+    } satisfies ArtistModel;
   }
 }
