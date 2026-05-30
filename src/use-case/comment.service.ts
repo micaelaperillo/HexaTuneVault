@@ -3,6 +3,7 @@ import { ICreateComment } from '../port/comment/i-create-comment.port';
 import { IDeleteComment } from '../port/comment/i-delete-comment.port';
 import { ISearchComment } from '../port/comment/i-search-comment.port';
 import { IGetComment } from '../port/comment/i-get-comment.port';
+import { IGetCommentLikes } from '../port/comment/i-get-comment-likes.port';
 import { ILikeComment } from '../port/comment/i-like-comment-port';
 import { IUnlikeComment } from '../port/comment/i-unlike-comment.port';
 import {
@@ -22,6 +23,7 @@ export class CommentService
     IDeleteComment,
     ISearchComment,
     IGetComment,
+    IGetCommentLikes,
     ILikeComment,
     IUnlikeComment
 {
@@ -50,6 +52,14 @@ export class CommentService
       throw new CommentNotFoundException(commentId);
     }
     return comment;
+  }
+
+  async getLikes(commentId: number): Promise<string[]> {
+    const likes = await this.repo.findLikesByCommentId(commentId);
+    if (!likes) {
+      throw new CommentNotFoundException(commentId);
+    }
+    return likes;
   }
 
   async like(commentId: number, userId: string): Promise<void> {

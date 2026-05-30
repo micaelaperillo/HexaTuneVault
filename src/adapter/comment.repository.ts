@@ -26,6 +26,16 @@ export class CommentRepository implements ICommentRepository {
     return this.run(() => this.repo.findOneBy({ id }));
   }
 
+  async findLikesByCommentId(commentId: number): Promise<string[] | null> {
+    const comment = await this.run(() =>
+      this.repo.findOne({
+        where: { id: commentId },
+        select: { likedBy: true },
+      }),
+    );
+    return comment ? comment.likedBy : null;
+  }
+
   async deleteById(id: number): Promise<void> {
     await this.run(() => this.repo.delete(id));
   }

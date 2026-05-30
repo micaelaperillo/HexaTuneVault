@@ -14,6 +14,7 @@ export interface ICommentRepository {
     associatedId: string,
     associatedType: AssociatedType,
   ): Promise<CommentModel[]>;
+  findLikesByCommentId(commentId: number): Promise<string[] | null>;
   deleteById(id: number): Promise<void>;
   addLike(commentId: number, userId: string): Promise<void>;
   removeLike(commentId: number, userId: string): Promise<void>;
