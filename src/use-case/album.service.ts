@@ -1,11 +1,7 @@
 import type { IGetAlbum, ISearchAlbum } from '../port/album';
-import type { AlbumFilters } from '../model/album.filter';
-import type { AlbumModel } from '../model/album.model';
+import type { AlbumFilters, AlbumModel } from '../model';
 
-import {
-  type IAlbumProvider,
-  ALBUM_PROVIDER,
-} from '../repository/album.provider';
+import { type IAlbumProvider, ALBUM_PROVIDER } from '../repository';
 
 import { Inject, Injectable } from '@nestjs/common';
 

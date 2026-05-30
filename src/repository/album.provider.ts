@@ -1,5 +1,4 @@
-import type { AlbumModel } from '../model/album.model';
-import type { AlbumFilters } from '../model/album.filter';
+import type { AlbumModel, AlbumFilters } from '../model';
 
 export const ALBUM_PROVIDER = Symbol('IAlbumProvider');
 

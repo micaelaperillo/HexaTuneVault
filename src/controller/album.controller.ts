@@ -1,8 +1,12 @@
-import type { AlbumResponse } from '../dto/album.response';
-import type { AlbumModel } from '../model/album.model';
+import type { AlbumResponse } from '../dto';
+import type { AlbumModel } from '../model';
 
-import { type IGetAlbum, GET_ALBUM } from '../port/album/get.port';
-import { type ISearchAlbum, SEARCH_ALBUM } from '../port/album/search.port';
+import {
+  type IGetAlbum,
+  GET_ALBUM,
+  type ISearchAlbum,
+  SEARCH_ALBUM,
+} from '../port';
 
 import {
   BadRequestException,

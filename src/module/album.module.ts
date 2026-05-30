@@ -3,10 +3,7 @@ import { Module } from '@nestjs/common';
 import { AlbumController } from '../controller/album.controller';
 import { ExternalApiModule } from '../infrastructure/api/api.module';
 
-import {
-  SpotifyAlbumProvider,
-  ALBUM_PROVIDER,
-} from '../adapter/album.provider';
+import { SpotifyAlbumProvider, ALBUM_PROVIDER } from '../adapter';
 
 import {
   AlbumService,

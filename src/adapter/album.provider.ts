@@ -1,15 +1,14 @@
 import type { SpotifyApi, SimplifiedAlbum } from '@spotify/web-api-ts-sdk';
 
-import type { AlbumModel } from '../model/album.model';
-import type { AlbumFilters } from '../model/album.filter';
-import type { IAlbumProvider } from '../repository/album.provider';
+import type { AlbumModel, AlbumFilters } from '../model';
+import type { IAlbumProvider } from '../repository';
 
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
 import { SPOTIFY_API } from '../infrastructure/api/provider';
 import { AlbumProviderError } from '../error/album';
 
-export { ALBUM_PROVIDER } from '../repository/album.provider';
+export { ALBUM_PROVIDER } from '../repository';
 
 @Injectable()
 export class SpotifyAlbumProvider implements IAlbumProvider {
