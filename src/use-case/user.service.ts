@@ -24,6 +24,8 @@ import { AlreadyFollowingException } from '../error/user/already-following.excep
 import { NotFollowingException } from '../error/user/not-following.exception';
 import { SelfFollowException } from '../error/user/self-follow.exception';
 
+// TODO hay un par de ifs aca, ver si estar en la misma capa
+
 @Injectable()
 export class UserService
   implements
@@ -63,6 +65,10 @@ export class UserService
   }
 
   async edit(user: Partial<UserModel>): Promise<UserModel> {
+    if (user.password !== undefined) {
+      const password = await this.hasher.hash(user.password);
+      return this.repo.update({ ...user, password });
+    }
     return this.repo.update(user);
   }
 
