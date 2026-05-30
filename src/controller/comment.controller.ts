@@ -39,7 +39,7 @@ import {
 } from './exception.mapper';
 
 @UseFilters(NotFoundMapper, ConflictMapper, InternalServerErrorMapper)
-@Controller('comments')
+@Controller('api/comments')
 export class CommentController {
   constructor(
     @Inject(CREATE_COMMENT) private readonly createComment: ICreateComment,
