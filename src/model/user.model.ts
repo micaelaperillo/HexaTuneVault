@@ -6,5 +6,5 @@ export interface UserModel {
   lastName: string;
   email: string;
   biography: string;
-  pfp: string;
+  profilePictureUrl: string;
 }
