@@ -1,4 +1,4 @@
-import { AssociatedType } from './associated-type.enum';
+import { AssociatedType } from './comment.associated.type';
 
 export interface CommentModel {
   id: number;
@@ -6,6 +6,6 @@ export interface CommentModel {
   createdAt: Date;
   createdBy: string;
   associatedTo: string;
-  associatedType: typeof AssociatedType;
+  associatedType: AssociatedType;
   likedBy: string[];
 }
