@@ -23,6 +23,9 @@ importers:
       '@nestjs/typeorm':
         specifier: ^11.0.1
         version: 11.0.1(@nestjs/common@11.1.23(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.23)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@1.0.0(pg@8.21.0)(ts-node@10.9.2(@types/node@24.12.4)(typescript@5.9.3)))
+      '@spotify/web-api-ts-sdk':
+        specifier: ^1.2.0
+        version: 1.2.0
       class-transformer:
         specifier: ^0.5.1
         version: 0.5.1
@@ -66,6 +69,9 @@ importers:
       '@types/node':
         specifier: ^24.0.0
         version: 24.12.4
+      '@types/spotify-api':
+        specifier: ^0.0.26
+        version: 0.0.26
       '@types/supertest':
         specifier: ^7.0.0
         version: 7.2.0
@@ -760,6 +766,9 @@ packages:
   '@sinonjs/fake-timers@15.4.0':
     resolution: {integrity: sha512-DsG+8/LscQIQg68J6Ef3dv10u6nVyetYn923s3/sus5eaGfTo1of5WMZSLf0UJc9KDuKPilPH0UDJCjvNbDNCA==}
 
+  '@spotify/web-api-ts-sdk@1.2.0':
+    resolution: {integrity: sha512-JUaebva3Ohwo5I5tuTqyW/FKGOMbb40YevJMySAOINRxP7qQ/AMjBzfJx0zeO6yS+wAPfQSoGNsZaUggHw8vsA==}
+
   '@sqltools/formatter@1.2.5':
     resolution: {integrity: sha512-Uy0+khmZqUrUGm5dmMqVlnvufZRSK0FbYzVgp0UMstm+F5+W2/jnEEQyc9vo1ZR/E5ZI/B1WjjoTqBqwJL6Krw==}
 
@@ -856,6 +865,9 @@ packages:
 
   '@types/serve-static@2.2.0':
     resolution: {integrity: sha512-8mam4H1NHLtu7nmtalF7eyBH14QyOASmcxHhSfEoRyr0nP/YdoesEtU+uSRvMe96TW/HPTtkoKqQLl53N7UXMQ==}
+
+  '@types/spotify-api@0.0.26':
+    resolution: {integrity: sha512-ryvstkj8FJFT8WwunmRAafC3xPzzAso/SvOv/iyWofjPg6WJLpIz8QNHVPhmy6hR9rw+c+Aw/5Doshq18MFxbg==}
 
   '@types/stack-utils@2.0.3':
     resolution: {integrity: sha512-9aEbYZ3TbYMznPdcdr3SmIrLXwC/AKZXQeCf9Pgao5CKb8CyHuEX5jzWPTkvregvhRJHcpRO6BFoGW9ycaOkYw==}
@@ -4036,6 +4048,8 @@ snapshots:
     dependencies:
       '@sinonjs/commons': 3.0.1
 
+  '@spotify/web-api-ts-sdk@1.2.0': {}
+
   '@sqltools/formatter@1.2.5': {}
 
   '@tokenizer/inflate@0.4.1':
@@ -4154,6 +4168,8 @@ snapshots:
     dependencies:
       '@types/http-errors': 2.0.5
       '@types/node': 24.12.4
+
+  '@types/spotify-api@0.0.26': {}
 
   '@types/stack-utils@2.0.3': {}
 
