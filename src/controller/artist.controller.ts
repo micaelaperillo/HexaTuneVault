@@ -29,12 +29,18 @@ export class ArtistController {
   ) {}
 
   @Get()
-  async search(@Query('q') name: string) {
-    this.logger.debug(`Search artist with q=${name}`);
+  async search(
+    @Query('q') name: string,
+    @Query('genre') genre?: string | string[],
+  ) {
+    this.logger.debug(
+      `Search artist with q=${name} genre=${JSON.stringify(genre)}`,
+    );
 
     if (!name) throw new BadRequestException();
+    genre = typeof genre === 'string' ? [genre] : genre;
 
-    const results = await this.searcher.search({ name });
+    const results = await this.searcher.search({ name, genre });
 
     return results.map(ArtistController.toResponse);
   }
