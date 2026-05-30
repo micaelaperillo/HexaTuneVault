@@ -6,12 +6,9 @@ import { CommentModule } from './module/comment.module';
 
 @Module({
   imports: [
-    
     ConfigModule.forRoot({ isGlobal: true }),
-   
     ArtistModule,
     AlbumModule,
-  ,
     CommentModule,
   ],
   controllers: [],
