@@ -15,21 +15,27 @@ import { Inject } from '@nestjs/common';
 import {
   CREATE_COMMENT,
   type ICreateComment,
-} from '../port/i-create-comment.port';
+} from '../port/comment/i-create-comment.port';
 import {
   DELETE_COMMENT,
   type IDeleteComment,
-} from '../port/i-delete-comment.port';
+} from '../port/comment/i-delete-comment.port';
 import {
   SEARCH_COMMENT,
   type ISearchComment,
-} from '../port/i-search-comment.port';
-import { GET_COMMENT, type IGetComment } from '../port/i-get-comment.port';
-import { LIKE_COMMENT, type ILikeComment } from '../port/i-like-comment-port';
+} from '../port/comment/i-search-comment.port';
+import {
+  GET_COMMENT,
+  type IGetComment,
+} from '../port/comment/i-get-comment.port';
+import {
+  LIKE_COMMENT,
+  type ILikeComment,
+} from '../port/comment/i-like-comment-port';
 import {
   UNLIKE_COMMENT,
   type IUnlikeComment,
-} from '../port/i-unlike-comment.port';
+} from '../port/comment/i-unlike-comment.port';
 import { CreateCommentDto } from '../dto/create-comment.dto';
 import { CommentFiltersDto } from '../dto/comment-filters.dto';
 import { CommentExceptionFilter } from './comment-exception.filter';

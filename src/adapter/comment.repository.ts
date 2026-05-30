@@ -6,7 +6,7 @@ import { ICommentRepository } from '../repository/i-comment.repository';
 import { AssociatedType } from '../model/associated-type.enum';
 import { CommentModel } from '../model/comment.model';
 import { CommentFilters } from '../model/comment-filters.model';
-import { CommentDBException } from '../exceptions/comment-db.exception';
+import { CommentDBException } from '../error/comment/comment-db.exception';
 
 @Injectable()
 export class CommentRepository implements ICommentRepository {

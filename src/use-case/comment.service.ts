@@ -1,19 +1,19 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ICreateComment } from '../port/i-create-comment.port';
-import { IDeleteComment } from '../port/i-delete-comment.port';
-import { ISearchComment } from '../port/i-search-comment.port';
-import { IGetComment } from '../port/i-get-comment.port';
-import { ILikeComment } from '../port/i-like-comment-port';
-import { IUnlikeComment } from '../port/i-unlike-comment.port';
+import { ICreateComment } from '../port/comment/i-create-comment.port';
+import { IDeleteComment } from '../port/comment/i-delete-comment.port';
+import { ISearchComment } from '../port/comment/i-search-comment.port';
+import { IGetComment } from '../port/comment/i-get-comment.port';
+import { ILikeComment } from '../port/comment/i-like-comment-port';
+import { IUnlikeComment } from '../port/comment/i-unlike-comment.port';
 import {
   COMMENT_REPOSITORY,
   type ICommentRepository,
 } from '../repository/i-comment.repository';
 import { CommentModel } from '../model/comment.model';
 import { CommentFilters } from '../model/comment-filters.model';
-import { CommentNotFoundException } from '../exceptions/comment-not-found.exception';
-import { NotLikedException } from '../exceptions/not-liked.exception';
-import { AlreadyLikedException } from '../exceptions/already-liked.exception';
+import { CommentNotFoundException } from '../error/comment/comment-not-found.exception';
+import { NotLikedException } from '../error/comment/not-liked.exception';
+import { AlreadyLikedException } from '../error/comment/already-liked.exception';
 
 @Injectable()
 export class CommentService

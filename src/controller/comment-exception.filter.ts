@@ -7,11 +7,11 @@ import {
   ConflictException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { CommentNotFoundException } from '../exceptions/comment-not-found.exception';
-import { AlreadyLikedException } from '../exceptions/already-liked.exception';
-import { NotLikedException } from '../exceptions/not-liked.exception';
+import { CommentNotFoundException } from '../error/comment/comment-not-found.exception';
+import { AlreadyLikedException } from '../error/comment/already-liked.exception';
+import { NotLikedException } from '../error/comment/not-liked.exception';
 import { Response } from 'express';
-import { CommentDBException } from '../exceptions/comment-db.exception';
+import { CommentDBException } from '../error/comment/comment-db.exception';
 
 @Catch(
   CommentNotFoundException,

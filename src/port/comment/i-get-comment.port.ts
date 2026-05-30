@@ -1,4 +1,4 @@
-import { CommentModel } from '../model/comment.model';
+import { CommentModel } from '../../model/comment.model';
 
 export const GET_COMMENT = Symbol('IGetComment');
 
