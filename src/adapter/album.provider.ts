@@ -22,6 +22,14 @@ export class SpotifyAlbumProvider implements IAlbumProvider {
   async search(filters: AlbumFilters): Promise<AlbumModel[]> {
     try {
       const artistName = filters.artist;
+      const albumName = filters.name;
+
+      if (artistName && albumName) {
+        const query = `album:${albumName} artist:${artistName}`;
+        const { albums } = await this.spotify.search(query, ['album']);
+        return albums.items.map(SpotifyAlbumProvider.toModel);
+      }
+
       if (artistName) {
         const { artists } = await this.spotify.search(artistName, ['artist']);
         const artist = artists.items[0];
@@ -32,7 +40,6 @@ export class SpotifyAlbumProvider implements IAlbumProvider {
         return albumsPage.items.map(SpotifyAlbumProvider.toModel);
       }
 
-      const albumName = filters.name;
       if (albumName) {
         const { albums } = await this.spotify.search(albumName, ['album']);
         return albums.items.map(SpotifyAlbumProvider.toModel);
