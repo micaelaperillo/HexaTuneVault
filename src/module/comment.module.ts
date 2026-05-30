@@ -15,14 +15,13 @@ import { DatabaseModule } from 'src/infrastructure/database/database.module';
   imports: [DatabaseModule],
   controllers: [CommentController],
   providers: [
-    CommentService,
     { provide: COMMENT_REPOSITORY, useClass: CommentRepository },
-    { provide: CREATE_COMMENT, useExisting: CommentService },
-    { provide: DELETE_COMMENT, useExisting: CommentService },
-    { provide: SEARCH_COMMENT, useExisting: CommentService },
-    { provide: GET_COMMENT, useExisting: CommentService },
-    { provide: LIKE_COMMENT, useExisting: CommentService },
-    { provide: UNLIKE_COMMENT, useExisting: CommentService },
+    { provide: CREATE_COMMENT, useClass: CommentService },
+    { provide: DELETE_COMMENT, useClass: CommentService },
+    { provide: SEARCH_COMMENT, useClass: CommentService },
+    { provide: GET_COMMENT, useClass: CommentService },
+    { provide: LIKE_COMMENT, useClass: CommentService },
+    { provide: UNLIKE_COMMENT, useClass: CommentService },
   ],
 })
 export class CommentModule {}
