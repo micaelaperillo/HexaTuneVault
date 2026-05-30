@@ -2,13 +2,13 @@ import { Injectable, Inject } from '@nestjs/common';
 import type {
   ICreateReview,
   CreateReviewCommand,
-} from '@port/review/create-review.port.js';
-import type { IReviewRepository } from '@repository/review-repository.port.js';
-import type { IReviewConfig } from '@port/review/review-config.port.js';
-import { ReviewModel } from '@model/review.model.js';
-import { SubjectReference } from '@model/subject-reference.js';
-import { ReviewCooldownException } from '@error/review/review-cooldown.exception.js';
-import { REVIEW_REPOSITORY, REVIEW_CONFIG } from '@port/review/tokens.js';
+} from '../port/review/create-review.port';
+import type { IReviewRepository } from '../repository/review-repository.port';
+import type { IReviewConfig } from '../port/review/review-config.port';
+import { ReviewModel } from '../model/review.model';
+import { SubjectReference } from '../model/subject-reference';
+import { ReviewCooldownException } from '../error/review/review-cooldown.exception';
+import { REVIEW_REPOSITORY, REVIEW_CONFIG } from '../port/review/tokens';
 
 @Injectable()
 export class CreateReviewService implements ICreateReview {

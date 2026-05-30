@@ -1,7 +1,7 @@
-import { ReviewMapper } from './review.mapper.js';
-import { ReviewEntity } from '@entity/review.entity.js';
-import { ReviewModel } from '@model/review.model.js';
-import { SubjectReference, SubjectType } from '@model/subject-reference.js';
+import { ReviewMapper } from './review.mapper';
+import { ReviewEntity } from '../entity/review.entity';
+import { ReviewModel } from '../model/review.model';
+import { SubjectReference, SubjectType } from '../model/subject-reference';
 describe('ReviewMapper', () => {
   const now = new Date();
 

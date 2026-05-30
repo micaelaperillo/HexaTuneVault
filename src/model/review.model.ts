@@ -1,11 +1,11 @@
-import { SubjectReference } from './subject-reference.js';
-import { InvalidReviewException } from '@error/review/invalid-review.exception.js';
+import { SubjectReference } from './subject-reference';
+import { InvalidReviewException } from '../error/review/invalid-review.exception';
 import {
   RATING_MIN,
   RATING_MAX,
   CONTENT_MIN_LENGTH,
   CONTENT_MAX_LENGTH,
-} from '@model/review-constraints.js';
+} from './review-constraints';
 
 export class ReviewModel {
   private constructor(

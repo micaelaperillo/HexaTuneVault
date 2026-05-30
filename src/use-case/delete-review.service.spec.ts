@@ -1,10 +1,10 @@
-import { DeleteReviewService } from './delete-review.service.js';
-import { createMockReviewRepository } from '../__test__/mock-review-repository.js';
-import type { IReviewRepository } from '@repository/review-repository.port.js';
-import { SubjectReference, SubjectType } from '@model/subject-reference.js';
-import { ReviewModel } from '@model/review.model.js';
-import { ReviewNotFoundException } from '@error/review/review-not-found.exception.js';
-import { ForbiddenDeletionException } from '@error/review/forbidden-deletion.exception.js';
+import { DeleteReviewService } from './delete-review.service';
+import { createMockReviewRepository } from '../__test__/mock-review-repository';
+import type { IReviewRepository } from '../repository/review-repository.port';
+import { SubjectReference, SubjectType } from '../model/subject-reference';
+import { ReviewModel } from '../model/review.model';
+import { ReviewNotFoundException } from '../error/review/review-not-found.exception';
+import { ForbiddenDeletionException } from '../error/review/forbidden-deletion.exception';
 
 describe('DeleteReviewService', () => {
   let service: DeleteReviewService;

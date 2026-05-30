@@ -1,6 +1,6 @@
-import { ReviewEntity } from '@entity/review.entity.js';
-import { ReviewModel } from '@model/review.model.js';
-import { SubjectReference } from '@model/subject-reference.js';
+import { ReviewEntity } from '../entity/review.entity';
+import { ReviewModel } from '../model/review.model';
+import { SubjectReference } from '../model/subject-reference';
 
 export class ReviewMapper {
   static toDomain(entity: ReviewEntity): ReviewModel {

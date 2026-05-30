@@ -1,4 +1,4 @@
-import { InvalidReviewException } from '@error/review/invalid-review.exception.js';
+import { InvalidReviewException } from '../error/review/invalid-review.exception';
 
 export const SubjectType = {
   ALBUM: 'album',

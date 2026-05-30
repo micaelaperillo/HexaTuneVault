@@ -1,6 +1,6 @@
-import { ReviewModel } from './review.model.js';
-import { SubjectReference, SubjectType } from './subject-reference.js';
-import { InvalidReviewException } from '@error/review/invalid-review.exception.js';
+import { ReviewModel } from './review.model';
+import { SubjectReference, SubjectType } from './subject-reference';
+import { InvalidReviewException } from '../error/review/invalid-review.exception';
 
 describe('ReviewModel', () => {
   const validSubjectRef = new SubjectReference(SubjectType.ALBUM, '1');

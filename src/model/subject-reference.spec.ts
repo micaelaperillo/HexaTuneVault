@@ -1,5 +1,5 @@
-import { SubjectReference, SubjectType } from './subject-reference.js';
-import { InvalidReviewException } from '@error/review/invalid-review.exception.js';
+import { SubjectReference, SubjectType } from './subject-reference';
+import { InvalidReviewException } from '../error/review/invalid-review.exception';
 
 describe('SubjectReference', () => {
   it('should create a valid reference', () => {

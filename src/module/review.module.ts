@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ReviewEntity } from '@entity/review.entity.js';
-import { TypeOrmReviewRepository } from '@adapter/typeorm-review.repository.js';
-import { CreateReviewService } from '@use-case/create-review.service.js';
-import { DeleteReviewService } from '@use-case/delete-review.service.js';
-import { SearchReviewService } from '@use-case/search-review.service.js';
-import { GetReviewService } from '@use-case/get-review.service.js';
-import { ReviewController } from '@controller/review.controller.js';
+import { ReviewEntity } from '../entity/review.entity';
+import { TypeOrmReviewRepository } from '../adapter/typeorm-review.repository';
+import { CreateReviewService } from '../use-case/create-review.service';
+import { DeleteReviewService } from '../use-case/delete-review.service';
+import { SearchReviewService } from '../use-case/search-review.service';
+import { GetReviewService } from '../use-case/get-review.service';
+import { ReviewController } from '../controller/review.controller';
 import {
   CREATE_REVIEW,
   DELETE_REVIEW,
@@ -15,7 +15,7 @@ import {
   GET_REVIEW,
   REVIEW_REPOSITORY,
   REVIEW_CONFIG,
-} from '@port/review/tokens.js';
+} from '../port/review/tokens';
 
 @Module({
   imports: [ConfigModule, TypeOrmModule.forFeature([ReviewEntity])],

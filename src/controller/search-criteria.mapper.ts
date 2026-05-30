@@ -1,5 +1,5 @@
-import type { SearchCriteria } from '@model/search-criteria.js';
-import type { SearchReviewQueryDto } from '@dto/search-review-query.dto.js';
+import type { SearchCriteria } from '../model/search-criteria';
+import type { SearchReviewQueryDto } from '../dto/search-review-query.dto';
 
 export class SearchCriteriaMapper {
   static fromDto(dto: SearchReviewQueryDto): SearchCriteria {

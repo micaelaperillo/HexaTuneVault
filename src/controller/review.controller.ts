@@ -14,20 +14,20 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import type { Response, Request } from 'express';
-import type { ICreateReview } from '@port/review/create-review.port.js';
-import type { IDeleteReview } from '@port/review/delete-review.port.js';
-import type { ISearchReview } from '@port/review/search-review.port.js';
-import type { IGetReview } from '@port/review/get-review.port.js';
-import { CreateReviewRequest } from '@dto/create-review.request.js';
-import { SearchReviewQueryDto } from '@dto/search-review-query.dto.js';
-import { ReviewResponse } from '@dto/review-response.dto.js';
-import { SearchCriteriaMapper } from './search-criteria.mapper.js';
+import type { ICreateReview } from '../port/review/create-review.port';
+import type { IDeleteReview } from '../port/review/delete-review.port';
+import type { ISearchReview } from '../port/review/search-review.port';
+import type { IGetReview } from '../port/review/get-review.port';
+import { CreateReviewRequest } from '../dto/create-review.request';
+import { SearchReviewQueryDto } from '../dto/search-review-query.dto';
+import { ReviewResponse } from '../dto/review-response.dto';
+import { SearchCriteriaMapper } from './search-criteria.mapper';
 import {
   CREATE_REVIEW,
   DELETE_REVIEW,
   SEARCH_REVIEW,
   GET_REVIEW,
-} from '@port/review/tokens.js';
+} from '../port/review/tokens';
 
 @Controller('api/reviews')
 export class ReviewController {

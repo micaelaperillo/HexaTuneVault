@@ -1,9 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import type { ValidationError } from 'class-validator';
-import { AppModule } from './app.module.js';
-import { AllExceptionsFilter } from '@infrastructure/filter/all-exceptions.filter.js';
-import { DomainExceptionFilter } from '@infrastructure/filter/domain-exception.filter.js';
+import { AppModule } from './app.module';
+import { AllExceptionsFilter } from './infrastructure/filter/all-exceptions.filter';
+import { DomainExceptionFilter } from './infrastructure/filter/domain-exception.filter';
 
 function flattenValidationErrors(errors: ValidationError[]): string[] {
   return errors.flatMap((error) => {

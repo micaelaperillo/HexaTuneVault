@@ -1,5 +1,5 @@
-import type { ReviewModel } from '@model/review.model.js';
-import { SubjectType } from '@model/subject-reference.js';
+import type { ReviewModel } from '../model/review.model';
+import { SubjectType } from '../model/subject-reference';
 
 export class ReviewResponse {
   id!: number;

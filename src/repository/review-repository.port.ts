@@ -1,7 +1,7 @@
-import type { PaginatedResult } from '@port/paginated-result.js';
-import type { ReviewModel } from '@model/review.model.js';
-import type { SubjectReference } from '@model/subject-reference.js';
-import type { SearchCriteria } from '@model/search-criteria.js';
+import type { PaginatedResult } from '../port/paginated-result';
+import type { ReviewModel } from '../model/review.model';
+import type { SubjectReference } from '../model/subject-reference';
+import type { SearchCriteria } from '../model/search-criteria';
 
 export interface IReviewRepository {
   save(review: ReviewModel): Promise<ReviewModel>;

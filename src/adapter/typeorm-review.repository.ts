@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThan } from 'typeorm';
-import { ReviewEntity } from '@entity/review.entity.js';
-import { ReviewModel } from '@model/review.model.js';
-import { SubjectReference } from '@model/subject-reference.js';
-import type { PaginatedResult } from '@port/paginated-result.js';
-import type { SearchCriteria } from '@model/search-criteria.js';
-import { SortField, SortOrder } from '@model/search-criteria.js';
-import type { IReviewRepository } from '@repository/review-repository.port.js';
-import { ReviewMapper } from '@repository/review.mapper.js';
+import { ReviewEntity } from '../entity/review.entity';
+import { ReviewModel } from '../model/review.model';
+import { SubjectReference } from '../model/subject-reference';
+import type { PaginatedResult } from '../port/paginated-result';
+import type { SearchCriteria } from '../model/search-criteria';
+import { SortField, SortOrder } from '../model/search-criteria';
+import type { IReviewRepository } from '../repository/review-repository.port';
+import { ReviewMapper } from '../repository/review.mapper';
 
 const SORT_FIELD_COLUMN: Record<SortField, string> = {
   [SortField.CREATED_AT]: 'review.createdAt',

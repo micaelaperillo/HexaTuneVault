@@ -1,6 +1,6 @@
-import { ReviewResponse } from './review-response.dto.js';
-import { ReviewModel } from '@model/review.model.js';
-import { SubjectReference, SubjectType } from '@model/subject-reference.js';
+import { ReviewResponse } from './review-response.dto';
+import { ReviewModel } from '../model/review.model';
+import { SubjectReference, SubjectType } from '../model/subject-reference';
 
 describe('ReviewResponse', () => {
   const now = new Date();

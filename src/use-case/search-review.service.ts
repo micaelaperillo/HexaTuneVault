@@ -1,10 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
-import type { ISearchReview } from '@port/review/search-review.port.js';
-import type { IReviewRepository } from '@repository/review-repository.port.js';
-import type { PaginatedResult } from '@port/paginated-result.js';
-import type { ReviewModel } from '@model/review.model.js';
-import type { SearchCriteria } from '@model/search-criteria.js';
-import { REVIEW_REPOSITORY } from '@port/review/tokens.js';
+import type { ISearchReview } from '../port/review/search-review.port';
+import type { IReviewRepository } from '../repository/review-repository.port';
+import type { PaginatedResult } from '../port/paginated-result';
+import type { ReviewModel } from '../model/review.model';
+import type { SearchCriteria } from '../model/search-criteria';
+import { REVIEW_REPOSITORY } from '../port/review/tokens';
 
 @Injectable()
 export class SearchReviewService implements ISearchReview {

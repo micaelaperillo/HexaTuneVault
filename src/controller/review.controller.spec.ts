@@ -1,18 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ReviewController } from './review.controller.js';
-import type { ICreateReview } from '@port/review/create-review.port.js';
-import type { IDeleteReview } from '@port/review/delete-review.port.js';
-import type { ISearchReview } from '@port/review/search-review.port.js';
-import type { IGetReview } from '@port/review/get-review.port.js';
+import { ReviewController } from './review.controller';
+import type { ICreateReview } from '../port/review/create-review.port';
+import type { IDeleteReview } from '../port/review/delete-review.port';
+import type { ISearchReview } from '../port/review/search-review.port';
+import type { IGetReview } from '../port/review/get-review.port';
 import {
   CREATE_REVIEW,
   DELETE_REVIEW,
   SEARCH_REVIEW,
   GET_REVIEW,
-} from '@port/review/tokens.js';
-import { SubjectType, SubjectReference } from '@model/subject-reference.js';
-import { ReviewModel } from '@model/review.model.js';
-import { SortField, SortOrder } from '@model/search-criteria.js';
+} from '../port/review/tokens';
+import { SubjectType, SubjectReference } from '../model/subject-reference';
+import { ReviewModel } from '../model/review.model';
+import { SortField, SortOrder } from '../model/search-criteria';
 import type { Response, Request } from 'express';
 
 describe('ReviewController', () => {

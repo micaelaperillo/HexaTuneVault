@@ -1,9 +1,9 @@
 import 'reflect-metadata';
 import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
-import { SearchReviewQueryDto } from './search-review-query.dto.js';
-import { SubjectType } from '@model/subject-reference.js';
-import { SortField, SortOrder } from '@model/search-criteria.js';
+import { SearchReviewQueryDto } from './search-review-query.dto';
+import { SubjectType } from '../model/subject-reference';
+import { SortField, SortOrder } from '../model/search-criteria';
 
 describe('SearchReviewQueryDto', () => {
   function validate(data: Record<string, unknown>): string[] {

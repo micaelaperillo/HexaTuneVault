@@ -15,9 +15,9 @@ import type {
   ValidationArguments,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { SortField, SortOrder } from '@model/search-criteria.js';
-import { SubjectType } from '@model/subject-reference.js';
-import { RATING_MIN, RATING_MAX } from '@model/review-constraints.js';
+import { SortField, SortOrder } from '../model/search-criteria';
+import { SubjectType } from '../model/subject-reference';
+import { RATING_MIN, RATING_MAX } from '../model/review-constraints';
 
 @ValidatorConstraint({ async: false })
 class MaxRatingDtoConstraint implements ValidatorConstraintInterface {

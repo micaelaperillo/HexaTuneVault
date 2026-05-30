@@ -1,11 +1,11 @@
-import { CreateReviewService } from './create-review.service.js';
-import { createMockReviewRepository } from '../__test__/mock-review-repository.js';
-import type { IReviewConfig } from '@port/review/review-config.port.js';
-import type { IReviewRepository } from '@repository/review-repository.port.js';
-import { SubjectType, SubjectReference } from '@model/subject-reference.js';
-import { ReviewCooldownException } from '@error/review/review-cooldown.exception.js';
-import { InvalidReviewException } from '@error/review/invalid-review.exception.js';
-import { ReviewModel } from '@model/review.model.js';
+import { CreateReviewService } from './create-review.service';
+import { createMockReviewRepository } from '../__test__/mock-review-repository';
+import type { IReviewConfig } from '../port/review/review-config.port';
+import type { IReviewRepository } from '../repository/review-repository.port';
+import { SubjectType, SubjectReference } from '../model/subject-reference';
+import { ReviewCooldownException } from '../error/review/review-cooldown.exception';
+import { InvalidReviewException } from '../error/review/invalid-review.exception';
+import { ReviewModel } from '../model/review.model';
 
 describe('CreateReviewService', () => {
   let service: CreateReviewService;

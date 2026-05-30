@@ -13,18 +13,6 @@
     "target": "ES2023",
     "sourceMap": true,
     "outDir": "./dist",
-    "paths": {
-      "@model/*": ["./src/model/*"],
-      "@port/*": ["./src/port/*"],
-      "@use-case/*": ["./src/use-case/*"],
-      "@controller/*": ["./src/controller/*"],
-      "@dto/*": ["./src/dto/*"],
-      "@error/*": ["./src/error/*"],
-      "@entity/*": ["./src/entity/*"],
-      "@adapter/*": ["./src/adapter/*"],
-      "@repository/*": ["./src/repository/*"],
-      "@infrastructure/*": ["./src/infrastructure/*"]
-    },
     "incremental": true,
     "skipLibCheck": true,
     "strict": true,

@@ -1,4 +1,4 @@
-import { DomainException } from '@error/domain.exception.js';
+import { DomainException } from '../domain.exception';
 
 export class InvalidReviewException extends DomainException {
   constructor(message: string) {

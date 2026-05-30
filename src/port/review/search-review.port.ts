@@ -1,6 +1,6 @@
-import type { PaginatedResult } from '@port/paginated-result.js';
-import type { ReviewModel } from '@model/review.model.js';
-import type { SearchCriteria } from '@model/search-criteria.js';
+import type { PaginatedResult } from '../paginated-result';
+import type { ReviewModel } from '../../model/review.model';
+import type { SearchCriteria } from '../../model/search-criteria';
 
 export interface ISearchReview {
   execute(criteria: SearchCriteria): Promise<PaginatedResult<ReviewModel>>;

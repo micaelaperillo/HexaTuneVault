@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ReviewEntity } from '@entity/review.entity.js';
-import { CommentEntity } from '@entity/comment.entity.js';
+import { ReviewEntity } from '../../entity/review.entity';
+import { CommentEntity } from '../../entity/comment.entity';
 
 @Module({
   imports: [

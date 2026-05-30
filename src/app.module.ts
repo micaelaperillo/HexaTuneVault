@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { DatabaseModule } from '@infrastructure/database/database.module.js';
-import { ReviewModule } from './module/review.module.js';
-import { ArtistModule } from './module/artist.module.js';
-import { CommentModule } from './module/comment.module.js';
+import { DatabaseModule } from './infrastructure/database/database.module';
+import { ReviewModule } from './module/review.module';
+import { ArtistModule } from './module/artist.module';
+import { CommentModule } from './module/comment.module';
 
 @Module({
   imports: [

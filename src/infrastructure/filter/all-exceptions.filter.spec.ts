@@ -1,6 +1,6 @@
 import { HttpStatus, HttpException, BadRequestException } from '@nestjs/common';
 import type { ArgumentsHost } from '@nestjs/common';
-import { AllExceptionsFilter } from './all-exceptions.filter.js';
+import { AllExceptionsFilter } from './all-exceptions.filter';
 
 describe('AllExceptionsFilter', () => {
   let filter: AllExceptionsFilter;

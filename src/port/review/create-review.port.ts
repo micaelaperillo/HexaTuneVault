@@ -1,5 +1,5 @@
-import type { ReviewModel } from '@model/review.model.js';
-import type { SubjectType } from '@model/subject-reference.js';
+import type { ReviewModel } from '../../model/review.model';
+import type { SubjectType } from '../../model/subject-reference';
 
 export interface CreateReviewCommand {
   content: string;

@@ -1,4 +1,4 @@
-import type { SubjectType } from '@model/subject-reference.js';
+import type { SubjectType } from './subject-reference';
 
 export const SortField = {
   CREATED_AT: 'createdAt',

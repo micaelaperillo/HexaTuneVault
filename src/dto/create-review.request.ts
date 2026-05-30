@@ -8,13 +8,13 @@ import {
   Max,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { SubjectType } from '@model/subject-reference.js';
+import { SubjectType } from '../model/subject-reference';
 import {
   RATING_MIN,
   RATING_MAX,
   CONTENT_MIN_LENGTH,
   CONTENT_MAX_LENGTH,
-} from '@model/review-constraints.js';
+} from '../model/review-constraints';
 
 export class CreateReviewRequest {
   @IsString()

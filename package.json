@@ -6,7 +6,7 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "build": "nest build && tsc-alias",
+    "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -55,7 +55,6 @@
     "ts-jest": "^29.4.11",
     "ts-loader": "^9.5.7",
     "ts-node": "^10.9.2",
-    "tsc-alias": "^1.8.17",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.60.0"
@@ -67,23 +66,13 @@
       "ts"
     ],
     "rootDir": ".",
-    "roots": ["<rootDir>/src", "<rootDir>/test"],
+    "roots": [
+      "<rootDir>/src",
+      "<rootDir>/test"
+    ],
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "moduleNameMapper": {
-      "^@model/(.*)\\.js$": "<rootDir>/src/model/$1",
-      "^@port/(.*)\\.js$": "<rootDir>/src/port/$1",
-      "^@use-case/(.*)\\.js$": "<rootDir>/src/use-case/$1",
-      "^@controller/(.*)\\.js$": "<rootDir>/src/controller/$1",
-      "^@dto/(.*)\\.js$": "<rootDir>/src/dto/$1",
-      "^@error/(.*)\\.js$": "<rootDir>/src/error/$1",
-      "^@entity/(.*)\\.js$": "<rootDir>/src/entity/$1",
-      "^@adapter/(.*)\\.js$": "<rootDir>/src/adapter/$1",
-      "^@repository/(.*)\\.js$": "<rootDir>/src/repository/$1",
-      "^@infrastructure/(.*)\\.js$": "<rootDir>/src/infrastructure/$1",
-      "^(\\.{1,2}/.*)\\.js$": "$1"
     },
     "collectCoverageFrom": [
       "src/**/*.(t|j)s"

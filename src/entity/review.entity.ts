@@ -6,7 +6,7 @@ import {
   UpdateDateColumn,
   Index,
 } from 'typeorm';
-import type { SubjectType } from '@model/subject-reference.js';
+import type { SubjectType } from '../model/subject-reference';
 
 @Entity('reviews')
 @Index(['subjectType', 'subjectId'])

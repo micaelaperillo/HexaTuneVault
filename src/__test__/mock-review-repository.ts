@@ -1,4 +1,4 @@
-import type { IReviewRepository } from '@repository/review-repository.port.js';
+import type { IReviewRepository } from '../repository/review-repository.port';
 
 export function createMockReviewRepository(): jest.Mocked<IReviewRepository> {
   return {
