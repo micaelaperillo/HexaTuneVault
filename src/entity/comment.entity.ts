@@ -4,7 +4,7 @@ import {
   Column,
   CreateDateColumn,
 } from 'typeorm';
-import { AssociatedType } from '../model/associated-type.enum';
+import { AssociatedType } from '../model/associated-type';
 
 @Entity('comments')
 export class CommentEntity {
@@ -27,7 +27,7 @@ export class CommentEntity {
     type: 'enum',
     enum: AssociatedType,
   })
-  associatedType!: typeof AssociatedType;
+  associatedType!: AssociatedType;
 
   @Column('text', { array: true, default: '{}' })
   likedBy!: string[];
