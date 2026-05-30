@@ -25,9 +25,9 @@ import {
     {
       provide: REVIEW_CONFIG,
       useFactory: (config: ConfigService) => ({
-        cooldownSeconds: Number(
-          config.get<string>('REVIEW_COOLDOWN_SECONDS', '60'),
-        ),
+        cooldownSeconds:
+          parseInt(config.get<string>('REVIEW_COOLDOWN_SECONDS', '60'), 10) ||
+          60,
       }),
       inject: [ConfigService],
     },
