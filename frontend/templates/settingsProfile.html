@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'settings.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'globals.css' %}">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    </head>
+
+    <body>
+        <div class="Back">
+
+            <a href="/">
+                <div class="imageBox">
+                    <img class="imageLogo" src="{% static 'resources/logo.png' %}" alt="logo" />
+                </div>
+            </a>
+
+            <div class="formContainer" style="margin-top: 70px;">
+            <div class="formBox">
+                <div style="display: flex; width: 100%; margin: 30px 0;">
+                    <h3 style="text-align: center; width: 100%">Profile settings</h3>
+                    <a href="/profile" style="margin-left: auto; margin-right: 20px;">
+                        <i class="material-icons closeIcon">close</i>
+                    </a>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div style="display: flex;">   
+                            <div class="profileImage">
+                                <h3>@{{ user_profile.user }}</h3>
+                                <figure>
+                                    <img class="image" src="{{user_profile.profileimg.url}}" alt="profile image">
+                                </figure>
+                                <input type="file" name="image" id="fileInput" class="file-input">
+                                
+                                <label for="fileInput" class="custom-button">Edit image<i class="material-icons" style="margin-left: 5px;">edit</i></label> 
+                            </div>
+                    
+
+                        <div style="padding: 8%">
+                            <div class="item">
+                                <label class="label" for="location">Location</label>
+                                <input placeholder="Enter your location" id='location' type="text" name="location" value="{{user_profile.location}}" class="input">
+                            </div>
+                            <div class="item">
+                                <label class="label" for="about">Biography</label>  
+                                <textarea placeholder="Write your biography" id="about" rows="3" name="bio" class="input">{{user_profile.bio}}</textarea>
+                            </div> 
+                        </div>
+                    </div>
+
+                    <div class="buttonBox">
+                        <a href="/profile" style = "text-decoration: none"><div class="cancelButton"> Cancel</div></a>
+                        
+                        <button type="submit" class="saveButton">Save changes</button>
+                    </div>
+                </form>
+            </div>
+            </div>
+        </div>
+    </body>
+</html>

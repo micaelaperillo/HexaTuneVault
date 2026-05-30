@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'miniPreviewVault.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'globals.css' %}">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    </head>
+    <body>  
+        <div class="vaultPrev">
+            <a href="/vault/{{vault.vtype}}/{{vault.id}}" style="text-decoration: none; color: white;">
+                <img src="{{vault.image}}" alt="profile" class="vault-image"/>
+                <div class="text-vault-container" style="margin: 10px 0 0 15px;">
+                    <p class="vault-name">{{ vault.artist }}</p>
+                    {% if vault.vtype == 'album' %}
+                    <p class="vault-type">Album</p>
+                    {% elif  vault.vtype == 'artist'%}
+                    <p class="vault-type">Artist</p>
+                    {% elif  vault.vtype == 'podcast' %}
+                    <p class="vault-type">Podcast</p>
+                    {% elif  vault.vtype == 'episode' %}
+                    <p class="vault-type">Episode</p>
+                    {% endif %}
+                </div>
+            </a>
+        </div>
+    </body>
+</html>

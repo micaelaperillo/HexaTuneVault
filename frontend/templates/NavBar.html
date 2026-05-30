@@ -1,0 +1,68 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'navBar.css' %}">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <div class="Menu">
+        <a href="/">
+        <button class="Logo">
+            <div>
+                <img class="LogoImg" src="{% static 'resources/logo.png' %}" alt="logo" />
+            </div>
+        </button>
+        </a>
+        <nav class="Navigation">
+        <ul class="List">
+            <li class="NavItem"><a href="/music/" class="Item">Music</a></li>
+            <li class="NavItem"><a href="/podcasts/" class="Item">Podcasts</a></li>
+            <li class="NavItem"><a href="/members/" class="Item">Members</a></li>
+            <li class="NavItem">
+            {% if user.is_authenticated %}
+            <a href="/profile/">
+                <div class="profile-button" >
+                    <i class="material-icons" style="font-size: 30px;">account_circle</i>
+                </div>
+            </a>
+            {% else %}
+            <a href="/login">
+                <button class="LogIn">
+                    <p class="ItemLogIn">Log In</p>
+                </button>
+            </a>
+            {% endif %}
+            </li>
+            <li class="NavItem">
+                <div class="search">
+                    <input class="Item" type="text" id="searcher" name="query"/>
+                    <button class="search-btn" onclick="search()">
+                            <i class="material-icons search-icon">search</i>
+                    </button>
+            </div>
+            </li>
+
+        </ul>
+        </nav>
+    </div> 
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const currentRelativePath = window.location.pathname
+        const menuItems = document.querySelectorAll('.NavItem')
+        menuItems.forEach(function (item) {
+            const menuItemUrl = item.querySelector('a').getAttribute('href')
+            if (currentRelativePath == menuItemUrl || currentRelativePath.includes('artist') && menuItemUrl == "/music/" ||
+                currentRelativePath.includes('album') && menuItemUrl == "/music/" || 
+                currentRelativePath.includes('podcast') && menuItemUrl == "/podcasts/" ||
+                currentRelativePath.includes('profile') && menuItemUrl == "/profile/"
+            ) {
+                item.classList.add('active')
+            }
+        })
+    });
+
+    function search(){
+        var query = document.getElementById("searcher").value;
+        if ( query == "")
+            return
+        // Redirigir a la página de búsqueda con el valor ingresado
+        window.location.href = "/search/" + encodeURIComponent(query);
+    }
+    </script>
