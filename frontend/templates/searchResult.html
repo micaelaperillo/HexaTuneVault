@@ -70,31 +70,13 @@
             {% endif %}
             
 
-            {% if result.3.vaults %}
-            <div class="sub-header">
-                <h2  class="sub-title">Episodes</h2>
-                <button class="view-all" onclick="viewAll('podcasts')">View all</button>
-            </div>
-            <div class='sub-gallery'>
-                {% for episode in result.3.vaults %}
-                    {% with episode_id=episode.id %}
-                        <div class='sub-gallery-item'>
-                            {% with episode_description="/vault/episode/"|add:episode_id %}
-                                {% include 'previewVault.html' with vtype='Episode' spotifyimg=episode.image description=episode_description likes=episode.likes  title=episode.episode %}
-                            {% endwith %}
-                        </div>
-                    {% endwith %}
-                {% endfor %}
-            </div>
-            {% endif %}
-
-            {% if result.4.members %}            
+            {% if result.3.members %}
             <div class="sub-header">
                 <h2  class="sub-title">Member artists</h2>
                 <button class="view-all" onclick="viewAll('members')">View all</button>
             </div>
             <div class='gallery-mem'>
-                {% for user_data in result.4.members %}
+                {% for user_data in result.3.members %}
                     <div class='gallery2-item'>
                     {% include 'previewProfile.html' with user_data=user_data %}
                     </div>
@@ -106,9 +88,9 @@
                 <h2  class="sub-title">Members</h2>
                 <button class="view-all" onclick="viewAll('members')">View all</button>
             </div>
-            {% if result.5.members %}
+            {% if result.4.members %}
             <div class='gallery-mem'>
-                {% for user_data in result.5.members %}
+                {% for user_data in result.4.members %}
                     <div class='gallery2-item'>
                     {% include 'previewProfile.html' with user_data=user_data %}
                     </div>

@@ -40,8 +40,6 @@
                     <p class="type">Artist</p>
                     {% elif  vault.type == 'podcast' %}
                     <p class="type">Podcast</p>
-                    {% elif  vault.type == 'episode' %}
-                    <p class="type">Episode</p>
                     {% endif %}
                     <div class="info-header">
                     <h2>{{vault.title}}</h2>
@@ -94,12 +92,9 @@
                         {% elif  vault.type == 'podcast' %}
                         <p class="info-separation">·</p>
                         <p class="info-item-2">{{vault.total_tracks}} episodes </p>
-                        {% elif  vault.type == 'episode' %}
-                        <p class="info-separation">·</p>
-                        <p class="info-item-2">{{vault.total_tracks}} min </p>
                         {% endif %}
                     </div>
-                    {% if vault.type == 'podcast' or vault.type == 'episode' %}
+                    {% if vault.type == 'podcast' %}
                     <div class="description">
                         <p>{{vault.description}}</p>
                     </div>
