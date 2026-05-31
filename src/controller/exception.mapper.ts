@@ -8,6 +8,7 @@ import {
 } from '../error/comment/';
 
 import { ArtistProviderError } from '../error/artist/';
+import { PodcastProviderError } from '../error/podcast/';
 
 import {
   Catch,
@@ -38,7 +39,7 @@ export class ConflictMapper implements ExceptionFilter {
   }
 }
 
-@Catch(CommentDBException, ArtistProviderError)
+@Catch(CommentDBException, ArtistProviderError, PodcastProviderError)
 export class InternalServerErrorMapper implements ExceptionFilter {
   catch(_: Error, host: ArgumentsHost): void {
     return toResponse(
