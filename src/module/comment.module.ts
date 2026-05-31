@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { CommentEntity } from '../entity/comment.entity';
 import { COMMENT_REPOSITORY } from '../repository/i-comment.repository';
 import { CommentRepository } from '../adapter/comment.repository';
 
@@ -16,10 +18,8 @@ import {
 
 import { CommentController } from '../controller/comment.controller';
 
-import { DatabaseModule } from '../infrastructure/database/database.module';
-
 @Module({
-  imports: [DatabaseModule],
+  imports: [TypeOrmModule.forFeature([CommentEntity])],
   controllers: [CommentController],
   providers: [
     { provide: COMMENT_REPOSITORY, useClass: CommentRepository },

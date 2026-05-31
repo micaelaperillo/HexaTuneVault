@@ -1,22 +1,18 @@
-import { DataSource } from 'typeorm';
-import * as entities from '../../../entity';
+import type { ConfigService } from '@nestjs/config';
+import type { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { ReviewEntity } from '../../../entity/review.entity';
+import { CommentEntity } from '../../../entity/comment.entity';
+import { UserEntity } from '../../../entity/user.entity';
 
-export const POSTGRES_DB = Symbol('POSTGRES_DB');
-
-export const postgres = {
-  provide: POSTGRES_DB,
-  useFactory: async () => {
-    const dataSource = new DataSource({
-      type: 'postgres',
-      host: process.env.DB_HOST ?? 'localhost',
-      port: parseInt(process.env.DB_PORT ?? '5432', 10),
-      username: process.env.DB_USER ?? 'postgres',
-      password: process.env.DB_PASSWORD ?? 'postgres',
-      database: process.env.DB_NAME ?? 'hexatunevault',
-      synchronize: process.env.NODE_ENV !== 'production',
-      entities: Object.values(entities),
-    });
-
-    return dataSource.initialize();
-  },
-};
+export function postgresConfig(config: ConfigService): TypeOrmModuleOptions {
+  return {
+    type: 'postgres',
+    host: config.get<string>('DB_HOST', 'localhost'),
+    port: parseInt(config.get<string>('DB_PORT', '5432'), 10) || 5432,
+    username: config.get<string>('DB_USER', 'postgres'),
+    password: config.get<string>('DB_PASSWORD', 'postgres'),
+    database: config.get<string>('DB_NAME', 'hexatunevault'),
+    entities: [ReviewEntity, CommentEntity, UserEntity],
+    synchronize: config.get<string>('NODE_ENV') !== 'production',
+  };
+}

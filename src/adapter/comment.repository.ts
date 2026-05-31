@@ -1,20 +1,19 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { DataSource, ILike, Repository, QueryFailedError } from 'typeorm';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ILike, Repository, QueryFailedError } from 'typeorm';
 import { CommentEntity } from '../entity/comment.entity';
 import { ICommentRepository } from '../repository/i-comment.repository';
 import { AssociatedType } from '../model/comment.associated.type';
 import { CommentModel } from '../model/comment.model';
 import { CommentFilters } from '../model/comment.filter';
 import { CommentDBException } from '../error/comment/comment-db.exception';
-import { POSTGRES_DB } from '../infrastructure/database/provider/postgres.provider';
 
 @Injectable()
 export class CommentRepository implements ICommentRepository {
-  private readonly repo: Repository<CommentEntity>;
-
-  constructor(@Inject(POSTGRES_DB) ds: DataSource) {
-    this.repo = ds.getRepository(CommentEntity);
-  }
+  constructor(
+    @InjectRepository(CommentEntity)
+    private readonly repo: Repository<CommentEntity>,
+  ) {}
 
   async create(
     comment: Omit<CommentModel, 'id' | 'createdAt' | 'likedBy'>,

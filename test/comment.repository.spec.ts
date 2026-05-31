@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { QueryFailedError } from 'typeorm';
 import { CommentRepository } from '../src/adapter/comment.repository';
-import { POSTGRES_DB } from '../src/infrastructure/database/provider/postgres.provider';
+import { CommentEntity } from '../src/entity/comment.entity';
 import { CommentDBException } from '../src/error/comment/comment-db.exception';
 import { AssociatedType } from '../src/model/comment.associated.type';
 
@@ -16,10 +17,6 @@ describe('CommentRepository', () => {
     delete: jest.fn(),
   };
 
-  const mockDataSource = {
-    getRepository: jest.fn().mockReturnValue(mockTypeOrmRepo),
-  };
-
   const mockComment = {
     id: 1,
     content: 'Test comment',
@@ -32,12 +29,14 @@ describe('CommentRepository', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
-    mockDataSource.getRepository.mockReturnValue(mockTypeOrmRepo);
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CommentRepository,
-        { provide: POSTGRES_DB, useValue: mockDataSource },
+        {
+          provide: getRepositoryToken(CommentEntity),
+          useValue: mockTypeOrmRepo,
+        },
       ],
     }).compile();
 

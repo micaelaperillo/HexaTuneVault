@@ -1,4 +1,4 @@
-import { ArtistModel } from 'src/model';
+import { ArtistModel } from '../model/artist.model';
 
 export class ArtistResponseDto {
   readonly name: string;
@@ -11,7 +11,7 @@ export class ArtistResponseDto {
   constructor({ name, avatar, external_urls }: ArtistModel) {
     this.name = name;
     this.avatar = avatar;
-    this.external_urls = external_urls as Record<string, string>;
+    this.external_urls = external_urls;
 
     const params = new URLSearchParams({ artist: name }).toString();
 

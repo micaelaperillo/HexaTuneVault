@@ -1,4 +1,4 @@
-import { PodcastModel } from 'src/model';
+import { PodcastModel } from '../model';
 
 export class PodcastResponseDto {
   readonly name: string;
