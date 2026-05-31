@@ -15,7 +15,7 @@ import type {
   ValidationArguments,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { SortField, SortOrder } from '../model/search-criteria';
+import { SortField, SortOrder } from '../model/review-search-criteria';
 import { SubjectType } from '../model/subject-reference';
 import { RATING_MIN, RATING_MAX } from '../model/review-constraints';
 

@@ -1,8 +1,8 @@
 import { SearchReviewService } from '../src/use-case/search-review.service';
 import { createMockReviewRepository } from './mock-review-repository';
 import type { IReviewRepository } from '../src/repository/review-repository.port';
-import type { SearchCriteria } from '../src/model/search-criteria';
-import { SortField, SortOrder } from '../src/model/search-criteria';
+import type { ReviewSearchCriteria } from '../src/model/review-search-criteria';
+import { SortField, SortOrder } from '../src/model/review-search-criteria';
 import { SubjectReference, SubjectType } from '../src/model/subject-reference';
 import { ReviewModel } from '../src/model/review.model';
 
@@ -10,7 +10,7 @@ describe('SearchReviewService', () => {
   let service: SearchReviewService;
   let reviewRepo: jest.Mocked<IReviewRepository>;
 
-  const defaultCriteria: SearchCriteria = {
+  const defaultCriteria: ReviewSearchCriteria = {
     page: 1,
     pageSize: 10,
     sortBy: SortField.CREATED_AT,
@@ -54,7 +54,7 @@ describe('SearchReviewService', () => {
   });
 
   it('should pass criteria filters to repository', async () => {
-    const criteria: SearchCriteria = {
+    const criteria: ReviewSearchCriteria = {
       ...defaultCriteria,
       content: 'search term',
       authorId: '5',

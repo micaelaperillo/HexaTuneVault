@@ -18,7 +18,7 @@ export type SubjectFilter =
   | { subjectType?: undefined; subjectId?: undefined }
   | { subjectType: SubjectType; subjectId?: string };
 
-export type SearchCriteria = {
+export type ReviewSearchCriteria = {
   page: number;
   pageSize: number;
   content?: string;

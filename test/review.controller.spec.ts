@@ -12,7 +12,7 @@ import {
 } from '../src/port/review/tokens';
 import { SubjectType, SubjectReference } from '../src/model/subject-reference';
 import { ReviewModel } from '../src/model/review.model';
-import { SortField, SortOrder } from '../src/model/search-criteria';
+import { SortField, SortOrder } from '../src/model/review-search-criteria';
 import type { Response, Request } from 'express';
 
 describe('ReviewController', () => {

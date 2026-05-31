@@ -2,8 +2,8 @@ import { TypeOrmReviewRepository } from '../src/adapter/typeorm-review.repositor
 import { ReviewEntity } from '../src/entity/review.entity';
 import { ReviewModel } from '../src/model/review.model';
 import { SubjectReference, SubjectType } from '../src/model/subject-reference';
-import type { SearchCriteria } from '../src/model/search-criteria';
-import { SortField, SortOrder } from '../src/model/search-criteria';
+import type { ReviewSearchCriteria } from '../src/model/review-search-criteria';
+import { SortField, SortOrder } from '../src/model/review-search-criteria';
 import type { Repository } from 'typeorm';
 
 describe('TypeOrmReviewRepository', () => {
@@ -155,7 +155,7 @@ describe('TypeOrmReviewRepository', () => {
   });
 
   describe('search', () => {
-    const baseCriteria: SearchCriteria = {
+    const baseCriteria: ReviewSearchCriteria = {
       page: 1,
       pageSize: 20,
       sortBy: SortField.CREATED_AT,

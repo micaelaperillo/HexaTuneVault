@@ -1,8 +1,8 @@
-import type { SearchCriteria } from '../model/search-criteria';
+import type { ReviewSearchCriteria } from '../model/review-search-criteria';
 import type { SearchReviewQueryDto } from '../dto/search-review-query.dto';
 
-export class SearchCriteriaMapper {
-  static fromDto(dto: SearchReviewQueryDto): SearchCriteria {
+export class ReviewSearchCriteriaMapper {
+  static fromDto(dto: SearchReviewQueryDto): ReviewSearchCriteria {
     const base = {
       page: dto.page,
       pageSize: dto.page_size,

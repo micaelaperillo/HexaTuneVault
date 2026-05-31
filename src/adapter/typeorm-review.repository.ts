@@ -4,9 +4,9 @@ import { Repository, MoreThan } from 'typeorm';
 import { ReviewEntity } from '../entity/review.entity';
 import { ReviewModel } from '../model/review.model';
 import { SubjectReference } from '../model/subject-reference';
-import type { PaginatedResult } from '../port/paginated-result';
-import type { SearchCriteria } from '../model/search-criteria';
-import { SortField, SortOrder } from '../model/search-criteria';
+import type { PaginatedResult } from '../common/paginated-result';
+import type { ReviewSearchCriteria } from '../model/review-search-criteria';
+import { SortField, SortOrder } from '../model/review-search-criteria';
 import type { IReviewRepository } from '../repository/review-repository.port';
 
 const SORT_FIELD_COLUMN: Record<SortField, string> = {
@@ -53,7 +53,7 @@ export class TypeOrmReviewRepository implements IReviewRepository {
   }
 
   async search(
-    criteria: SearchCriteria,
+    criteria: ReviewSearchCriteria,
   ): Promise<PaginatedResult<ReviewModel>> {
     const qb = this.repo.createQueryBuilder('review');
 

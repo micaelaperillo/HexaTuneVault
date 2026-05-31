@@ -21,7 +21,7 @@ import type { IGetReview } from '../port/review/get-review.port';
 import { CreateReviewRequest } from '../dto/create-review.request';
 import { SearchReviewQueryDto } from '../dto/search-review-query.dto';
 import { ReviewResponse } from '../dto/review-response.dto';
-import { SearchCriteriaMapper } from './search-criteria.mapper';
+import { ReviewSearchCriteriaMapper } from './review-search-criteria.mapper';
 import {
   CREATE_REVIEW,
   DELETE_REVIEW,
@@ -66,7 +66,7 @@ export class ReviewController {
     @Query() dto: SearchReviewQueryDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<ReviewResponse[]> {
-    const criteria = SearchCriteriaMapper.fromDto(dto);
+    const criteria = ReviewSearchCriteriaMapper.fromDto(dto);
     const { data, total } = await this.searchReview.execute(criteria);
     res.header('X-Total-Count', total.toString());
     return data.map((review) => ReviewResponse.fromDomain(review));

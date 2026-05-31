@@ -3,7 +3,7 @@ import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
 import { SearchReviewQueryDto } from '../src/dto/search-review-query.dto';
 import { SubjectType } from '../src/model/subject-reference';
-import { SortField, SortOrder } from '../src/model/search-criteria';
+import { SortField, SortOrder } from '../src/model/review-search-criteria';
 
 describe('SearchReviewQueryDto', () => {
   function validate(data: Record<string, unknown>): string[] {

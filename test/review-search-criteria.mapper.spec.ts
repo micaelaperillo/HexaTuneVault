@@ -1,10 +1,10 @@
-import { SearchCriteriaMapper } from '../src/controller/search-criteria.mapper';
+import { ReviewSearchCriteriaMapper } from '../src/controller/review-search-criteria.mapper';
 import { SubjectType } from '../src/model/subject-reference';
-import { SortField, SortOrder } from '../src/model/search-criteria';
+import { SortField, SortOrder } from '../src/model/review-search-criteria';
 import type { SearchReviewQueryDto } from '../src/dto/search-review-query.dto';
 
-describe('SearchCriteriaMapper', () => {
-  it('should successfully map valid dto to SearchCriteria', () => {
+describe('ReviewSearchCriteriaMapper', () => {
+  it('should successfully map valid dto to ReviewSearchCriteria', () => {
     const dto: SearchReviewQueryDto = {
       page: 1,
       page_size: 10,
@@ -16,7 +16,7 @@ describe('SearchCriteriaMapper', () => {
       sort_order: SortOrder.DESC,
     };
 
-    const criteria = SearchCriteriaMapper.fromDto(dto);
+    const criteria = ReviewSearchCriteriaMapper.fromDto(dto);
 
     expect(criteria.page).toBe(1);
     expect(criteria.pageSize).toBe(10);
@@ -40,7 +40,7 @@ describe('SearchCriteriaMapper', () => {
       sort_order: SortOrder.DESC,
     };
 
-    const criteria = SearchCriteriaMapper.fromDto(dto);
+    const criteria = ReviewSearchCriteriaMapper.fromDto(dto);
 
     expect(criteria.dateFrom).toBeInstanceOf(Date);
     expect(criteria.dateTo).toBeInstanceOf(Date);
@@ -56,7 +56,7 @@ describe('SearchCriteriaMapper', () => {
       sort_order: SortOrder.DESC,
     };
 
-    const criteria = SearchCriteriaMapper.fromDto(dto);
+    const criteria = ReviewSearchCriteriaMapper.fromDto(dto);
 
     expect(criteria.page).toBe(1);
     expect(criteria.pageSize).toBe(20);
@@ -88,7 +88,7 @@ describe('SearchCriteriaMapper', () => {
       sort_order: SortOrder.ASC,
     };
 
-    const criteria = SearchCriteriaMapper.fromDto(dto);
+    const criteria = ReviewSearchCriteriaMapper.fromDto(dto);
 
     expect(criteria.page).toBe(2);
     expect(criteria.pageSize).toBe(50);
