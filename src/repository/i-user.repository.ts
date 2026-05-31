@@ -7,7 +7,7 @@ export interface IUserRepository {
   create(user: Omit<UserModel, 'id'>): Promise<UserModel>;
   findById(id: number): Promise<UserModel | null>;
   findByUsername(username: string): Promise<UserModel | null>;
-  authenticate(username: string, plaintext: string): Promise<UserModel | null>;
+  authenticate(username: string, plaintext: string): Promise<UserModel>;
   search(filters: UserFilters): Promise<UserModel[]>;
   update(user: Partial<UserModel>): Promise<UserModel>;
   deleteById(id: number): Promise<void>;

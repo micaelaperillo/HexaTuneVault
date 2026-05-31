@@ -5,6 +5,7 @@ import { IUserRepository } from '../repository/i-user.repository';
 import { UserModel } from '../model/user.model';
 import { UserFilters } from '../model/user.filter';
 import { UserDBException } from '../error/user/user-db.exception';
+import { InvalidCredentialsException } from '../error/user/invalid-credentials.exception';
 import { POSTGRES_DB } from '../infrastructure/database/provider/postgres.provider';
 import { type IPasswordHasher, PASSWORD_HASHER } from 'src/repository/i-password-hasher';
 
@@ -31,10 +32,10 @@ export class UserRepository implements IUserRepository {
     return this.run(() => this.repo.findOneBy({ username }));
   }
 
-  async authenticate(username: string, plaintext: string): Promise<UserModel | null> {
+  async authenticate(username: string, plaintext: string): Promise<UserModel> {
     const user = await this.findByUsername(username);
     if (!user || !(await this.hasher.verify(plaintext, user.password))) {
-      return null;
+      throw new InvalidCredentialsException();
     }
     return user;
   }

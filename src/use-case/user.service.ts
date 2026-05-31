@@ -25,7 +25,6 @@ import { UserModel } from '../model/user.model';
 import { JwtModel } from '../model/jwt.model';
 import { UserFilters } from '../model/user.filter';
 import { UserNotFoundException } from '../error/user/user-not-found.exception';
-import { InvalidCredentialsException } from '../error/user/invalid-credentials.exception';
 import { AlreadyFollowingException } from '../error/user/already-following.exception';
 import { NotFollowingException } from '../error/user/not-following.exception';
 import { SelfFollowException } from '../error/user/self-follow.exception';
@@ -57,9 +56,6 @@ export class UserService
       credentials.username,
       credentials.password,
     );
-    if (!user) {
-      throw new InvalidCredentialsException();
-    }
     return this.tokenIssuer.issue(user);
   }
 
