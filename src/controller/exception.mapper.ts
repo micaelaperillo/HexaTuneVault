@@ -8,6 +8,7 @@ import {
 } from '../error/comment/';
 
 import { ArtistProviderError } from '../error/artist/';
+import { PodcastProviderError } from '../error/podcast/';
 
 import {
   UserDBException,
@@ -71,7 +72,7 @@ export class UnprocessableEntityMapper implements ExceptionFilter {
   }
 }
 
-@Catch(CommentDBException, UserDBException, ArtistProviderError)
+@Catch(CommentDBException, UserDBException, ArtistProviderError, PodcastProviderError)
 export class InternalServerErrorMapper implements ExceptionFilter {
   catch(_: Error, host: ArgumentsHost): void {
     return toResponse(
