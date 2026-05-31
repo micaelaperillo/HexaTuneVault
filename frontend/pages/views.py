@@ -115,13 +115,12 @@ def profile(request, user=None):
         'user_profile': user_profile,
         'isCurrentUser': is_current_user,
         'button_text': 'Follow',
-        # The user API exposes no follower/post/favourite data yet; render the
+        # The user API exposes no follower/post data yet; render the
         # template's empty states until those APIs are wired.
         'user_followers_count': 0,
         'user_following_count': 0,
         'user_post_length': 0,
         'user_posts': [],
-        'user_favourites': {},
         'user_followers': {},
         'user_following': {},
     }
@@ -354,17 +353,6 @@ def follow(request):
                 target['id'], request.user.id, request=request
             )
         return redirect('/profile/' + username)
-    return redirect('home')
-
-
-@login_required_api
-def fav_or_unfav_vault(request):
-    if request.method == 'POST':
-        vault_id = request.POST.get('vault_id')
-        vtype = request.POST.get('vtype')
-        vault_id_path = request.POST.get('vault_id_path')
-        api_client.post(f'/api/vaults/{vault_id}/favourite', request=request)
-        return redirect('/vault/' + vtype + '/' + vault_id_path)
     return redirect('home')
 
 
