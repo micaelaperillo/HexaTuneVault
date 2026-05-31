@@ -21,31 +21,15 @@ export class SpotifyAlbumProvider implements IAlbumProvider {
    */
   async search(filters: AlbumFilters): Promise<AlbumModel[]> {
     try {
-      const artistName = filters.artist;
-      const albumName = filters.name;
+      const query = SpotifyAlbumProvider.toQuery(filters);
+      this.logger.debug(query);
 
-      if (artistName && albumName) {
-        const query = `album:${albumName} artist:${artistName}`;
-        const { albums } = await this.spotify.search(query, ['album']);
-        return albums.items.map(SpotifyAlbumProvider.toModel);
-      }
+      const { albums } = await this.spotify.search(query, ['album']);
+      this.logger.debug(albums.items);
 
-      if (artistName) {
-        const { artists } = await this.spotify.search(artistName, ['artist']);
-        const artist = artists.items[0];
-        if (!artist) {
-          return [];
-        }
-        const albumsPage = await this.spotify.artists.albums(artist.id);
-        return albumsPage.items.map(SpotifyAlbumProvider.toModel);
-      }
-
-      if (albumName) {
-        const { albums } = await this.spotify.search(albumName, ['album']);
-        return albums.items.map(SpotifyAlbumProvider.toModel);
-      }
-
-      return [];
+      return albums.items
+        .filter((a) => a.images.length)
+        .map(SpotifyAlbumProvider.toModel);
     } catch (e) {
       const error = e instanceof Error ? e : new Error(String(e));
       throw new AlbumProviderError(error);
@@ -59,13 +43,27 @@ export class SpotifyAlbumProvider implements IAlbumProvider {
     return (await this.search(filters))[0] ?? null;
   }
 
+  private static toQuery(filters: AlbumFilters) {
+    const params: string[] = [];
+
+    if (filters.name) {
+      params.push(`album:${filters.name}`);
+    }
+
+    if (filters.artist) {
+      params.push(`artist:${filters.artist}`);
+    }
+
+    return params.join(' ');
+  }
+
   private static toModel(
     this: void,
     { name, images, release_date, total_tracks, artists }: SimplifiedAlbum,
   ) {
     return {
       name,
-      cover: images[0]?.url ?? '',
+      cover: images[0].url,
       releaseDate: release_date,
       totalTracks: total_tracks,
       artists: artists.map((a) => a.name),
