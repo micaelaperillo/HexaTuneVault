@@ -4,15 +4,26 @@ export class PodcastResponseDto {
   readonly name: string;
   readonly avatar: string;
   readonly publisher: string;
+  readonly description: string;
+  readonly total_episodes: number;
   readonly external_urls: Record<string, string>;
   readonly self: `/${string}`;
   readonly episodes: `/${string}`;
   readonly reviews: `/${string}`;
 
-  constructor({ name, avatar, publisher, external_urls }: PodcastModel) {
+  constructor({
+    name,
+    avatar,
+    publisher,
+    description,
+    total_episodes,
+    external_urls,
+  }: PodcastModel) {
     this.name = name;
     this.avatar = avatar;
     this.publisher = publisher;
+    this.description = description;
+    this.total_episodes = total_episodes;
     this.external_urls = external_urls;
 
     const params = new URLSearchParams({ podcast: name }).toString();

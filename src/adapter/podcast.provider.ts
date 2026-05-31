@@ -74,12 +74,21 @@ export class SpotifyPodcastProvider implements IPodcastProvider {
 
   private static toModel(
     this: void,
-    { name, images, publisher, external_urls }: SimplifiedShow,
+    {
+      name,
+      images,
+      publisher,
+      description,
+      total_episodes,
+      external_urls,
+    }: SimplifiedShow,
   ) {
     return {
       name,
       avatar: images[0].url,
       publisher,
+      description,
+      total_episodes,
       external_urls: { ...external_urls },
     } satisfies PodcastModel;
   }
