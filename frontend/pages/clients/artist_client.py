@@ -30,7 +30,6 @@ def _to_vault(artist: dict) -> dict:
         'id': name,                      # artist detail is keyed by name, not an id
         'artist': name,                  # title shown in previewVault
         'image': artist.get('avatar', ''),
-        'likes': '',                     # the artist API exposes no like count
         # Passthrough HATEOAS links for when the album/review APIs are wired.
         'self': artist.get('self'),
         'albums': artist.get('albums'),

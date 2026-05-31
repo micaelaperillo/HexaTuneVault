@@ -26,7 +26,6 @@ def _to_vault(album: dict) -> dict:
         'id': name,                         
         'album': name,                       
         'image': album.get('cover', ''),
-        'likes': '',                        
         'date': album.get('releaseDate', ''),
         'total_tracks': album.get('totalTracks', ''),
         'artists': album.get('artists') or [],

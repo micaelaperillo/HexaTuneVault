@@ -34,8 +34,6 @@ def _to_vault(podcast: dict) -> dict:
         'total_episodes': podcast.get('total_episodes', ''),
         'external_url': external_urls.get('spotify', ''),
         'image': podcast.get('avatar', ''),
-        'likes': '',                      # the podcast API exposes no like count
-
         'self': podcast.get('self'),
         'reviews': podcast.get('reviews'),
     }
