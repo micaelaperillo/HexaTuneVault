@@ -1,14 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import type { ValidationError } from 'class-validator';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './infrastructure/filter/all-exceptions.filter';
-import {
-  ReviewNotFoundMapper,
-  ReviewForbiddenMapper,
-  ReviewBadRequestMapper,
-  ReviewCooldownMapper,
-} from './infrastructure/filter/http-exception.mappers';
+import { filters } from './infrastructure/filter/http-exception.mappers';
 
 function flattenValidationErrors(errors: ValidationError[]): string[] {
   return errors.flatMap((error) => {
@@ -25,15 +21,9 @@ async function bootstrap() {
   app.enableCors({
     exposedHeaders: ['X-Total-Count', 'Location'],
   });
-  // Global filters: later-registered run first, so the review mappers take
-  // precedence over the AllExceptionsFilter catch-all for review exceptions.
-  app.useGlobalFilters(
-    new AllExceptionsFilter(),
-    new ReviewNotFoundMapper(),
-    new ReviewForbiddenMapper(),
-    new ReviewBadRequestMapper(),
-    new ReviewCooldownMapper(),
-  );
+  // Later-registered filters run first, so the domain mappers take precedence
+  // over the AllExceptionsFilter catch-all.
+  app.useGlobalFilters(new AllExceptionsFilter(), ...filters);
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -47,6 +37,16 @@ async function bootstrap() {
         }),
     }),
   );
+
+  const config = new DocumentBuilder()
+    .setTitle('HexaTuneVault')
+    .setDescription('HexaTuneVault API')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+
   await app.listen(process.env.PORT ?? 3000);
 }
 void bootstrap();
