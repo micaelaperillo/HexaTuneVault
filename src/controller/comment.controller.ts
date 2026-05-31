@@ -39,7 +39,7 @@ import {
   NotFoundMapper,
   ConflictMapper,
   InternalServerErrorMapper,
-} from './exception.mapper';
+} from '../infrastructure/filter/http-exception.mappers';
 
 @UseFilters(NotFoundMapper, ConflictMapper, InternalServerErrorMapper)
 @Controller('api/comments')

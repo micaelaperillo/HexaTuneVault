@@ -11,5 +11,5 @@ Subject existence validation is deferred until the referenced modules (album, tr
 
 ## Consequences
 - Reviews may reference non-existent subjects until validation is added
-- The `DomainExceptionFilter` already maps `SUBJECT_NOT_FOUND` to 422, ready for when validation is implemented
+- When validation is added, a `SubjectNotFoundException` should map to 422 via a controller exception mapper, consistent with the other review exceptions
 - A database migration to add foreign key constraints may be needed
