@@ -72,7 +72,12 @@ export class UnprocessableEntityMapper implements ExceptionFilter {
   }
 }
 
-@Catch(CommentDBException, UserDBException, ArtistProviderError, PodcastProviderError)
+@Catch(
+  CommentDBException,
+  UserDBException,
+  ArtistProviderError,
+  PodcastProviderError,
+)
 export class InternalServerErrorMapper implements ExceptionFilter {
   catch(_: Error, host: ArgumentsHost): void {
     return toResponse(
