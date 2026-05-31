@@ -6,6 +6,7 @@ import { IDeleteUser } from '../port/user/i-delete-user.port';
 import { ISearchUser } from '../port/user/i-search-user.port';
 import { IGetUser } from '../port/user/i-get-user.port';
 import { IFollowUser } from '../port/user/i-follow-user.port';
+import { IListFollows } from '../port/user/i-list-follows.port';
 import {
   USER_REPOSITORY,
   type IUserRepository,
@@ -20,10 +21,12 @@ export {
   SEARCH_USER,
   GET_USER,
   FOLLOW_USER,
+  LIST_FOLLOWS,
 } from '../port/user';
 import { UserModel } from '../model/user.model';
 import { JwtModel } from '../model/jwt.model';
 import { UserFilters } from '../model/user.filter';
+import { Page, PageRequest } from '../model/page.model';
 import { UserNotFoundException } from '../error/user/user-not-found.exception';
 import { AlreadyFollowingException } from '../error/user/already-following.exception';
 import { NotFollowingException } from '../error/user/not-following.exception';
@@ -40,7 +43,8 @@ export class UserService
     IDeleteUser,
     ISearchUser,
     IGetUser,
-    IFollowUser
+    IFollowUser,
+    IListFollows
 {
   constructor(
     @Inject(USER_REPOSITORY)
@@ -102,5 +106,21 @@ export class UserService
       throw new NotFollowingException(followerId, followingId);
     }
     await this.repo.unfollow(followerId, followingId);
+  }
+
+  async findFollowers(
+    userId: number,
+    page: PageRequest,
+  ): Promise<Page<number>> {
+    await this.get(userId);
+    return this.repo.findFollowers(userId, page);
+  }
+
+  async findFollowing(
+    userId: number,
+    page: PageRequest,
+  ): Promise<Page<number>> {
+    await this.get(userId);
+    return this.repo.findFollowing(userId, page);
   }
 }
