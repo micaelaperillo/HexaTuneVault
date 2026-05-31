@@ -19,7 +19,7 @@ export const localstore = [
         file.location = // Reduce TS comment scope
           new URL(
             `${content}/${location}`,
-            `${req.protocol}://${req.get('host')!}`,
+            `${req.protocol}://${req.get('host')}`,
           ).toString();
 
         cb(null, location);
