@@ -23,7 +23,10 @@ export class ImageController {
       new ParseFilePipeBuilder()
         // 10mb
         .addMaxSizeValidator({ maxSize: 10_000_000 })
-        .addFileTypeValidator({ fileType: /^image\/(png|jpeg|gif)$/ })
+        .addFileTypeValidator({
+          fileType: /^image\/.*$/,
+          fallbackToMimetype: true,
+        })
         .build(),
     )
     file: Express.Multer.File,
