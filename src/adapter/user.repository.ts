@@ -1,9 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { DataSource, ILike, Repository, QueryFailedError } from 'typeorm';
+import { DataSource, Repository, QueryFailedError } from 'typeorm';
 import { UserEntity } from '../entity/user.entity';
 import { IUserRepository } from '../repository/i-user.repository';
 import { UserModel } from '../model/user.model';
 import { UserFilters } from '../model/user.filter';
+import type { Page, PageRequest } from '../model/page.model';
 import { UserDBException } from '../error/user/user-db.exception';
 import { InvalidCredentialsException } from '../error/user/invalid-credentials.exception';
 import { POSTGRES_DB } from '../infrastructure/database/provider/postgres.provider';
@@ -25,7 +26,10 @@ export class UserRepository implements IUserRepository {
   }
 
   async findById(id: number): Promise<UserModel | null> {
-    return this.run(() => this.repo.findOneBy({ id }));
+    // `followerCount`/`followingCount` are virtual columns selected automatically.
+    return this.run(() =>
+      this.repo.createQueryBuilder('u').where('u.id = :id', { id }).getOne(),
+    );
   }
 
   async findByUsername(username: string): Promise<UserModel | null> {
@@ -41,22 +45,27 @@ export class UserRepository implements IUserRepository {
   }
 
   async search(filters: UserFilters): Promise<UserModel[]> {
-    return this.run(() =>
-      this.repo.findBy({
-        ...(filters.username !== undefined && {
-          username: ILike(`%${filters.username}%`),
-        }),
-        ...(filters.email !== undefined && {
-          email: ILike(`%${filters.email}%`),
-        }),
-        ...(filters.firstName !== undefined && {
-          firstName: ILike(`%${filters.firstName}%`),
-        }),
-        ...(filters.lastName !== undefined && {
-          lastName: ILike(`%${filters.lastName}%`),
-        }),
-      }),
-    );
+    return this.run(() => {
+      // `followerCount`/`followingCount` are virtual columns selected automatically.
+      const qb = this.repo.createQueryBuilder('u');
+
+      if (filters.username !== undefined)
+        qb.andWhere('u.username ILIKE :username', {
+          username: `%${filters.username}%`,
+        });
+      if (filters.email !== undefined)
+        qb.andWhere('u.email ILIKE :email', { email: `%${filters.email}%` });
+      if (filters.firstName !== undefined)
+        qb.andWhere('u.firstName ILIKE :firstName', {
+          firstName: `%${filters.firstName}%`,
+        });
+      if (filters.lastName !== undefined)
+        qb.andWhere('u.lastName ILIKE :lastName', {
+          lastName: `%${filters.lastName}%`,
+        });
+
+      return qb.getMany();
+    });
   }
 
   async update(user: Partial<UserModel>): Promise<UserModel> {
@@ -100,6 +109,36 @@ export class UserRepository implements IUserRepository {
         .loadMany<UserEntity>(),
     );
     return following.some((user) => user.id === followingId);
+  }
+
+  async findFollowers(
+    userId: number,
+    { page, pageSize }: PageRequest,
+  ): Promise<Page<number>> {
+    const [rows, total] = await this.run(() =>
+      this.repo
+        .createQueryBuilder('u')
+        .innerJoin('u.following', 'target', 'target.id = :userId', { userId })
+        .skip((page - 1) * pageSize)
+        .take(pageSize)
+        .getManyAndCount(),
+    );
+    return { items: rows.map((u) => u.id), page, pageSize, total };
+  }
+
+  async findFollowing(
+    userId: number,
+    { page, pageSize }: PageRequest,
+  ): Promise<Page<number>> {
+    const [rows, total] = await this.run(() =>
+      this.repo
+        .createQueryBuilder('u')
+        .innerJoin('u.followers', 'source', 'source.id = :userId', { userId })
+        .skip((page - 1) * pageSize)
+        .take(pageSize)
+        .getManyAndCount(),
+    );
+    return { items: rows.map((u) => u.id), page, pageSize, total };
   }
 
   private async run<T>(fn: () => Promise<T>): Promise<T> {

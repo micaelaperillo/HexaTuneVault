@@ -1,5 +1,6 @@
 import type { UserModel } from '../model';
 import type { UserFilters } from '../model/user.filter';
+import type { Page, PageRequest } from '../model/page.model';
 
 export const USER_REPOSITORY = Symbol('IUserRepository');
 
@@ -14,4 +15,6 @@ export interface IUserRepository {
   follow(followerId: number, followingId: number): Promise<void>;
   unfollow(followerId: number, followingId: number): Promise<void>;
   isFollowing(followerId: number, followingId: number): Promise<boolean>;
+  findFollowers(userId: number, page: PageRequest): Promise<Page<number>>;
+  findFollowing(userId: number, page: PageRequest): Promise<Page<number>>;
 }
