@@ -1,9 +1,9 @@
-import { Transform } from 'class-transformer/types/decorators/transform.decorator';
+import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
-  @Transform(({ value }) => (value as string).trim()) 
+  @Transform(({ value }) => (value as string).trim())
   @IsNotEmpty()
   username!: string;
 
