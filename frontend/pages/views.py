@@ -10,6 +10,7 @@ from .clients import artist_client
 from .clients import podcast_client
 from .clients import album_client
 from .clients import comment_client
+from .clients import user_client
 
 
 def login_required_api(view):
@@ -47,12 +48,12 @@ def home(request):
 
 def signin(request):
     if request.method == 'POST':
-        response = api_client.post('/api/auth/login', json={
-            'username': request.POST.get('username'),
-            'password': request.POST.get('password'),
-        })
+        response = user_client.authenticate(
+            request.POST.get('username'),
+            request.POST.get('password'),
+        )
         if response is not None and response.ok:
-            token = response.json().get('token')
+            token = response.json().get('accessToken')
             return _set_token_cookie(redirect('home'), token)
         messages.info(request, 'Invalid username or password')
         return redirect('login')
@@ -65,18 +66,22 @@ def signup(request):
             messages.info(request, 'Password not matching')
             return redirect('create_account')
 
-        is_artist = request.POST.get('isArtist') == 'on'
-        payload = {
-            'username': request.POST.get('username'),
-            'email': request.POST.get('email'),
-            'password': request.POST.get('password'),
-            'isArtist': is_artist,
-            'link': request.POST.get('link', ''),
-        }
-        response = api_client.post('/api/auth/register', json=payload)
+        # NOTE: the user API has no isArtist/link fields, so those form inputs
+        # are not forwarded yet.
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        response = user_client.create(
+            username=username,
+            password=password,
+            email=request.POST.get('email'),
+        )
         if response is not None and response.ok:
-            token = response.json().get('token')
-            return _set_token_cookie(redirect('profile'), token)
+            # Create issues no token; authenticate to start the session.
+            auth = user_client.authenticate(username, password)
+            if auth is not None and auth.ok:
+                token = auth.json().get('accessToken')
+                return _set_token_cookie(redirect('profile'), token)
+            return redirect('login')
 
         # Surface the API's validation message when available.
         detail = 'Could not create account'
@@ -104,29 +109,38 @@ def profile(request, user=None):
             return redirect('login')
         user = request.user.username
 
-    context = api_client.get_json(
-        f'/api/users/{user}/profile', request=request, default={}
-    ) or {}
-    context['isCurrentUser'] = (user == request.user.username)
+    user_profile = user_client.get_by_username(user, request=request) or {}
+    is_current_user = (user == request.user.username)
+    context = {
+        'user_profile': user_profile,
+        'isCurrentUser': is_current_user,
+        'button_text': 'Follow',
+        # The user API exposes no follower/post/favourite data yet; render the
+        # template's empty states until those APIs are wired.
+        'user_followers_count': 0,
+        'user_following_count': 0,
+        'user_post_length': 0,
+        'user_posts': [],
+        'user_favourites': {},
+        'user_followers': {},
+        'user_following': {},
+    }
     return render(request, 'profile.html', context)
 
 
 @login_required_api
 def settings_profile(request):
+    user_id = request.user.id
     if request.method == 'POST':
-        data = {
-            'bio': request.POST.get('bio', ''),
-            'location': request.POST.get('location', ''),
-        }
-        files = {}
-        if request.FILES.get('image'):
-            image = request.FILES['image']
-            files['image'] = (image.name, image.read(), image.content_type)
-        api_client.post('/api/users/me/settings', request=request, data=data, files=files or None)
+        # The user API only stores biography; location and image upload have no
+        # API field yet, so they are not persisted.
+        user_client.edit(
+            user_id, request=request, biography=request.POST.get('bio', '')
+        )
         return redirect('settings')
 
-    context = api_client.get_json('/api/users/me/settings', request=request, default={}) or {}
-    return render(request, 'settingsProfile.html', context)
+    user_profile = user_client.get(user_id, request=request) or {}
+    return render(request, 'settingsProfile.html', {'user_profile': user_profile})
 
 
 
@@ -203,16 +217,21 @@ def podcasts_search(request, query):
 def members(request):
     if request.method == 'POST':
         return redirect('/members/' + request.POST.get('query', ''))
-    context = api_client.get_json('/api/members/recommended', request=request, default={}) or {}
-    return render(request, 'members.html', context)
+    # No "recommended" endpoint yet; list all users as the recommended set.
+    members_list = user_client.search(request=request)
+    return render(request, 'members.html', {'membersList': members_list})
 
 
 def members_search(request, query):
     if request.method == 'POST':
         return redirect('/members/' + request.POST.get('query', ''))
-    context = api_client.get_json(
-        '/api/members/search', request=request, params={'q': query}, default={}
-    ) or {}
+    accounts = user_client.search(query, request=request)
+    context = {
+        'result': [
+            {'query': query, 'members': accounts},  # 0 -> Accounts tab
+            {'query': query, 'members': []},         # 1 -> Artists tab (no flag yet)
+        ],
+    }
     return render(request, 'searchMembers.html', context)
 
 
@@ -327,9 +346,14 @@ def vault_post(request, vtype, id, post_id):
 @login_required_api
 def follow(request):
     if request.method == 'POST':
-        user = request.POST.get('user')
-        api_client.post(f'/api/users/{user}/follow', request=request)
-        return redirect('/profile/' + user)
+        username = request.POST.get('user')
+        # The form posts a username, but the API follows by numeric id.
+        target = user_client.get_by_username(username, request=request)
+        if target is not None and target.get('id') is not None:
+            user_client.toggle_follow(
+                target['id'], request.user.id, request=request
+            )
+        return redirect('/profile/' + username)
     return redirect('home')
 
 
