@@ -296,6 +296,11 @@ def vault(request, vtype, id):
         if album is not None:
             # The album API returns artist names only (no avatars yet).
             author = album['artists'][0] if album['artists'] else ''
+            author_image = ''
+            if author:
+                artist = artist_client.get(author, request=request)
+                if artist is not None:
+                    author_image = artist['image']
             context['vault'] = {
                 'type': 'album',
                 'title': album['album'],
