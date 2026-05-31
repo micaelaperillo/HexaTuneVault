@@ -6,17 +6,21 @@ import { UserModel } from '../model/user.model';
 import { UserFilters } from '../model/user.filter';
 import { UserDBException } from '../error/user/user-db.exception';
 import { POSTGRES_DB } from '../infrastructure/database/provider/postgres.provider';
+import { type IPasswordHasher, PASSWORD_HASHER } from 'src/repository/i-password-hasher';
 
 @Injectable()
 export class UserRepository implements IUserRepository {
   private readonly repo: Repository<UserEntity>;
+  private readonly hasher: IPasswordHasher;
 
-  constructor(@Inject(POSTGRES_DB) ds: DataSource) {
+  constructor(@Inject(POSTGRES_DB) ds: DataSource, @Inject(PASSWORD_HASHER) hasher: IPasswordHasher) {
     this.repo = ds.getRepository(UserEntity);
+    this.hasher = hasher;
   }
 
   async create(user: Omit<UserModel, 'id'>): Promise<UserModel> {
-    return this.run(() => this.repo.save(user));
+    const password = await this.hasher.hash(user.password);
+    return this.run(() => this.repo.save({ ...user, password }));
   }
 
   async findById(id: number): Promise<UserModel | null> {
@@ -25,6 +29,14 @@ export class UserRepository implements IUserRepository {
 
   async findByUsername(username: string): Promise<UserModel | null> {
     return this.run(() => this.repo.findOneBy({ username }));
+  }
+
+  async authenticate(username: string, plaintext: string): Promise<UserModel | null> {
+    const user = await this.findByUsername(username);
+    if (!user || !(await this.hasher.verify(plaintext, user.password))) {
+      return null;
+    }
+    return user;
   }
 
   async search(filters: UserFilters): Promise<UserModel[]> {
@@ -47,9 +59,9 @@ export class UserRepository implements IUserRepository {
   }
 
   async update(user: Partial<UserModel>): Promise<UserModel> {
+    user.password &&= await this.hasher.hash(user.password); 
     return this.run(async () => {
-      const saved = await this.repo.save(user);
-      return this.repo.findOneByOrFail({ id: saved.id });
+      return this.repo.save(user);
     });
   }
 

@@ -10,10 +10,6 @@ import {
   USER_REPOSITORY,
   type IUserRepository,
 } from '../repository/i-user.repository';
-import {
-  PASSWORD_HASHER,
-  type IPasswordHasher,
-} from '../repository/i-password-hasher';
 import { TOKEN_ISSUER, type ITokenIssuer } from '../repository/i-token-issuer';
 import { UserModel } from '../model/user.model';
 import { JwtModel } from '../model/jwt.model';
@@ -40,8 +36,6 @@ export class UserService
   constructor(
     @Inject(USER_REPOSITORY)
     private readonly repo: IUserRepository,
-    @Inject(PASSWORD_HASHER)
-    private readonly hasher: IPasswordHasher,
     @Inject(TOKEN_ISSUER)
     private readonly tokenIssuer: ITokenIssuer,
   ) {}
@@ -49,26 +43,21 @@ export class UserService
   async authenticate(
     credentials: Pick<UserModel, 'username' | 'password'>,
   ): Promise<JwtModel> {
-    const user = await this.repo.findByUsername(credentials.username);
-    if (
-      !user ||
-      !(await this.hasher.compare(credentials.password, user.password))
-    ) {
+    const user = await this.repo.authenticate(
+      credentials.username,
+      credentials.password,
+    );
+    if (!user) {
       throw new InvalidCredentialsException();
     }
     return this.tokenIssuer.issue(user);
   }
 
   async create(user: Omit<UserModel, 'id'>): Promise<UserModel> {
-    const password = await this.hasher.hash(user.password);
-    return this.repo.create({ ...user, password });
+    return this.repo.create(user);
   }
 
   async edit(user: Partial<UserModel>): Promise<UserModel> {
-    if (user.password !== undefined) {
-      const password = await this.hasher.hash(user.password);
-      return this.repo.update({ ...user, password });
-    }
     return this.repo.update(user);
   }
 

@@ -13,7 +13,7 @@ export class Argon2idPasswordHasher implements IPasswordHasher {
     });
   }
 
-  async compare(plain: string, hash: string): Promise<boolean> {
+  async verify(plain: string, hash: string): Promise<boolean> {
     return argon2.verify(hash, plain);
   }
 }
