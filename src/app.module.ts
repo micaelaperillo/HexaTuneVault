@@ -4,6 +4,7 @@ import { ArtistModule } from './module/artist.module';
 import { PodcastModule } from './module/podcast.module';
 import { AlbumModule } from './module/album.module';
 import { CommentModule } from './module/comment.module';
+import { UserModule } from './module/user.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { CommentModule } from './module/comment.module';
     PodcastModule,
     AlbumModule,
     CommentModule,
+    UserModule,
   ],
   controllers: [],
   providers: [],
