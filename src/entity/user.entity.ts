@@ -8,6 +8,7 @@ import {
   VersionColumn,
   ManyToMany,
   JoinTable,
+  VirtualColumn,
 } from 'typeorm';
 
 @Entity('users')
@@ -58,4 +59,22 @@ export class UserEntity {
 
   @ManyToMany(() => UserEntity, (user) => user.following)
   followers!: UserEntity[];
+
+  // Computed (not persisted) columns. The `user_follows` join table stores a row
+  // `(followerId, followingId)` meaning followerId follows followingId, so the
+  // number of followers of this user is the count of rows where it is the
+  // followingId, and the number it follows is the count where it is the followerId.
+  @VirtualColumn({
+    type: 'int',
+    query: (alias) =>
+      `SELECT COUNT(*)::int FROM "user_follows" WHERE "followingId" = ${alias}.id`,
+  })
+  followerCount?: number;
+
+  @VirtualColumn({
+    type: 'int',
+    query: (alias) =>
+      `SELECT COUNT(*)::int FROM "user_follows" WHERE "followerId" = ${alias}.id`,
+  })
+  followingCount?: number;
 }

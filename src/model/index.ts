@@ -9,3 +9,4 @@ export * from './comment.filter';
 export * from './user.model';
 export * from './user.filter';
 export * from './jwt.model';
+export * from './page.model';
