@@ -308,7 +308,7 @@ def vault(request, vtype, id):
                 'id': id,
                 'date': album['date'],
                 'total_tracks': album['total_tracks'],
-                'authors': [{'name': author, 'image': ''}],
+                'authors': [{'name': author, 'image': author_image}],
             }
     else:
         context = api_client.get_json(f'/api/vaults/{vtype}/{id}', request=request, default={}) or {}
