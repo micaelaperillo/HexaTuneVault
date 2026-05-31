@@ -1,4 +1,4 @@
-import type { Express, Response } from 'express';
+import type { Response } from 'express';
 
 import {
   Controller,
@@ -29,10 +29,10 @@ export class ImageController {
         })
         .build(),
     )
-    file: Express.Multer.File,
+    file: Express.Multer.File & { location: string },
     @Res({ passthrough: true }) res: Response,
   ) {
     this.logger.log(`Uploaded ${file.filename} (${file.size} bytes)`);
-    res.location(`/user-content/${file.filename}`);
+    res.location(file.location);
   }
 }
