@@ -9,7 +9,6 @@ import {
   Body,
   Query,
   ParseIntPipe,
-  UseFilters,
   HttpCode,
 } from '@nestjs/common';
 
@@ -37,21 +36,6 @@ import { LoginUserDto } from '../dto/login-user.dto';
 import { UserResponseDto } from '../dto/user-response.dto';
 import { AuthResponseDto } from '../dto/auth-response.dto';
 
-import {
-  NotFoundMapper,
-  ConflictMapper,
-  UnauthorizedMapper,
-  UnprocessableEntityMapper,
-  InternalServerErrorMapper,
-} from './exception.mapper';
-
-@UseFilters(
-  NotFoundMapper,
-  ConflictMapper,
-  UnauthorizedMapper,
-  UnprocessableEntityMapper,
-  InternalServerErrorMapper,
-)
 @Controller('api/users')
 export class UserController {
   constructor(

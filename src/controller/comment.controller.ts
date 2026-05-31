@@ -9,7 +9,6 @@ import {
   Body,
   Query,
   ParseIntPipe,
-  UseFilters,
   HttpCode,
 } from '@nestjs/common';
 
@@ -35,13 +34,6 @@ import { CommentFiltersDto } from '../dto/comment-filters.dto';
 import { CommentResponseDto } from '../dto/comment-response.dto';
 import { UserLinkDto } from '../dto/user-link.dto';
 
-import {
-  NotFoundMapper,
-  ConflictMapper,
-  InternalServerErrorMapper,
-} from './exception.mapper';
-
-@UseFilters(NotFoundMapper, ConflictMapper, InternalServerErrorMapper)
 @Controller('api/comments')
 export class CommentController {
   constructor(

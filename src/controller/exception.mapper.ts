@@ -37,7 +37,7 @@ function toResponse(e: HttpException, host: ArgumentsHost) {
 }
 
 @Catch(CommentNotFoundException, UserNotFoundException)
-export class NotFoundMapper implements ExceptionFilter {
+class NotFoundMapper implements ExceptionFilter {
   catch(exception: Error, host: ArgumentsHost): void {
     return toResponse(new NotFoundException(exception.message), host);
   }
@@ -49,21 +49,21 @@ export class NotFoundMapper implements ExceptionFilter {
   AlreadyFollowingException,
   NotFollowingException,
 )
-export class ConflictMapper implements ExceptionFilter {
+class ConflictMapper implements ExceptionFilter {
   catch(exception: Error, host: ArgumentsHost): void {
     return toResponse(new ConflictException(exception.message), host);
   }
 }
 
 @Catch(InvalidCredentialsException)
-export class UnauthorizedMapper implements ExceptionFilter {
+class UnauthorizedMapper implements ExceptionFilter {
   catch(exception: Error, host: ArgumentsHost): void {
     return toResponse(new UnauthorizedException(exception.message), host);
   }
 }
 
 @Catch(SelfFollowException)
-export class UnprocessableEntityMapper implements ExceptionFilter {
+class UnprocessableEntityMapper implements ExceptionFilter {
   catch(exception: Error, host: ArgumentsHost): void {
     return toResponse(
       new UnprocessableEntityException(exception.message),
@@ -78,7 +78,7 @@ export class UnprocessableEntityMapper implements ExceptionFilter {
   ArtistProviderError,
   PodcastProviderError,
 )
-export class InternalServerErrorMapper implements ExceptionFilter {
+class InternalServerErrorMapper implements ExceptionFilter {
   catch(_: Error, host: ArgumentsHost): void {
     return toResponse(
       new InternalServerErrorException('An unexpected error occurred'),
@@ -86,3 +86,11 @@ export class InternalServerErrorMapper implements ExceptionFilter {
     );
   }
 }
+
+export const filters = [
+  new NotFoundMapper(),
+  new ConflictMapper(),
+  new UnauthorizedMapper(),
+  new UnprocessableEntityMapper(),
+  new InternalServerErrorMapper(),
+] as const;
