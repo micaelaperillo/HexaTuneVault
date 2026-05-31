@@ -8,6 +8,7 @@ from django.shortcuts import redirect, render
 from .clients import api_client
 from .clients import artist_client
 from .clients import podcast_client
+from .clients import album_client
 from .clients import comment_client
 
 
@@ -149,10 +150,11 @@ def music_search(request, query):
         return redirect('/music/' + query)
     genre = request.GET.get('genre', '')
     artists = artist_client.search(query, genre, request=request)
+    albums = album_client.search(query, request=request)
     context = {
         'result': [
-            {'query': query, 'vaults': artists},  
-            {'query': query, 'vaults': []},       #Albums tab (TODO: album API)
+            {'query': query, 'vaults': artists},  # 0 -> Artists
+            {'query': query, 'vaults': albums},   # 1 -> Albums
         ],
     }
     return render(request, 'searchMusic.html', context)
@@ -218,17 +220,20 @@ def members_search(request, query):
 def all_search(request, query):
     if request.method == 'POST':
         return redirect('/search/' + request.POST.get('query', ''))
+
     # The artist and podcast APIs are live; other sections await their APIs.
     artists = artist_client.search(query, request=request)
     podcasts = podcast_client.search(query, request=request)
+    albums = album_client.search(query, request=request)
+
     context = {
         'result': [
             {'query': query, 'vaults': artists},  # 0 -> Artists
-            {'query': query, 'vaults': []},       # 1 -> Albums
+            {'query': query, 'vaults': albums},       # 1 -> Albums
             {'query': query, 'vaults': podcasts}, # 2 -> Podcasts
             {'query': query, 'members': []},      # 3 -> Artist members
             {'query': query, 'members': []},      # 4 -> Members
-        ],
+        ]
     }
     return render(request, 'searchResult.html', context)
 
@@ -266,6 +271,21 @@ def vault(request, vtype, id):
                 'total_tracks': podcast['total_episodes'],  # template reuses total_tracks as the episode count
                 'external_url': podcast['external_url'],
                 'authors': [{'name': podcast['publisher'], 'image': podcast['image']}],
+            }
+    elif vtype == 'album':
+        album = album_client.get(id, request=request)
+        context = {}
+        if album is not None:
+            # The album API returns artist names only (no avatars yet).
+            author = album['artists'][0] if album['artists'] else ''
+            context['vault'] = {
+                'type': 'album',
+                'title': album['album'],
+                'spotifyimg': album['image'],
+                'id': id,
+                'date': album['date'],
+                'total_tracks': album['total_tracks'],
+                'authors': [{'name': author, 'image': ''}],
             }
     else:
         context = api_client.get_json(f'/api/vaults/{vtype}/{id}', request=request, default={}) or {}
