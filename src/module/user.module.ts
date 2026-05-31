@@ -8,8 +8,8 @@ import { Argon2idPasswordHasher } from '../adapter/argon2id-password-hasher';
 import { TOKEN_ISSUER } from '../repository/i-token-issuer';
 import { JwtTokenIssuer } from '../adapter/jwt-token-issuer';
 
-import { UserService } from '../use-case/user.service';
 import {
+  UserService,
   AUTHENTICATE_USER,
   CREATE_USER,
   EDIT_USER,
@@ -17,7 +17,7 @@ import {
   SEARCH_USER,
   GET_USER,
   FOLLOW_USER,
-} from '../port/user/';
+} from '../use-case/user.service';
 
 import { UserController } from '../controller/user.controller';
 

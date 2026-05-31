@@ -11,6 +11,16 @@ import {
   type IUserRepository,
 } from '../repository/i-user.repository';
 import { TOKEN_ISSUER, type ITokenIssuer } from '../repository/i-token-issuer';
+
+export {
+  AUTHENTICATE_USER,
+  CREATE_USER,
+  EDIT_USER,
+  DELETE_USER,
+  SEARCH_USER,
+  GET_USER,
+  FOLLOW_USER,
+} from '../port/user';
 import { UserModel } from '../model/user.model';
 import { JwtModel } from '../model/jwt.model';
 import { UserFilters } from '../model/user.filter';
