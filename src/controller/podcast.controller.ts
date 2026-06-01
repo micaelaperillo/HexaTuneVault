@@ -60,11 +60,15 @@ export class PodcastController {
   private static toResponse(this: void, podcast: PodcastModel) {
     const params = new URLSearchParams({ podcast: podcast.name }).toString();
 
-    return plainToInstance(PodcastResponseDto, {
-      ...podcast,
-      self: `/api/podcasts/${encodeURIComponent(podcast.name)}`,
-      episodes: `/api/episodes?${params}`,
-      reviews: `/api/reviews?${params}`,
-    });
+    return plainToInstance(
+      PodcastResponseDto,
+      {
+        ...podcast,
+        self: `/api/podcasts/${encodeURIComponent(podcast.name)}`,
+        episodes: `/api/episodes?${params}`,
+        reviews: `/api/reviews?${params}`,
+      },
+      { excludeExtraneousValues: true },
+    );
   }
 }
