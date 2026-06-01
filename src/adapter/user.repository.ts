@@ -1,23 +1,24 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { DataSource, ILike, Repository, QueryFailedError } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ILike, Repository, QueryFailedError } from 'typeorm';
 import { UserEntity } from '../entity/user.entity';
 import { IUserRepository } from '../repository/i-user.repository';
 import { UserModel } from '../model/user.model';
 import { UserFilters } from '../model/user.filter';
 import { UserDBException } from '../error/user/user-db.exception';
 import { InvalidCredentialsException } from '../error/user/invalid-credentials.exception';
-import { POSTGRES_DB } from '../infrastructure/database/provider/postgres.provider';
-import { type IPasswordHasher, PASSWORD_HASHER } from 'src/repository/i-password-hasher';
+import {
+  type IPasswordHasher,
+  PASSWORD_HASHER,
+} from '../repository/i-password-hasher';
 
 @Injectable()
 export class UserRepository implements IUserRepository {
-  private readonly repo: Repository<UserEntity>;
-  private readonly hasher: IPasswordHasher;
-
-  constructor(@Inject(POSTGRES_DB) ds: DataSource, @Inject(PASSWORD_HASHER) hasher: IPasswordHasher) {
-    this.repo = ds.getRepository(UserEntity);
-    this.hasher = hasher;
-  }
+  constructor(
+    @InjectRepository(UserEntity)
+    private readonly repo: Repository<UserEntity>,
+    @Inject(PASSWORD_HASHER) private readonly hasher: IPasswordHasher,
+  ) {}
 
   async create(user: Omit<UserModel, 'id'>): Promise<UserModel> {
     const password = await this.hasher.hash(user.password);
@@ -60,7 +61,7 @@ export class UserRepository implements IUserRepository {
   }
 
   async update(user: Partial<UserModel>): Promise<UserModel> {
-    user.password &&= await this.hasher.hash(user.password); 
+    user.password &&= await this.hasher.hash(user.password);
     return this.run(async () => {
       return this.repo.save(user);
     });
