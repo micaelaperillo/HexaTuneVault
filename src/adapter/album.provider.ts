@@ -52,11 +52,11 @@ export class SpotifyAlbumProvider implements IAlbumProvider {
     const params: string[] = [];
 
     if (filters.name) {
-      params.push(`album:${filters.name}`);
+      params.push(filters.name);
     }
 
     if (filters.artist) {
-      params.push(`artist:${filters.artist}`);
+      params.push(filters.artist);
     }
 
     return params.join(' ');
