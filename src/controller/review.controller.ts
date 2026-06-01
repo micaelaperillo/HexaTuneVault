@@ -21,7 +21,6 @@ import type { IGetReview } from '../port/review/get-review.port';
 import { CreateReviewRequest } from '../dto/create-review.request';
 import { SearchReviewQueryDto } from '../dto/search-review-query.dto';
 import { ReviewResponse } from '../dto/review-response.dto';
-import { ReviewSearchCriteriaMapper } from './review-search-criteria.mapper';
 import {
   CREATE_REVIEW,
   DELETE_REVIEW,
@@ -86,5 +85,51 @@ export class ReviewController {
     // TODO: replace hardcoded userId with @CurrentUser() from AuthGuard
     const userId = '1';
     await this.deleteReview.execute({ reviewId: id, requesterId: userId });
+  }
+
+  private static toResponse(this: void, review: ReviewModel) {
+    if (review.id === undefined || review.createdAt === undefined) {
+      throw new Error('Cannot create response from unsaved review');
+    }
+
+    return plainToInstance(
+      ReviewResponse,
+      {
+        ...review,
+        created_at: review.createdAt,
+        updated_at: review.updatedAt,
+        self: `/api/reviews/${review.id}`,
+        collection: `/api/reviews`,
+        subject: `/api/${review.subjectRef.type}s/${review.subjectRef.id}`,
+        author: `/api/users/${review.authorId}`,
+      },
+      { excludeExtraneousValues: true },
+    );
+  }
+}
+
+class ReviewSearchCriteriaMapper {
+  static fromDto(dto: SearchReviewQueryDto): ReviewSearchCriteria {
+    const base = {
+      page: dto.page,
+      pageSize: dto.page_size,
+      content: dto.content_contains,
+      authorId: dto.author_id,
+      minRating: dto.min_rating,
+      maxRating: dto.max_rating,
+      dateFrom: dto.date_from,
+      dateTo: dto.date_to,
+      sortBy: dto.sort_by,
+      sortOrder: dto.sort_order,
+    };
+
+    if (dto.subject_type !== undefined) {
+      return {
+        ...base,
+        subjectType: dto.subject_type,
+        subjectId: dto.subject_id,
+      };
+    }
+    return { ...base, subjectType: undefined, subjectId: undefined };
   }
 }
