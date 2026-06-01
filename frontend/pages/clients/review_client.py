@@ -46,8 +46,22 @@ def list_by_author(author_id, request=None) -> list[dict]:
     return [_to_profile_post(r, request, subject_cache) for r in data]
 
 
+def feed(authors, request=None, limit=20) -> list[dict]:
+    subject_cache: dict[tuple[str, str], tuple[str, str]] = {}
+    items: list[dict] = []
+    for author in authors:
+        data = api_client.get_json(
+            BASE, request=request,
+            params={'author_id': str(author['id'])}, default=[],)
+        if not isinstance(data, list):
+            continue
+        for r in data:
+            item = _to_profile_post(r, request, subject_cache)
+            item['user'] = author.get('username', '')
+            items.append(item)
+    return items[:limit]
+
 def _subject(subject_type, subject_id, request, cache) -> tuple[str, str]:
-    """Resolve a review's subject to (display_name, image_url)."""
     key = (subject_type, subject_id)
     if key in cache:
         return cache[key]
@@ -69,7 +83,6 @@ def _subject(subject_type, subject_id, request, cache) -> tuple[str, str]:
 
 
 def _to_profile_post(r: dict, request, cache) -> dict:
-    """Shape a review for profile.html's commentBox include."""
     subject_type = r.get('subject_type', '')
     subject_id = r.get('subject_id', '')
     name, image = _subject(subject_type, subject_id, request, cache)

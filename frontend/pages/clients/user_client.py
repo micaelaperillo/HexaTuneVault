@@ -37,7 +37,6 @@ def create(username, password, email, first_name='', last_name='',
 
 
 def search(username='', request=None) -> list[dict]:
-    """Search users by username (blank = all users). Returns member dicts."""
     params = {'username': username} if username else None
     data = api_client.get_json('/api/users', request=request, params=params, default=[])
     if not isinstance(data, list):
@@ -110,11 +109,12 @@ def _follow_user(user_id, request, cache) -> dict:
     profile = get(user_id, request=request) if user_id else None
     if profile:
         info = {
+            'id': user_id,
             'username': profile.get('user', ''),
             'img': profile.get('profileimg', ''),
         }
     else:
-        info = {'username': user_id or '', 'img': DEFAULT_PROFILE_IMAGE}
+        info = {'id': user_id, 'username': user_id or '', 'img': DEFAULT_PROFILE_IMAGE}
     cache[user_id] = info
     return info
 
@@ -128,7 +128,6 @@ def _to_member(user: dict) -> dict:
 
 
 def _to_profile(user: dict) -> dict:
-    """Shape for profile.html / settingsProfile.html."""
     return {
         'id': user.get('id'),
         'user': user.get('username', ''),

@@ -43,7 +43,8 @@ def _set_token_cookie(response, token):
 def home(request):
     timeline = []
     if request.user.is_authenticated:
-        timeline = api_client.get_json('/api/feed/timeline', request=request, default=[])
+        following = user_client.following(request.user.id, request=request)
+        timeline = review_client.feed(following['users'], request=request)
     return render(request, 'home.html', {'timeline': timeline})
 
 
