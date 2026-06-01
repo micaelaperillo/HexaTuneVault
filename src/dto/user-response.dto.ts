@@ -15,6 +15,8 @@ export class UserResponseDto {
   @Expose()
   biography!: string;
   @Expose()
+  location!: string;
+  @Expose()
   profilePictureUrl!: string;
   @Expose()
   followerCount!: number;
@@ -25,6 +27,7 @@ export class UserResponseDto {
     const dto = plainToInstance(UserResponseDto, model, {
       excludeExtraneousValues: true,
     });
+    dto.location = model.location ?? '';
     dto.followerCount = model.followerCount ?? 0;
     dto.followingCount = model.followingCount ?? 0;
     return dto;

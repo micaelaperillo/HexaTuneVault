@@ -34,6 +34,9 @@ export class UserEntity {
   @Column({ default: '' })
   biography!: string;
 
+  @Column({ length: 256, default: '' })
+  location!: string;
+
   @Column({ default: '' })
   profilePictureUrl!: string;
 

@@ -1,5 +1,11 @@
 import { Transform } from 'class-transformer';
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -27,6 +33,12 @@ export class CreateUserDto {
 
   @IsString()
   biography!: string;
+
+  @IsOptional()
+  @IsString()
+  @Transform(({ value }) => (value as string).trim())
+  @MaxLength(256)
+  location?: string;
 
   @IsString()
   profilePictureUrl!: string;
