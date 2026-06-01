@@ -24,7 +24,12 @@ export class SpotifyAlbumProvider implements IAlbumProvider {
       const query = SpotifyAlbumProvider.toQuery(filters);
       this.logger.debug(query);
 
-      const { albums } = await this.spotify.search(query, ['album']);
+      const { albums } = await this.spotify.search(
+        query,
+        ['album'],
+        undefined,
+        10,
+      );
       this.logger.debug(albums.items);
 
       return albums.items

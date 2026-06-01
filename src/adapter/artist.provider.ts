@@ -24,7 +24,12 @@ export class SpotifyArtistProvider implements IArtistProvider {
       const query = SpotifyArtistProvider.toQuery(filters);
       this.logger.debug(query);
 
-      const { artists } = await this.spotify.search(query, ['artist']);
+      const { artists } = await this.spotify.search(
+        query,
+        ['artist'],
+        undefined,
+        10,
+      );
       this.logger.debug(artists.items);
 
       return artists.items
