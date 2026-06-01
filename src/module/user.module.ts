@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { JwtModule, type JwtModuleOptions } from '@nestjs/jwt';
 
 import { UserEntity } from '../entity/user.entity';
 import { USER_REPOSITORY } from '../repository/i-user.repository';
@@ -25,28 +24,7 @@ import {
 import { UserController } from '../controller/user.controller';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([UserEntity]),
-    JwtModule.registerAsync({
-      useFactory: (): JwtModuleOptions => {
-        const secret = process.env.JWT_SECRET;
-        if (!secret) {
-          throw new Error('JWT_SECRET is not set');
-        }
-        return {
-          secret,
-          signOptions: {
-            // `@types/jsonwebtoken` types `expiresIn` as `number | StringValue`
-            // (an `ms` template-literal type), so a plain `string` from the env
-            // needs this assertion. Keep the env value a valid `ms` span (e.g. '1h').
-            expiresIn: (process.env.JWT_EXPIRES_IN ?? '1h') as NonNullable<
-              JwtModuleOptions['signOptions']
-            >['expiresIn'],
-          },
-        };
-      },
-    }),
-  ],
+  imports: [TypeOrmModule.forFeature([UserEntity])],
   controllers: [UserController],
   providers: [
     { provide: USER_REPOSITORY, useClass: UserRepository },
