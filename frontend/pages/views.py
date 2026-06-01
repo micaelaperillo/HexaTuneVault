@@ -137,7 +137,7 @@ def profile(request, user=None):
 def settings_profile(request):
     user_id = request.user.id
     if request.method == 'POST':
-        fields = {'biography': request.POST.get('bio', '')}
+        fields = {'biography': request.POST.get('bio', ''),'location':request.POST.get('location','')}
         image_url = image_client.upload(request.FILES.get('image'), request=request)
         if image_url:
             fields['profilePictureUrl'] = image_url
@@ -296,7 +296,7 @@ def vault(request, vtype, id):
                 'spotifyimg': podcast['image'],
                 'id': id,
                 'description': podcast['description'],
-                'total_tracks': podcast['total_episodes'],  # template reuses total_tracks as the episode count
+                'total_tracks': podcast['total_episodes'], 
                 'external_url': podcast['external_url'],
                 'authors': [{'name': podcast['publisher'], 'image': podcast['image']}],
             }

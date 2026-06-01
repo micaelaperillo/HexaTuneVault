@@ -23,7 +23,7 @@ def authenticate(username, password):
 
 
 def create(username, password, email, first_name='', last_name='',
-           biography='', profile_picture_url=DEFAULT_PROFILE_IMAGE):
+           biography='',location='' ,profile_picture_url=DEFAULT_PROFILE_IMAGE):
     return api_client.post('/api/users', json={
         'username': username,
         'password': password,
@@ -31,6 +31,7 @@ def create(username, password, email, first_name='', last_name='',
         'firstName': first_name or username,
         'lastName': last_name or username,
         'biography': biography,
+        'location':location,
         'profilePictureUrl': profile_picture_url,
     })
 
@@ -135,7 +136,7 @@ def _to_profile(user: dict) -> dict:
         'user': user.get('username', ''),
         'profileimg': user.get('profilePictureUrl') or DEFAULT_PROFILE_IMAGE,
         'bio': user.get('biography', ''),
-        'location': '',     # not in the user API
+        'location': user.get('location',''),
         'isArtist': False,  # not in the user API
         'email': user.get('email', ''),
         'firstName': user.get('firstName', ''),
