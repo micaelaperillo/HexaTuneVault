@@ -145,6 +145,7 @@ def settings_profile(request):
     user_profile = user_client.get(user_id, request=request) or {}
     return render(request, 'settingsProfile.html', {'user_profile': user_profile})
 
+TRENDING_QUERY = 'the'
 
 
 def music(request):
@@ -154,8 +155,9 @@ def music(request):
         if genre and query:
             query += '/?genre=' + genre
         return redirect('/music/' + query)
-    context = api_client.get_json('/api/music/trending', request=request, default={}) or {}
-    return render(request, 'music.html', context)
+    artists = artist_client.search(TRENDING_QUERY, request=request)
+    top = {a['id']: a for a in artists}
+    return render(request, 'music.html', {'top': top})
 
 
 def music_search(request, query):
@@ -188,8 +190,10 @@ def podcasts(request):
         if media_type and query:
             query += ('&media_type=' if content else '/?media_type=') + media_type
         return redirect('/podcasts/' + query)
-    context = api_client.get_json('/api/podcasts/trending', request=request, default={}) or {}
-    return render(request, 'podcasts.html', context)
+    results = podcast_client.search(TRENDING_QUERY, request=request)
+    top = {p['id']: {'artist': p['show'], 'image': p['image']}
+           for p in results}
+    return render(request, 'podcasts.html', {'top': top})
 
 
 def podcasts_search(request, query):
