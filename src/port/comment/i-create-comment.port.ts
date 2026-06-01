@@ -1,4 +1,4 @@
-import { CommentModel } from '../../model/comment.model';
+import { CommentModel, UserModel, ReviewModel } from '../../model';
 
 /** DI token for {@link ICreateComment}. */
 export const CREATE_COMMENT = Symbol('ICreateComment');
@@ -13,5 +13,13 @@ export interface ICreateComment {
    * to nest the comment as a reply, or `null` for a top-level comment.
    * @returns The created comment, including its generated `id` and `createdAt`.
    */
-  create(comment: Omit<CommentModel, 'id' | 'createdAt'>): Promise<CommentModel>;
+  create(
+    comment: Omit<
+      CommentModel,
+      'id' | 'createdAt' | 'createdBy' | 'parentReview'
+    > & {
+      createdBy: Pick<UserModel, 'id'>;
+      parentReview: Pick<ReviewModel, 'id'>;
+    },
+  ): Promise<CommentModel>;
 }

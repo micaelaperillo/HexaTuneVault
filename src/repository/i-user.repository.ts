@@ -15,6 +15,6 @@ export interface IUserRepository {
   follow(followerId: number, followingId: number): Promise<void>;
   unfollow(followerId: number, followingId: number): Promise<void>;
   isFollowing(followerId: number, followingId: number): Promise<boolean>;
-  findFollowers(userId: number, page: PageRequest): Promise<Page<number>>;
-  findFollowing(userId: number, page: PageRequest): Promise<Page<number>>;
+  findFollowers(userId: number, page: PageRequest): Promise<Page<UserModel>>;
+  findFollowing(userId: number, page: PageRequest): Promise<Page<UserModel>>;
 }

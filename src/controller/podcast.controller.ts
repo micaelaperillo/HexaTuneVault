@@ -1,3 +1,5 @@
+import type { PodcastModel } from '../model';
+
 import {
   type IGetPodcast,
   GET_PODCAST,
@@ -16,6 +18,7 @@ import {
   Logger,
   Inject,
 } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
 
 @Controller('api/podcasts')
 export class PodcastController {
@@ -41,7 +44,7 @@ export class PodcastController {
       market,
     });
 
-    return PodcastResponseDto.fromMany(results);
+    return results.map(PodcastController.toResponse);
   }
 
   @Get(':name')
@@ -51,6 +54,17 @@ export class PodcastController {
     const podcast = await this.getter.get({ name });
     if (!podcast) throw new NotFoundException();
 
-    return PodcastResponseDto.from(podcast);
+    return PodcastController.toResponse(podcast);
+  }
+
+  private static toResponse(this: void, podcast: PodcastModel) {
+    const params = new URLSearchParams({ podcast: podcast.name }).toString();
+
+    return plainToInstance(PodcastResponseDto, {
+      ...podcast,
+      self: `/api/podcasts/${encodeURIComponent(podcast.name)}`,
+      episodes: `/api/episodes?${params}`,
+      reviews: `/api/reviews?${params}`,
+    });
   }
 }

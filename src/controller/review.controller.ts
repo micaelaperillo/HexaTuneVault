@@ -27,6 +27,9 @@ import {
   SEARCH_REVIEW,
   GET_REVIEW,
 } from '../port/review/tokens';
+import { ReviewSearchCriteria } from '../model/review-search-criteria';
+import { ReviewModel } from '../model';
+import { plainToInstance } from 'class-transformer';
 
 @Controller('api/reviews')
 export class ReviewController {
@@ -52,12 +55,13 @@ export class ReviewController {
       subjectId: dto.subject_id,
       authorId: userId,
     });
-    const response = ReviewResponse.fromDomain(review);
+
     res.header(
       'Location',
-      `${req.protocol}://${req.get('host')}/api/reviews/${response.id}`,
+      `${req.protocol}://${req.get('host')}/api/reviews/${review.id}`,
     );
-    return response;
+
+    return ReviewController.toResponse(review);
   }
 
   @Get()
@@ -68,7 +72,7 @@ export class ReviewController {
     const criteria = ReviewSearchCriteriaMapper.fromDto(dto);
     const { data, total } = await this.searchReview.execute(criteria);
     res.header('X-Total-Count', total.toString());
-    return data.map((review) => ReviewResponse.fromDomain(review));
+    return data.map(ReviewController.toResponse);
   }
 
   @Get(':id')
@@ -76,7 +80,7 @@ export class ReviewController {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<ReviewResponse> {
     const review = await this.getReview.execute(id);
-    return ReviewResponse.fromDomain(review);
+    return ReviewController.toResponse(review);
   }
 
   @Delete(':id')

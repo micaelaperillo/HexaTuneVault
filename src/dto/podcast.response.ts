@@ -1,43 +1,30 @@
-import { PodcastModel } from '../model';
+import { Expose } from 'class-transformer';
 
 export class PodcastResponseDto {
-  readonly name: string;
-  readonly avatar: string;
-  readonly publisher: string;
-  readonly description: string;
-  readonly total_episodes: number;
-  readonly external_urls: Record<string, string>;
-  readonly self: `/${string}`;
-  readonly episodes: `/${string}`;
-  readonly reviews: `/${string}`;
+  @Expose()
+  readonly name!: string;
 
-  constructor({
-    name,
-    avatar,
-    publisher,
-    description,
-    total_episodes,
-    external_urls,
-  }: PodcastModel) {
-    this.name = name;
-    this.avatar = avatar;
-    this.publisher = publisher;
-    this.description = description;
-    this.total_episodes = total_episodes;
-    this.external_urls = external_urls;
+  @Expose()
+  readonly avatar!: string;
 
-    const params = new URLSearchParams({ podcast: name }).toString();
+  @Expose()
+  readonly publisher!: string;
 
-    this.self = `/api/podcasts/${encodeURIComponent(name)}`;
-    this.episodes = `/api/episodes?${params}`;
-    this.reviews = `/api/reviews?${params}`;
-  }
+  @Expose()
+  readonly description!: string;
 
-  static from(this: void, model: PodcastModel): PodcastResponseDto {
-    return new PodcastResponseDto(model);
-  }
+  @Expose()
+  readonly total_episodes!: number;
 
-  static fromMany(models: PodcastModel[]): PodcastResponseDto[] {
-    return models.map(PodcastResponseDto.from);
-  }
+  @Expose()
+  readonly external_urls!: Record<string, string>;
+
+  @Expose()
+  readonly self!: `/${string}`;
+
+  @Expose()
+  readonly episodes!: `/${string}`;
+
+  @Expose()
+  readonly reviews!: `/${string}`;
 }

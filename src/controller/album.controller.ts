@@ -1,4 +1,3 @@
-import type { AlbumResponse } from '../dto';
 import type { AlbumModel } from '../model';
 
 import {
@@ -7,6 +6,8 @@ import {
   type ISearchAlbum,
   SEARCH_ALBUM,
 } from '../port';
+
+import { AlbumResponseDto } from '../dto';
 
 import {
   BadRequestException,
@@ -18,6 +19,7 @@ import {
   Logger,
   Inject,
 } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
 
 @Controller('api/albums')
 export class AlbumController {
@@ -52,13 +54,17 @@ export class AlbumController {
     return AlbumController.toResponse(album);
   }
 
-  private static toResponse(this: void, album: AlbumModel) {
+  private static toResponse(this: void, album: AlbumModel): AlbumResponseDto {
     const params = new URLSearchParams({ album: album.name }).toString();
 
-    return {
-      ...album,
-      self: `/api/albums/${encodeURIComponent(album.name)}` as `/${string}`,
-      reviews: `/api/reviews?${params}` as `/${string}`,
-    } satisfies AlbumResponse;
+    return plainToInstance(
+      AlbumResponseDto,
+      {
+        ...album,
+        self: `/api/albums/${encodeURIComponent(album.name)}`,
+        reviews: `/api/reviews?${params}`,
+      },
+      { excludeExtraneousValues: true },
+    );
   }
 }

@@ -1,8 +1,11 @@
+import { UserModel, ReviewModel } from '.';
+
 export interface CommentModel {
   id: number;
   content: string;
   createdAt: Date;
-  createdById: number;
-  parentReviewId: number;
-  parentCommentId: number | null;
+  createdBy: UserModel;
+  parentReview: ReviewModel;
+  // Use the comment id to prevent accidental infinite loops
+  parentCommentId: CommentModel['id'] | null;
 }

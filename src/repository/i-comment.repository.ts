@@ -1,5 +1,9 @@
-import type { CommentFilters } from '../model/comment.filter';
-import type { CommentModel } from '../model';
+import type {
+  CommentFilters,
+  CommentModel,
+  ReviewModel,
+  UserModel,
+} from '../model';
 
 /** DI token for {@link ICommentRepository}. */
 export const COMMENT_REPOSITORY = Symbol('ICommentRepository');
@@ -21,7 +25,15 @@ export interface ICommentRepository {
    * @throws CommentDBException On a database error (e.g. a violated foreign key
    * when the author or parent review does not exist).
    */
-  create(comment: Omit<CommentModel, 'id' | 'createdAt'>): Promise<CommentModel>;
+  create(
+    comment: Omit<
+      CommentModel,
+      'id' | 'createdAt' | 'createdBy' | 'parentReview'
+    > & {
+      createdBy: Pick<UserModel, 'id'>;
+      parentReview: Pick<ReviewModel, 'id'>;
+    },
+  ): Promise<CommentModel>;
 
   /**
    * Looks up a comment by id.
@@ -47,11 +59,11 @@ export interface ICommentRepository {
   /**
    * Returns the ids of users who liked the comment.
    *
-   * @returns The liking users' ids, or `null` if the comment does not exist.
+   * @returns The liking users, or `null` if the comment does not exist.
    * The `null` vs. `[]` distinction lets the service tell "no such comment"
    * apart from "comment with zero likes".
    */
-  findLikesByCommentId(commentId: number): Promise<number[] | null>;
+  findLikesByCommentId(commentId: number): Promise<UserModel[] | null>;
 
   /**
    * Deletes the comment by id (cascading to its replies). A no-op if the id

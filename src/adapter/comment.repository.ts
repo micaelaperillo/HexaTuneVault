@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, IsNull, Repository, QueryFailedError } from 'typeorm';
-import { CommentEntity } from '../entity/comment.entity';
-import { UserEntity } from '../entity/user.entity';
-import { ReviewEntity } from '../entity/review.entity';
+
+import { CommentEntity, UserEntity } from '../entity';
 import { ICommentRepository } from '../repository/i-comment.repository';
 import { CommentModel } from '../model/comment.model';
 import { CommentFilters } from '../model/comment.filter';
 import { CommentDBException } from '../error/comment/comment-db.exception';
+import { ReviewModel, UserModel } from '../model';
+import { SubjectReference } from '../model/subject-reference';
 
 @Injectable()
 export class CommentRepository implements ICommentRepository {
@@ -17,20 +18,28 @@ export class CommentRepository implements ICommentRepository {
   ) {}
 
   async create(
-    comment: Omit<CommentModel, 'id' | 'createdAt'>,
+    comment: Omit<
+      CommentModel,
+      'id' | 'createdAt' | 'createdBy' | 'parentReview'
+    > & {
+      createdBy: Pick<UserModel, 'id'>;
+      parentReview: Pick<ReviewModel, 'id'>;
+    },
   ): Promise<CommentModel> {
     return this.run(async () => {
       const entity = this.repo.create({
         content: comment.content,
-        createdBy: { id: comment.createdById } as UserEntity,
-        parentReview: { id: comment.parentReviewId } as ReviewEntity,
+        createdBy: comment.createdBy,
+        parentReview: comment.parentReview,
         parentComment:
           comment.parentCommentId != null
             ? { id: comment.parentCommentId }
             : null,
       });
+
       const saved = await this.repo.save(entity);
       const reloaded = await this.repo.findOneByOrFail({ id: saved.id });
+
       return this.toModel(reloaded);
     });
   }
@@ -40,16 +49,16 @@ export class CommentRepository implements ICommentRepository {
     return entity ? this.toModel(entity) : null;
   }
 
-  async findLikesByCommentId(commentId: number): Promise<number[] | null> {
+  async findLikesByCommentId(commentId: number): Promise<UserModel[] | null> {
     return this.run(async () => {
       const exists = await this.repo.findOneBy({ id: commentId });
       if (!exists) return null;
-      const users = await this.repo
+
+      return this.repo
         .createQueryBuilder()
         .relation(CommentEntity, 'likedBy')
         .of(commentId)
         .loadMany<UserEntity>();
-      return users.map((user) => user.id);
     });
   }
 
@@ -114,9 +123,15 @@ export class CommentRepository implements ICommentRepository {
       id: entity.id,
       content: entity.content,
       createdAt: entity.createdAt,
-      createdById: entity.createdById,
-      parentReviewId: entity.parentReviewId,
-      parentCommentId: entity.parentCommentId ?? null,
+      createdBy: entity.createdBy,
+      parentReview: ReviewModel.reconstitute({
+        ...entity.parentReview,
+        subjectRef: new SubjectReference(
+          entity.parentReview.subjectType,
+          entity.parentReview.subjectId,
+        ),
+      }),
+      parentCommentId: entity.parentComment?.id ?? null,
     };
   }
 

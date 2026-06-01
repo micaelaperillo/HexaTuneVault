@@ -1,3 +1,5 @@
+import type { CommentModel } from '../model';
+
 import {
   Controller,
   Inject,
@@ -33,7 +35,9 @@ import { CreateCommentDto } from '../dto/create-comment.dto';
 import { CommentFiltersDto } from '../dto/comment-filters.dto';
 import { CommentResponseDto } from '../dto/comment-response.dto';
 import { SetCommentLikeDto } from '../dto/set-comment-like.dto';
-import { UserLinkDto } from '../dto/user-link.dto';
+import { UserResponseDto } from '../dto/user-response.dto';
+
+import { plainToInstance } from 'class-transformer';
 
 @Controller('api/comments')
 export class CommentController {
@@ -53,11 +57,12 @@ export class CommentController {
   async create(@Body() dto: CreateCommentDto): Promise<CommentResponseDto> {
     const comment = await this.createComment.create({
       content: dto.content,
-      createdById: dto.createdById,
-      parentReviewId: dto.parentReviewId,
+      createdBy: { id: dto.createdById },
+      parentReview: { id: dto.parentReviewId },
       parentCommentId: dto.parentCommentId ?? null,
     });
-    return CommentResponseDto.from(comment);
+
+    return CommentController.toResponse(comment);
   }
 
   @Get()
@@ -69,7 +74,8 @@ export class CommentController {
       content: filters.content,
       parentReviewId: filters.reviewId,
     });
-    return CommentResponseDto.fromMany(comments);
+
+    return comments.map(CommentController.toResponse);
   }
 
   @Get(':id')
@@ -77,7 +83,7 @@ export class CommentController {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<CommentResponseDto> {
     const comment = await this.getComment.get(id);
-    return CommentResponseDto.from(comment);
+    return CommentController.toResponse(comment);
   }
 
   @Get(':id/replies')
@@ -85,15 +91,15 @@ export class CommentController {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<CommentResponseDto[]> {
     const replies = await this.getCommentReplies.getReplies(id);
-    return CommentResponseDto.fromMany(replies);
+    return replies.map(CommentController.toResponse);
   }
 
   @Get(':id/likes')
   async getLikes(
     @Param('id', ParseIntPipe) id: number,
-  ): Promise<UserLinkDto[]> {
+  ): Promise<UserResponseDto[]> {
     const likes = await this.getCommentLikes.getLikes(id);
-    return UserLinkDto.fromMany(likes);
+    return likes.map((l) => plainToInstance(UserResponseDto, l));
   }
 
   @Delete(':id')
@@ -108,5 +114,25 @@ export class CommentController {
     @Body() dto: SetCommentLikeDto,
   ): Promise<void> {
     await this.likeComment.setLike(id, dto.user_id, dto.liked);
+  }
+
+  private static toResponse(this: void, comment: CommentModel) {
+    return plainToInstance(
+      CommentResponseDto,
+      {
+        ...comment,
+        self: `/api/comments/${comment.id}`,
+        like: `/api/comments/${comment.id}/like`,
+        likes: `/api/comments/${comment.id}/likes`,
+        replies: `/api/comments/${comment.id}/replies`,
+        collection: `/api/comments`,
+        author: `/api/users/${comment.createdBy.id}`,
+        review: `/api/reviews/${comment.parentReview.id}`,
+        parent: comment.parentCommentId
+          ? `/api/comments/${comment.parentCommentId}`
+          : undefined,
+      },
+      { excludeExtraneousValues: true },
+    );
   }
 }
