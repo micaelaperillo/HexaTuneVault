@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule, type JwtModuleOptions } from '@nestjs/jwt';
 
+import { UserEntity } from '../entity/user.entity';
 import { USER_REPOSITORY } from '../repository/i-user.repository';
 import { UserRepository } from '../adapter/user.repository';
 import { PASSWORD_HASHER } from '../repository/i-password-hasher';
@@ -21,11 +23,9 @@ import {
 
 import { UserController } from '../controller/user.controller';
 
-import { DatabaseModule } from '../infrastructure/database/database.module';
-
 @Module({
   imports: [
-    DatabaseModule,
+    TypeOrmModule.forFeature([UserEntity]),
     JwtModule.registerAsync({
       useFactory: (): JwtModuleOptions => {
         const secret = process.env.JWT_SECRET;
