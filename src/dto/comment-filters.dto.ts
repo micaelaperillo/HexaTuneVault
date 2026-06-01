@@ -1,16 +1,18 @@
-import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { AssociatedType } from '../model/comment.associated.type';
+import { IsInt, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CommentFiltersDto {
   @IsOptional()
-  @IsString()
-  createdBy?: string;
+  @Type(() => Number)
+  @IsInt()
+  createdById?: number;
 
   @IsOptional()
   @IsString()
   content?: string;
 
   @IsOptional()
-  @IsEnum(AssociatedType)
-  associatedType?: AssociatedType;
+  @Type(() => Number)
+  @IsInt()
+  reviewId?: number;
 }

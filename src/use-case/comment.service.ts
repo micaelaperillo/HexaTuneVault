@@ -3,9 +3,9 @@ import { ICreateComment } from '../port/comment/i-create-comment.port';
 import { IDeleteComment } from '../port/comment/i-delete-comment.port';
 import { ISearchComment } from '../port/comment/i-search-comment.port';
 import { IGetComment } from '../port/comment/i-get-comment.port';
+import { IGetCommentReplies } from '../port/comment/i-get-comment-replies.port';
 import { IGetCommentLikes } from '../port/comment/i-get-comment-likes.port';
 import { ILikeComment } from '../port/comment/i-like-comment-port';
-import { IUnlikeComment } from '../port/comment/i-unlike-comment.port';
 import {
   COMMENT_REPOSITORY,
   type ICommentRepository,
@@ -13,8 +13,6 @@ import {
 import { CommentModel } from '../model/comment.model';
 import { CommentFilters } from '../model/comment.filter';
 import { CommentNotFoundException } from '../error/comment/comment-not-found.exception';
-import { NotLikedException } from '../error/comment/not-liked.exception';
-import { AlreadyLikedException } from '../error/comment/already-liked.exception';
 
 @Injectable()
 export class CommentService
@@ -23,9 +21,9 @@ export class CommentService
     IDeleteComment,
     ISearchComment,
     IGetComment,
+    IGetCommentReplies,
     IGetCommentLikes,
-    ILikeComment,
-    IUnlikeComment
+    ILikeComment
 {
   constructor(
     @Inject(COMMENT_REPOSITORY)
@@ -33,7 +31,7 @@ export class CommentService
   ) {}
 
   async create(
-    comment: Omit<CommentModel, 'id' | 'createdAt' | 'likedBy'>,
+    comment: Omit<CommentModel, 'id' | 'createdAt'>,
   ): Promise<CommentModel> {
     return this.repo.create(comment);
   }
@@ -54,7 +52,15 @@ export class CommentService
     return comment;
   }
 
-  async getLikes(commentId: number): Promise<string[]> {
+  async getReplies(commentId: number): Promise<CommentModel[]> {
+    const comment = await this.repo.findById(commentId);
+    if (!comment) {
+      throw new CommentNotFoundException(commentId);
+    }
+    return this.repo.findReplies(commentId);
+  }
+
+  async getLikes(commentId: number): Promise<number[]> {
     const likes = await this.repo.findLikesByCommentId(commentId);
     if (!likes) {
       throw new CommentNotFoundException(commentId);
@@ -62,25 +68,19 @@ export class CommentService
     return likes;
   }
 
-  async like(commentId: number, userId: string): Promise<void> {
+  async setLike(
+    commentId: number,
+    userId: number,
+    liked: boolean,
+  ): Promise<void> {
     const comment = await this.repo.findById(commentId);
     if (!comment) {
       throw new CommentNotFoundException(commentId);
     }
-    if (comment.likedBy.includes(userId)) {
-      throw new AlreadyLikedException(commentId, userId);
+    if (liked) {
+      await this.repo.addLike(commentId, userId);
+    } else {
+      await this.repo.removeLike(commentId, userId);
     }
-    await this.repo.addLike(commentId, userId);
-  }
-
-  async unlike(commentId: number, userId: string): Promise<void> {
-    const comment = await this.repo.findById(commentId);
-    if (!comment) {
-      throw new CommentNotFoundException(commentId);
-    }
-    if (!comment.likedBy.includes(userId)) {
-      throw new NotLikedException(commentId, userId);
-    }
-    await this.repo.removeLike(commentId, userId);
   }
 }

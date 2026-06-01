@@ -5,15 +5,15 @@ import {
   DELETE_COMMENT,
   SEARCH_COMMENT,
   GET_COMMENT,
+  GET_COMMENT_REPLIES,
   GET_COMMENT_LIKES,
   LIKE_COMMENT,
-  UNLIKE_COMMENT,
 } from '../src/port/comment';
 import { CommentModel } from '../src/model/comment.model';
-import { AssociatedType } from '../src/model/comment.associated.type';
 import { CommentResponseDto } from '../src/dto/comment-response.dto';
 import { UserLinkDto } from '../src/dto/user-link.dto';
 import { CreateCommentDto } from '../src/dto/create-comment.dto';
+import { SetCommentLikeDto } from '../src/dto/set-comment-like.dto';
 
 describe('CommentController', () => {
   let controller: CommentController;
@@ -22,19 +22,18 @@ describe('CommentController', () => {
     id: 1,
     content: 'Test comment',
     createdAt: new Date('2024-01-01'),
-    createdBy: 'user1',
-    associatedTo: 'track1',
-    associatedType: AssociatedType.TRACK,
-    likedBy: ['user2'],
+    createdById: 1,
+    parentReviewId: 10,
+    parentCommentId: null,
   };
 
   const mockCreate = { create: jest.fn() };
   const mockDelete = { deleteById: jest.fn() };
   const mockSearch = { search: jest.fn() };
   const mockGet = { get: jest.fn() };
+  const mockGetReplies = { getReplies: jest.fn() };
   const mockGetLikes = { getLikes: jest.fn() };
-  const mockLike = { like: jest.fn() };
-  const mockUnlike = { unlike: jest.fn() };
+  const mockLike = { setLike: jest.fn() };
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -46,9 +45,9 @@ describe('CommentController', () => {
         { provide: DELETE_COMMENT, useValue: mockDelete },
         { provide: SEARCH_COMMENT, useValue: mockSearch },
         { provide: GET_COMMENT, useValue: mockGet },
+        { provide: GET_COMMENT_REPLIES, useValue: mockGetReplies },
         { provide: GET_COMMENT_LIKES, useValue: mockGetLikes },
         { provide: LIKE_COMMENT, useValue: mockLike },
-        { provide: UNLIKE_COMMENT, useValue: mockUnlike },
       ],
     }).compile();
 
@@ -58,31 +57,62 @@ describe('CommentController', () => {
   describe('create', () => {
     it('calls create port and returns a CommentResponseDto with correct links', async () => {
       mockCreate.create.mockResolvedValue(mockComment);
-      const dto = {
+      const dto: CreateCommentDto = {
         content: 'Test comment',
-        createdBy: 'user1',
-        associatedTo: 'track1',
-        associatedType: AssociatedType.TRACK,
-      } as CreateCommentDto;
+        createdById: 1,
+        parentReviewId: 10,
+      };
 
       const result = await controller.create(dto);
 
-      expect(mockCreate.create).toHaveBeenCalledWith(dto);
+      expect(mockCreate.create).toHaveBeenCalledWith({
+        content: 'Test comment',
+        createdById: 1,
+        parentReviewId: 10,
+        parentCommentId: null,
+      });
       expect(result).toBeInstanceOf(CommentResponseDto);
       expect(result.self).toBe('/api/comments/1');
+      expect(result.review).toBe('/api/reviews/10');
+    });
+
+    it('forwards parentCommentId for nested replies', async () => {
+      mockCreate.create.mockResolvedValue({
+        ...mockComment,
+        parentCommentId: 5,
+      });
+      const dto: CreateCommentDto = {
+        content: 'A reply',
+        createdById: 1,
+        parentReviewId: 10,
+        parentCommentId: 5,
+      };
+
+      const result = await controller.create(dto);
+
+      expect(mockCreate.create).toHaveBeenCalledWith({
+        content: 'A reply',
+        createdById: 1,
+        parentReviewId: 10,
+        parentCommentId: 5,
+      });
+      expect(result.parent).toBe('/api/comments/5');
     });
   });
 
   describe('search', () => {
-    it('calls search port with filters and returns an array of CommentResponseDto', async () => {
+    it('maps reviewId to the parentReviewId filter and returns CommentResponseDtos', async () => {
       mockSearch.search.mockResolvedValue([mockComment]);
-      const filters = {
-        createdBy: 'user1',
-        associatedType: AssociatedType.TRACK,
-      };
-      const result = await controller.search(filters);
+      const result = await controller.search({
+        createdById: 1,
+        reviewId: 10,
+      });
 
-      expect(mockSearch.search).toHaveBeenCalledWith(filters);
+      expect(mockSearch.search).toHaveBeenCalledWith({
+        createdById: 1,
+        content: undefined,
+        parentReviewId: 10,
+      });
       expect(result).toHaveLength(1);
       expect(result[0]).toBeInstanceOf(CommentResponseDto);
     });
@@ -99,16 +129,30 @@ describe('CommentController', () => {
     });
   });
 
+  describe('getReplies', () => {
+    it('calls getReplies port and returns an array of CommentResponseDto', async () => {
+      const reply = { ...mockComment, id: 2, parentCommentId: 1 };
+      mockGetReplies.getReplies.mockResolvedValue([reply]);
+      const result = await controller.getReplies(1);
+
+      expect(mockGetReplies.getReplies).toHaveBeenCalledWith(1);
+      expect(result).toHaveLength(1);
+      expect(result[0]).toBeInstanceOf(CommentResponseDto);
+      expect(result[0].self).toBe('/api/comments/2');
+      expect(result[0].parent).toBe('/api/comments/1');
+    });
+  });
+
   describe('getLikes', () => {
     it('calls getLikes port and returns an array of UserLinkDto', async () => {
-      mockGetLikes.getLikes.mockResolvedValue(['user2', 'user3']);
+      mockGetLikes.getLikes.mockResolvedValue([2, 3]);
       const result = await controller.getLikes(1);
 
       expect(mockGetLikes.getLikes).toHaveBeenCalledWith(1);
       expect(result).toHaveLength(2);
       expect(result[0]).toBeInstanceOf(UserLinkDto);
-      expect(result[0].user).toBe('/api/users/user2');
-      expect(result[1].user).toBe('/api/users/user3');
+      expect(result[0].user).toBe('/api/users/2');
+      expect(result[1].user).toBe('/api/users/3');
     });
   });
 
@@ -120,19 +164,19 @@ describe('CommentController', () => {
     });
   });
 
-  describe('like', () => {
-    it('calls like port with comment id and user id', async () => {
-      mockLike.like.mockResolvedValue(undefined);
-      await controller.like(1, 'user2');
-      expect(mockLike.like).toHaveBeenCalledWith(1, 'user2');
+  describe('setLike', () => {
+    it('calls setLike port with comment id, user id and liked flag', async () => {
+      mockLike.setLike.mockResolvedValue(undefined);
+      const dto: SetCommentLikeDto = { user_id: 2, liked: true };
+      await controller.setLike(1, dto);
+      expect(mockLike.setLike).toHaveBeenCalledWith(1, 2, true);
     });
-  });
 
-  describe('unlike', () => {
-    it('calls unlike port with comment id and user id', async () => {
-      mockUnlike.unlike.mockResolvedValue(undefined);
-      await controller.unlike(1, 'user2');
-      expect(mockUnlike.unlike).toHaveBeenCalledWith(1, 'user2');
+    it('passes liked=false to unlike', async () => {
+      mockLike.setLike.mockResolvedValue(undefined);
+      const dto: SetCommentLikeDto = { user_id: 2, liked: false };
+      await controller.setLike(1, dto);
+      expect(mockLike.setLike).toHaveBeenCalledWith(1, 2, false);
     });
   });
 });

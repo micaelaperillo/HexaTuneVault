@@ -3,10 +3,20 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  ManyToOne,
+  OneToMany,
+  ManyToMany,
+  JoinColumn,
+  JoinTable,
+  RelationId,
+  Index,
 } from 'typeorm';
-import { AssociatedType } from '../model/comment.associated.type';
+import { UserEntity } from './user.entity';
+import { ReviewEntity } from './review.entity';
 
 @Entity('comments')
+@Index(['parentReview'])
+@Index(['parentComment'])
 export class CommentEntity {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -17,18 +27,38 @@ export class CommentEntity {
   @CreateDateColumn()
   createdAt!: Date;
 
-  @Column({ default: '' })
-  createdBy!: string;
+  @ManyToOne(() => UserEntity, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'created_by_id' })
+  createdBy!: UserEntity;
 
-  @Column({ default: '' })
-  associatedTo!: string;
+  @RelationId((comment: CommentEntity) => comment.createdBy)
+  createdById!: number;
 
-  @Column({
-    type: 'enum',
-    enum: AssociatedType,
+  @ManyToOne(() => ReviewEntity, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'parent_review_id' })
+  parentReview!: ReviewEntity;
+
+  @RelationId((comment: CommentEntity) => comment.parentReview)
+  parentReviewId!: number;
+
+  @ManyToOne(() => CommentEntity, (comment) => comment.replies, {
+    nullable: true,
+    onDelete: 'CASCADE',
   })
-  associatedType!: AssociatedType;
+  @JoinColumn({ name: 'parent_comment_id' })
+  parentComment!: CommentEntity | null;
 
-  @Column('text', { array: true, default: '{}' })
-  likedBy!: string[];
+  @RelationId((comment: CommentEntity) => comment.parentComment)
+  parentCommentId!: number | null;
+
+  @OneToMany(() => CommentEntity, (comment) => comment.parentComment)
+  replies!: CommentEntity[];
+
+  @ManyToMany(() => UserEntity)
+  @JoinTable({
+    name: 'comment_likes',
+    joinColumn: { name: 'comment_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
+  })
+  likedBy!: UserEntity[];
 }

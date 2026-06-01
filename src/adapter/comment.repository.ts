@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository, QueryFailedError } from 'typeorm';
+import { ILike, IsNull, Repository, QueryFailedError } from 'typeorm';
 import { CommentEntity } from '../entity/comment.entity';
+import { UserEntity } from '../entity/user.entity';
+import { ReviewEntity } from '../entity/review.entity';
 import { ICommentRepository } from '../repository/i-comment.repository';
-import { AssociatedType } from '../model/comment.associated.type';
 import { CommentModel } from '../model/comment.model';
 import { CommentFilters } from '../model/comment.filter';
 import { CommentDBException } from '../error/comment/comment-db.exception';
@@ -16,72 +17,107 @@ export class CommentRepository implements ICommentRepository {
   ) {}
 
   async create(
-    comment: Omit<CommentModel, 'id' | 'createdAt' | 'likedBy'>,
+    comment: Omit<CommentModel, 'id' | 'createdAt'>,
   ): Promise<CommentModel> {
-    return this.run(() => this.repo.save(comment));
+    return this.run(async () => {
+      const entity = this.repo.create({
+        content: comment.content,
+        createdBy: { id: comment.createdById } as UserEntity,
+        parentReview: { id: comment.parentReviewId } as ReviewEntity,
+        parentComment:
+          comment.parentCommentId != null
+            ? { id: comment.parentCommentId }
+            : null,
+      });
+      const saved = await this.repo.save(entity);
+      const reloaded = await this.repo.findOneByOrFail({ id: saved.id });
+      return this.toModel(reloaded);
+    });
   }
 
   async findById(id: number): Promise<CommentModel | null> {
-    return this.run(() => this.repo.findOneBy({ id }));
+    const entity = await this.run(() => this.repo.findOneBy({ id }));
+    return entity ? this.toModel(entity) : null;
   }
 
-  async findLikesByCommentId(commentId: number): Promise<string[] | null> {
-    const comment = await this.run(() =>
-      this.repo.findOne({
-        where: { id: commentId },
-        select: { likedBy: true },
-      }),
-    );
-    return comment ? comment.likedBy : null;
+  async findLikesByCommentId(commentId: number): Promise<number[] | null> {
+    return this.run(async () => {
+      const exists = await this.repo.findOneBy({ id: commentId });
+      if (!exists) return null;
+      const users = await this.repo
+        .createQueryBuilder()
+        .relation(CommentEntity, 'likedBy')
+        .of(commentId)
+        .loadMany<UserEntity>();
+      return users.map((user) => user.id);
+    });
   }
 
   async deleteById(id: number): Promise<void> {
     await this.run(() => this.repo.delete(id));
   }
 
-  async findByAssociatedId(
-    associatedId: string,
-    associatedType: AssociatedType,
-  ): Promise<CommentModel[]> {
-    return this.run(() =>
-      this.repo.findBy({ associatedTo: associatedId, associatedType }),
+  async findReplies(parentCommentId: number): Promise<CommentModel[]> {
+    const entities = await this.run(() =>
+      this.repo.findBy({ parentComment: { id: parentCommentId } }),
     );
+    return entities.map((e) => this.toModel(e));
   }
 
-  async addLike(commentId: number, userId: string): Promise<void> {
-    const comment = await this.run(() =>
-      this.repo.findOneBy({ id: commentId }),
-    );
-    if (comment && !comment.likedBy.includes(userId)) {
-      comment.likedBy.push(userId);
-      await this.run(() => this.repo.save(comment));
-    }
+  async addLike(commentId: number, userId: number): Promise<void> {
+    await this.run(async () => {
+      const alreadyLiked = await this.repo
+        .createQueryBuilder('comment')
+        .innerJoin('comment.likedBy', 'user', 'user.id = :userId', { userId })
+        .where('comment.id = :commentId', { commentId })
+        .getCount();
+      if (alreadyLiked === 0) {
+        await this.repo
+          .createQueryBuilder()
+          .relation(CommentEntity, 'likedBy')
+          .of(commentId)
+          .add(userId);
+      }
+    });
   }
 
-  async removeLike(commentId: number, userId: string): Promise<void> {
-    const comment = await this.run(() =>
-      this.repo.findOneBy({ id: commentId }),
+  async removeLike(commentId: number, userId: number): Promise<void> {
+    await this.run(() =>
+      this.repo
+        .createQueryBuilder()
+        .relation(CommentEntity, 'likedBy')
+        .of(commentId)
+        .remove(userId),
     );
-    if (comment) {
-      comment.likedBy = comment.likedBy.filter((id) => id !== userId);
-      await this.run(() => this.repo.save(comment));
-    }
   }
 
   async search(filters: CommentFilters): Promise<CommentModel[]> {
-    return this.run(() =>
+    const entities = await this.run(() =>
       this.repo.findBy({
-        ...(filters.createdBy !== undefined && {
-          createdBy: filters.createdBy,
+        parentComment: IsNull(),
+        ...(filters.createdById !== undefined && {
+          createdBy: { id: filters.createdById },
         }),
         ...(filters.content !== undefined && {
           content: ILike(`%${filters.content}%`),
         }),
-        ...(filters.associatedType !== undefined && {
-          associatedType: filters.associatedType,
+        ...(filters.parentReviewId !== undefined && {
+          parentReview: { id: filters.parentReviewId },
         }),
       }),
     );
+    return entities.map((e) => this.toModel(e));
+  }
+
+  private toModel(entity: CommentEntity): CommentModel {
+    return {
+      id: entity.id,
+      content: entity.content,
+      createdAt: entity.createdAt,
+      createdById: entity.createdById,
+      parentReviewId: entity.parentReviewId,
+      parentCommentId: entity.parentCommentId ?? null,
+    };
   }
 
   private async run<T>(fn: () => Promise<T>): Promise<T> {
