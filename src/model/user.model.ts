@@ -7,4 +7,6 @@ export interface UserModel {
   email: string;
   biography: string;
   profilePictureUrl: string;
+  followerCount?: number;
+  followingCount?: number;
 }

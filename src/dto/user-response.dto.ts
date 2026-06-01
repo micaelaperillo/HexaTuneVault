@@ -16,11 +16,18 @@ export class UserResponseDto {
   biography!: string;
   @Expose()
   profilePictureUrl!: string;
+  @Expose()
+  followerCount!: number;
+  @Expose()
+  followingCount!: number;
 
   static from(model: UserModel): UserResponseDto {
-    return plainToInstance(UserResponseDto, model, {
+    const dto = plainToInstance(UserResponseDto, model, {
       excludeExtraneousValues: true,
     });
+    dto.followerCount = model.followerCount ?? 0;
+    dto.followingCount = model.followingCount ?? 0;
+    return dto;
   }
 
   static fromMany(models: UserModel[]): UserResponseDto[] {

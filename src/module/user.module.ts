@@ -19,6 +19,7 @@ import {
   SEARCH_USER,
   GET_USER,
   FOLLOW_USER,
+  LIST_FOLLOWS,
 } from '../use-case/user.service';
 
 import { UserController } from '../controller/user.controller';
@@ -58,6 +59,7 @@ import { UserController } from '../controller/user.controller';
     { provide: SEARCH_USER, useClass: UserService },
     { provide: GET_USER, useClass: UserService },
     { provide: FOLLOW_USER, useClass: UserService },
+    { provide: LIST_FOLLOWS, useClass: UserService },
   ],
 })
 export class UserModule {}
