@@ -35,7 +35,11 @@ export class ReviewEntity {
   @Column({ name: 'subject_id', type: 'varchar', default: '' })
   subjectId!: string;
 
-  @ManyToOne(() => UserEntity, (user) => user.reviews)
+  @ManyToOne(() => UserEntity, (user) => user.reviews, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'author_id' })
   author!: UserEntity;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
