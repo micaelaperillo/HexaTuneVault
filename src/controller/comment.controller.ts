@@ -21,17 +21,18 @@ import {
   type ISearchComment,
   GET_COMMENT,
   type IGetComment,
+  GET_COMMENT_REPLIES,
+  type IGetCommentReplies,
   GET_COMMENT_LIKES,
   type IGetCommentLikes,
   LIKE_COMMENT,
   type ILikeComment,
-  UNLIKE_COMMENT,
-  type IUnlikeComment,
 } from '../port/comment/';
 
 import { CreateCommentDto } from '../dto/create-comment.dto';
 import { CommentFiltersDto } from '../dto/comment-filters.dto';
 import { CommentResponseDto } from '../dto/comment-response.dto';
+import { SetCommentLikeDto } from '../dto/set-comment-like.dto';
 import { UserLinkDto } from '../dto/user-link.dto';
 
 @Controller('api/comments')
@@ -41,15 +42,21 @@ export class CommentController {
     @Inject(DELETE_COMMENT) private readonly deleteComment: IDeleteComment,
     @Inject(SEARCH_COMMENT) private readonly searchComment: ISearchComment,
     @Inject(GET_COMMENT) private readonly getComment: IGetComment,
+    @Inject(GET_COMMENT_REPLIES)
+    private readonly getCommentReplies: IGetCommentReplies,
     @Inject(GET_COMMENT_LIKES)
     private readonly getCommentLikes: IGetCommentLikes,
     @Inject(LIKE_COMMENT) private readonly likeComment: ILikeComment,
-    @Inject(UNLIKE_COMMENT) private readonly unlikeComment: IUnlikeComment,
   ) {}
 
   @Post()
   async create(@Body() dto: CreateCommentDto): Promise<CommentResponseDto> {
-    const comment = await this.createComment.create(dto);
+    const comment = await this.createComment.create({
+      content: dto.content,
+      createdById: dto.createdById,
+      parentReviewId: dto.parentReviewId,
+      parentCommentId: dto.parentCommentId ?? null,
+    });
     return CommentResponseDto.from(comment);
   }
 
@@ -57,7 +64,11 @@ export class CommentController {
   async search(
     @Query() filters: CommentFiltersDto,
   ): Promise<CommentResponseDto[]> {
-    const comments = await this.searchComment.search(filters);
+    const comments = await this.searchComment.search({
+      createdById: filters.createdById,
+      content: filters.content,
+      parentReviewId: filters.reviewId,
+    });
     return CommentResponseDto.fromMany(comments);
   }
 
@@ -67,6 +78,14 @@ export class CommentController {
   ): Promise<CommentResponseDto> {
     const comment = await this.getComment.get(id);
     return CommentResponseDto.from(comment);
+  }
+
+  @Get(':id/replies')
+  async getReplies(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<CommentResponseDto[]> {
+    const replies = await this.getCommentReplies.getReplies(id);
+    return CommentResponseDto.fromMany(replies);
   }
 
   @Get(':id/likes')
@@ -84,18 +103,10 @@ export class CommentController {
   }
 
   @Patch(':id/like')
-  async like(
+  async setLike(
     @Param('id', ParseIntPipe) id: number,
-    @Body('user_id') userId: string,
+    @Body() dto: SetCommentLikeDto,
   ): Promise<void> {
-    await this.likeComment.like(id, userId);
-  }
-
-  @Patch(':id/unlike')
-  async unlike(
-    @Param('id', ParseIntPipe) id: number,
-    @Body('user_id') userId: string,
-  ): Promise<void> {
-    await this.unlikeComment.unlike(id, userId);
+    await this.likeComment.setLike(id, dto.user_id, dto.liked);
   }
 }
