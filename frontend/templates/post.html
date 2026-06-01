@@ -25,9 +25,6 @@
                         <div class="comment">
                             <div class="comment-header">
                                 <h4 class="comment-title">@{{ post.user }}</h4>
-                                {% if post_user.isArtist %} 
-                                    <i class="material-icons" style="color: rgb(0, 128, 255); margin-left: 10px;">verified</i>
-                                {% endif %}
                                 <p class="date" style="margin-right: 20px;" >{{ post.date }}</p>
                                 {% with rating=post.rating %}
                                 {% if rating != 0 %}
@@ -110,7 +107,7 @@
                 <div class="commentaries">
                     {% for a_comment in comments %}
                         {% with comment=a_comment.comment %}
-                        {% include 'commentBox.html' with username=comment.user date=comment.date title=comment.content type="false" id="false" post_id="false" rating=0 img=a_comment.user.profileimg.url is_post=is_post comment_id=comment.id path=path is_liked=a_comment.is_liked likes=a_comment.likes with_likes="true" is_artist=a_comment.user.isArtist %}
+                        {% include 'commentBox.html' with username=comment.user date=comment.date title=comment.content type="false" id="false" post_id="false" rating=0 img=a_comment.user.profileimg.url is_post=is_post comment_id=comment.id path=path is_liked=a_comment.is_liked likes=a_comment.likes with_likes="true" %}
 
                         <div class="buttons">
                             <button class="replies-button" data-target="{{ comment.id }}" onclick="toggleReplies(this)">
@@ -152,7 +149,7 @@
                             <div class="hidden-replies" style="display: none;" data-comment-id="{{ comment.id }}">
                             {% for reply in a_comment.replies %}
                             <div style="margin: 20px 0;">
-                                {% include 'commentBox.html' with username=reply.comment.user date=reply.comment.date title=reply.comment.content type="false" id="false" post_id="false" rating=0 img=reply.user.profileimg.url is_post=is_post comment_id=reply.comment.id path=path is_liked=reply.is_liked likes=reply.likes with_likes="true" is_artist=reply.user.isArtist %}
+                                {% include 'commentBox.html' with username=reply.comment.user date=reply.comment.date title=reply.comment.content type="false" id="false" post_id="false" rating=0 img=reply.user.profileimg.url is_post=is_post comment_id=reply.comment.id path=path is_liked=reply.is_liked likes=reply.likes with_likes="true" %}
                             </div>
                             {% endfor %}
                             </div>

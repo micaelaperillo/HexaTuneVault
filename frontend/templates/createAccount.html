@@ -46,18 +46,6 @@
                 <input class="Input" type="password" name="password2"/>  
             </div>
 
-            <div  id="inputContainer" class="hidden">
-                <h3 class="InputItem">Spotify artist link</h3>
-                <div class="InputBox">
-                    <input class="Input" type="text" name="link"/>  
-                </div>
-            </div>
-
-            <div class="checkbox">
-                <h3 class="InputItem">I am an artist</h3>
-                <input type="checkbox" name="isArtist" id="myCheckbox" onchange="toggleInput()" style="margin-left: 10px; margin-top: 16px;">
-            </div>
-
             <div class="errorMessage">
                 {% for message in messages %}
                 <p>{{message}}</p>
@@ -77,18 +65,5 @@
         </div>
         </div>
     </div>
-
-    <script>
-        function toggleInput() {
-            var inputContainer = document.getElementById('inputContainer');
-            var checkbox = document.getElementById('myCheckbox');
-
-            if (checkbox.checked) {
-                inputContainer.classList.remove('hidden');
-            } else {
-                inputContainer.classList.add('hidden');
-            }
-        }
-    </script>
     </body>
 </html>

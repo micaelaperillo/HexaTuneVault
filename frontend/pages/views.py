@@ -68,8 +68,6 @@ def signup(request):
             messages.info(request, 'Password not matching')
             return redirect('create_account')
 
-        # NOTE: the user API has no isArtist/link fields, so those form inputs
-        # are not forwarded yet.
         username = request.POST.get('username')
         password = request.POST.get('password')
         response = user_client.create(
@@ -244,18 +242,16 @@ def all_search(request, query):
     if request.method == 'POST':
         return redirect('/search/' + request.POST.get('query', ''))
 
-    # The artist and podcast APIs are live; other sections await their APIs.
     artists = artist_client.search(query, request=request)
     podcasts = podcast_client.search(query, request=request)
     albums = album_client.search(query, request=request)
-
+    members = user_client.search(query,request=request)
     context = {
         'result': [
             {'query': query, 'vaults': artists},  # 0 -> Artists
             {'query': query, 'vaults': albums},       # 1 -> Albums
             {'query': query, 'vaults': podcasts}, # 2 -> Podcasts
-            {'query': query, 'members': []},      # 3 -> Artist members
-            {'query': query, 'members': []},      # 4 -> Members
+            {'query': query, 'members': members}, # 3 -> Members
         ]
     }
     return render(request, 'searchResult.html', context)

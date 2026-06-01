@@ -70,27 +70,13 @@
             {% endif %}
             
 
-            {% if result.3.members %}
-            <div class="sub-header">
-                <h2  class="sub-title">Member artists</h2>
-                <button class="view-all" onclick="viewAll('members')">View all</button>
-            </div>
-            <div class='gallery-mem'>
-                {% for user_data in result.3.members %}
-                    <div class='gallery2-item'>
-                    {% include 'previewProfile.html' with user_data=user_data %}
-                    </div>
-                {% endfor %}
-            </div>
-            {% endif %}
-
             <div class="sub-header">
                 <h2  class="sub-title">Members</h2>
                 <button class="view-all" onclick="viewAll('members')">View all</button>
             </div>
-            {% if result.4.members %}
+            {% if result.3.members %}
             <div class='gallery-mem'>
-                {% for user_data in result.4.members %}
+                {% for user_data in result.3.members %}
                     <div class='gallery2-item'>
                     {% include 'previewProfile.html' with user_data=user_data %}
                     </div>

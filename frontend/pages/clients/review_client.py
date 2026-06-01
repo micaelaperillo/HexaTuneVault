@@ -96,7 +96,6 @@ def _as_int(value, default=0) -> int:
 
 
 def _author(author_id, request, cache) -> tuple[str, dict]:
-    """Resolve a review author to (username, {profileimg:{url}, isArtist})."""
     if author_id in cache:
         return cache[author_id]
     profile = user_client.get(author_id, request=request) if author_id else None
@@ -104,11 +103,10 @@ def _author(author_id, request, cache) -> tuple[str, dict]:
         username = profile.get('user') or author_id
         info = {
             'profileimg': {'url': profile.get('profileimg') or DEFAULT_PROFILE_IMAGE},
-            'isArtist': profile.get('isArtist', False),
         }
     else:
         username = author_id or ''
-        info = {'profileimg': {'url': DEFAULT_PROFILE_IMAGE}, 'isArtist': False}
+        info = {'profileimg': {'url': DEFAULT_PROFILE_IMAGE}}
     cache[author_id] = (username, info)
     return username, info
 

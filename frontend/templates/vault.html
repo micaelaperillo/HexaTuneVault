@@ -114,7 +114,7 @@
                     {% for a_post in posts %}
                         <hr>
                         {% with post=a_post.post %}
-                        {% include 'commentBox.html' with username="@"|add:post.user date=post.date title=post.title type=vault.type id=post.vault_id post_id=post.id rating=post.rating img=a_post.user.profileimg.url likes=a_post.likes is_liked=a_post.is_liked is_post=is_post path=path with_likes="true" is_artist=a_post.user.isArtist %}
+                        {% include 'commentBox.html' with username="@"|add:post.user date=post.date title=post.title type=vault.type id=post.vault_id post_id=post.id rating=post.rating img=a_post.user.profileimg.url likes=a_post.likes is_liked=a_post.is_liked is_post=is_post path=path with_likes="true" %}
                         <a href="{% url 'post' vtype=vault.type id=post.vault_id post_id=post.id %}" style="text-decoration: none;">
                             <div class="replies-button-box">
                                 <button class="replies-button">

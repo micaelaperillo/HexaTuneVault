@@ -2,10 +2,7 @@ from . import api_client
 
 
 def search(query: str, genre: str = '', request=None) -> list[dict]:
-    """Search artists by name, optionally filtered by ``genre``.
 
-    Returns template-ready dicts (possibly empty).
-    """
     params = {'q': query}
     if genre:
         params['genre'] = genre
@@ -18,13 +15,11 @@ def search(query: str, genre: str = '', request=None) -> list[dict]:
 
 
 def get(name: str, request=None) -> dict | None:
-    """Fetch a single artist by name. Returns a template-ready dict or None."""
     data = api_client.get_json(f'/api/artists/{name}', request=request, default=None)
     return _to_vault(data) if isinstance(data, dict) else None
 
 
 def _to_vault(artist: dict) -> dict:
-    """Map an ArtistResponse to the { id, image, likes, artist } template shape."""
     name = artist.get('name', '')
     return {
         'id': name,                      # artist detail is keyed by name, not an id

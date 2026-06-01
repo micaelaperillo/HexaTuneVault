@@ -90,11 +90,10 @@ def _author(author_id, request, cache) -> tuple[str, dict]:
         username = profile.get('user') or author_id
         info = {
             'profileimg': {'url': profile.get('profileimg') or DEFAULT_AVATAR},
-            'isArtist': profile.get('isArtist', False),
         }
     else:
         username = author_id
-        info = {'profileimg': {'url': DEFAULT_AVATAR}, 'isArtist': False}
+        info = {'profileimg': {'url': DEFAULT_AVATAR}}
     cache[author_id] = (username, info)
     return username, info
 

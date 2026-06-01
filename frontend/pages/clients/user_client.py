@@ -112,10 +112,9 @@ def _follow_user(user_id, request, cache) -> dict:
         info = {
             'username': profile.get('user', ''),
             'img': profile.get('profileimg', ''),
-            'is_artist': profile.get('isArtist', False),
         }
     else:
-        info = {'username': user_id or '', 'img': DEFAULT_PROFILE_IMAGE, 'is_artist': False}
+        info = {'username': user_id or '', 'img': DEFAULT_PROFILE_IMAGE}
     cache[user_id] = info
     return info
 
@@ -125,7 +124,6 @@ def _to_member(user: dict) -> dict:
         'id': user.get('id'),
         'user': user.get('username', ''),
         'profileimg': user.get('profilePictureUrl') or DEFAULT_PROFILE_IMAGE,
-        'isArtist': False,  # the user API has no artist flag
     }
 
 
@@ -137,7 +135,6 @@ def _to_profile(user: dict) -> dict:
         'profileimg': user.get('profilePictureUrl') or DEFAULT_PROFILE_IMAGE,
         'bio': user.get('biography', ''),
         'location': user.get('location',''),
-        'isArtist': False,  # not in the user API
         'email': user.get('email', ''),
         'firstName': user.get('firstName', ''),
         'lastName': user.get('lastName', ''),
