@@ -17,6 +17,9 @@ export class AlbumResponseDto {
   readonly artists!: string[];
 
   @Expose()
+  readonly external_urls!: Record<string, string>;
+
+  @Expose()
   readonly self!: `/${string}`;
 
   @Expose()
