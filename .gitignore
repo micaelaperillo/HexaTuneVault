@@ -63,3 +63,6 @@ jest_rs/
 
 # Node compile cache
 node-compile-cache/
+
+# Local image repository
+/uploads
