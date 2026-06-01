@@ -28,7 +28,7 @@ import {
   GET_REVIEW,
 } from '../port/review/tokens';
 import { ReviewSearchCriteria } from '../model/review-search-criteria';
-import { ReviewModel } from '../model';
+import { ReviewModel, UserModel } from '../model';
 import { plainToInstance } from 'class-transformer';
 
 @Controller('api/reviews')
@@ -46,14 +46,14 @@ export class ReviewController {
     @Res({ passthrough: true }) res: Response,
     @Req() req: Request,
   ): Promise<ReviewResponse> {
-    // TODO: replace hardcoded userId with @CurrentUser() from AuthGuard
-    const userId = '1';
+    // TODO: replace hardcoded user with @CurrentUser() from AuthGuard
+    const user = { id: 1 } as UserModel;
     const review = await this.createReview.execute({
       content: dto.content,
       rating: dto.rating,
       subjectType: dto.subject_type,
       subjectId: dto.subject_id,
-      authorId: userId,
+      author: user,
     });
 
     res.header(
@@ -87,8 +87,8 @@ export class ReviewController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     // TODO: replace hardcoded userId with @CurrentUser() from AuthGuard
-    const userId = '1';
-    await this.deleteReview.execute({ reviewId: id, requesterId: userId });
+    const user = { id: 1 } as UserModel;
+    await this.deleteReview.execute({ reviewId: id, requesterId: user });
   }
 
   private static toResponse(this: void, review: ReviewModel) {
@@ -105,7 +105,7 @@ export class ReviewController {
         self: `/api/reviews/${review.id}`,
         collection: `/api/reviews`,
         subject: `/api/${review.subjectRef.type}s/${review.subjectRef.id}`,
-        author: `/api/users/${review.authorId}`,
+        author: `/api/users/${review.author.id}`,
       },
       { excludeExtraneousValues: true },
     );

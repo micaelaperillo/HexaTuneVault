@@ -126,6 +126,7 @@ export class CommentRepository implements ICommentRepository {
       createdBy: entity.createdBy,
       parentReview: ReviewModel.reconstitute({
         ...entity.parentReview,
+        author: entity.parentReview.author,
         subjectRef: new SubjectReference(
           entity.parentReview.subjectType,
           entity.parentReview.subjectId,
