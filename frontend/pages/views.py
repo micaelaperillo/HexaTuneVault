@@ -339,18 +339,18 @@ def vault(request, vtype, id):
 
 def vault_post(request, vtype, id, post_id):
     if request.method == 'POST':
-        # NOTE: the comments API has no threading, so comment_answer_id (the
-        # reply target) is not forwarded yet.
-        created_by = request.user.id if request.user.is_authenticated else None
-        comment_client.create(
-            content=request.POST.get('content'),
-            associated_to=post_id,
-            created_by=created_by,
-            request=request,
-        )
+        if request.user.is_authenticated:
+            answer_id = request.POST.get('comment_answer_id')
+            parent_comment_id = answer_id if answer_id and answer_id != '0' else None
+            comment_client.create(
+                content=request.POST.get('content'),
+                review_id=post_id,
+                created_by=request.user.id,
+                parent_comment_id=parent_comment_id,
+                request=request,
+            )
         return redirect(request.path)
 
-    # The review being viewed, plus the comments thread attached to it.
     review = review_client.get(post_id, request=request)
     comments = comment_client.list_for(post_id, request=request)
     context = {
@@ -371,7 +371,6 @@ def vault_post(request, vtype, id, post_id):
 def follow(request):
     if request.method == 'POST':
         username = request.POST.get('user')
-        # The form posts a username, but the API follows by numeric id.
         target = user_client.get_by_username(username, request=request)
         if target is not None and target.get('id') is not None:
             user_client.toggle_follow(
