@@ -5,6 +5,7 @@ import { PodcastModule } from './module/podcast.module';
 import { AlbumModule } from './module/album.module';
 import { CommentModule } from './module/comment.module';
 import { UserModule } from './module/user.module';
+import { ImageModule } from './module/image.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { UserModule } from './module/user.module';
     AlbumModule,
     CommentModule,
     UserModule,
+    ImageModule,
   ],
   controllers: [],
   providers: [],
