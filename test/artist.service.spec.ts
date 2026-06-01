@@ -42,7 +42,7 @@ describe('ArtistService', () => {
       const result = await service.search(filters);
 
       expect(mockProvider.search).toHaveBeenCalledWith(filters);
-      expect(result).toEqual([mockArtist]);
+      expect(result).toStrictEqual([mockArtist]);
     });
   });
 
@@ -54,7 +54,7 @@ describe('ArtistService', () => {
       const result = await service.get(filters);
 
       expect(mockProvider.get).toHaveBeenCalledWith(filters);
-      expect(result).toEqual(mockArtist);
+      expect(result).toStrictEqual(mockArtist);
     });
 
     it('returns null if provider returns null', async () => {

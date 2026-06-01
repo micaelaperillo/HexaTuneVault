@@ -116,7 +116,7 @@ describe('SpotifyArtistProvider', () => {
       expect(mockInfrastructure.search).toHaveBeenCalledWith('The Beatles', [
         'artist',
       ]);
-      expect(result).toEqual(mockMappedApiResponse);
+      expect(result).toStrictEqual(mockMappedApiResponse);
     });
 
     it('searchs by name and genre using the Spotify SDK', async () => {
@@ -129,7 +129,7 @@ describe('SpotifyArtistProvider', () => {
         'The Beatles genre:Rock genre:Roll',
         ['artist'],
       );
-      expect(result).toEqual(mockMappedApiResponse);
+      expect(result).toStrictEqual(mockMappedApiResponse);
     });
 
     it('filters incomplete response', async () => {
@@ -142,7 +142,7 @@ describe('SpotifyArtistProvider', () => {
 
       const result = await provider.search(filters);
 
-      expect(result).toEqual(mockMappedApiResponse);
+      expect(result).toStrictEqual(mockMappedApiResponse);
     });
 
     it('throws if the SDK fails', async () => {
@@ -172,7 +172,7 @@ describe('SpotifyArtistProvider', () => {
       expect(mockInfrastructure.search).toHaveBeenCalledWith('The Beatles', [
         'artist',
       ]);
-      expect(result).toEqual(mockMappedApiResponse[0]);
+      expect(result).toStrictEqual(mockMappedApiResponse[0]);
     });
 
     it('returns null when not found', async () => {
@@ -183,7 +183,7 @@ describe('SpotifyArtistProvider', () => {
 
       const result = await provider.get(filters);
 
-      expect(result).toEqual(null);
+      expect(result).toStrictEqual(null);
     });
   });
 });
