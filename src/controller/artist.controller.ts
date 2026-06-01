@@ -20,6 +20,9 @@ import {
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 
+import { Public } from '../infrastructure/auth/public.decorator';
+
+@Public()
 @Controller('api/artists')
 export class ArtistController {
   private readonly logger = new Logger(ArtistController.name);

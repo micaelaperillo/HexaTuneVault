@@ -30,6 +30,7 @@ import {
 import { ReviewSearchCriteria } from '../model/review-search-criteria';
 import { ReviewModel, UserModel } from '../model';
 import { plainToInstance } from 'class-transformer';
+import { Public } from '../infrastructure/auth/public.decorator';
 import { PageDto } from '../dto/page.dto';
 
 @Controller('api/reviews')
@@ -65,6 +66,7 @@ export class ReviewController {
     return ReviewController.toResponse(review);
   }
 
+  @Public()
   @Get()
   async search(
     @Query() dto: SearchReviewQueryDto,
@@ -76,6 +78,7 @@ export class ReviewController {
     return PageDto.of(items.map(ReviewController.toResponse), page, total);
   }
 
+  @Public()
   @Get(':id')
   async getById(
     @Param('id', ParseIntPipe) id: number,
