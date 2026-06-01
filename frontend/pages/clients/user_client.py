@@ -96,7 +96,7 @@ def _to_member(user: dict) -> dict:
     return {
         'id': user.get('id'),
         'user': user.get('username', ''),
-        'profileimg': user.get('profilePictureUrl', ''),
+        'profileimg': user.get('profilePictureUrl') or DEFAULT_PROFILE_IMAGE,
         'isArtist': False,  # the user API has no artist flag
     }
 
@@ -106,7 +106,7 @@ def _to_profile(user: dict) -> dict:
     return {
         'id': user.get('id'),
         'user': user.get('username', ''),
-        'profileimg': user.get('profilePictureUrl', ''),
+        'profileimg': user.get('profilePictureUrl') or DEFAULT_PROFILE_IMAGE,
         'bio': user.get('biography', ''),
         'location': '',     # not in the user API
         'isArtist': False,  # not in the user API

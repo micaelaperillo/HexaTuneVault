@@ -11,6 +11,7 @@ from .clients import podcast_client
 from .clients import album_client
 from .clients import comment_client
 from .clients import user_client
+from .clients import image_client
 
 
 def login_required_api(view):
@@ -131,11 +132,11 @@ def profile(request, user=None):
 def settings_profile(request):
     user_id = request.user.id
     if request.method == 'POST':
-        # The user API only stores biography; location and image upload have no
-        # API field yet, so they are not persisted.
-        user_client.edit(
-            user_id, request=request, biography=request.POST.get('bio', '')
-        )
+        fields = {'biography': request.POST.get('bio', '')}
+        image_url = image_client.upload(request.FILES.get('image'), request=request)
+        if image_url:
+            fields['profilePictureUrl'] = image_url
+        user_client.edit(user_id, request=request, **fields)
         return redirect('settings')
 
     user_profile = user_client.get(user_id, request=request) or {}
@@ -294,7 +295,6 @@ def vault(request, vtype, id):
         album = album_client.get(id, request=request)
         context = {}
         if album is not None:
-            # The album API returns artist names only (no avatars yet).
             author = album['artists'][0] if album['artists'] else ''
             author_image = ''
             if author:
