@@ -282,6 +282,7 @@ def vault(request, vtype, id):
                 'title': artist['artist'],
                 'spotifyimg': artist['image'],
                 'id': id,
+                'external_url': artist['external_url'],
                 'authors': [{'name': artist['artist'], 'image': artist['image']}],
             }
     elif vtype == 'podcast':
@@ -315,6 +316,7 @@ def vault(request, vtype, id):
                 'id': id,
                 'date': album['date'],
                 'total_tracks': album['total_tracks'],
+                'external_url': album['external_url'],
                 'authors': [{'name': author, 'image': author_image}],
             }
     else:

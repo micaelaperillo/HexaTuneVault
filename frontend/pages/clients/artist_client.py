@@ -21,10 +21,12 @@ def get(name: str, request=None) -> dict | None:
 
 def _to_vault(artist: dict) -> dict:
     name = artist.get('name', '')
+    external_urls = artist.get('external_urls') or {}
     return {
-        'id': name,              
-        'artist': name,      
+        'id': name,
+        'artist': name,
         'image': artist.get('avatar', ''),
+        'external_url': external_urls.get('spotify', ''),
         'self': artist.get('self'),
         'albums': artist.get('albums'),
         'reviews': artist.get('reviews'),

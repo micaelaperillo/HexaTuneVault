@@ -22,12 +22,14 @@ def get(name: str, request=None) -> dict | None:
 
 def _to_vault(album: dict) -> dict:
     name = album.get('name', '')
+    external_urls = album.get('external_urls') or {}
     return {
-        'id': name,                         
-        'album': name,                       
+        'id': name,
+        'album': name,
         'image': album.get('cover', ''),
         'date': album.get('releaseDate', ''),
         'total_tracks': album.get('totalTracks', ''),
+        'external_url': external_urls.get('spotify', ''),
         'artists': album.get('artists') or [],
         'self': album.get('self'),
         'reviews': album.get('reviews'),
