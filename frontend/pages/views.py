@@ -16,7 +16,6 @@ from .clients import review_client
 
 
 def login_required_api(view):
-    """Redirect anonymous users to the login page (replaces @login_required)."""
 
     @wraps(view)
     def wrapper(request, *args, **kwargs):

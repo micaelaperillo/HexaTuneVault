@@ -18,7 +18,6 @@ def search(query: str, explicit: str = '', media_type: str = '', market: str = '
 
 
 def get(name: str, request=None) -> dict | None:
-    """Fetch a single podcast by name. Returns a template-ready dict or None."""
     data = api_client.get_json(f'/api/podcasts/{name}', request=request, default=None)
     return _to_vault(data) if isinstance(data, dict) else None
 
