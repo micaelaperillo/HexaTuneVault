@@ -1,23 +1,9 @@
-"""Thin client for the NestJS users API.
-
-Maps a ``UserResponseDto`` (``{id, username, firstName, lastName, email,
-biography, profilePictureUrl}``) to the shapes the templates expect:
-  * :func:`_to_member`  -> previewProfile.html  (user / profileimg / isArtist)
-  * :func:`_to_profile` -> profile.html, settingsProfile.html
-
-Auth is ``POST /api/users/authenticate`` returning ``{accessToken}``; the JWT
-payload carries ``{sub: id, username}`` (see :func:`decode_token`). The API has
-no ``/me`` endpoint, so the middleware decodes the cookie locally.
-
-NOT in the user API (rendered as empty/placeholder until other APIs land):
-``isArtist``, ``location``, follower/following lists & counts, posts,
-favourites. Lookups are by numeric ``id``; username lookups go through search.
-"""
 
 import base64
 import json
 
 from . import api_client
+from .image_client import DEFAULT_PROFILE_IMAGE
 
 
 def decode_token(token: str) -> dict | None:
@@ -37,7 +23,7 @@ def authenticate(username, password):
 
 
 def create(username, password, email, first_name='', last_name='',
-           biography='', profile_picture_url=''):
+           biography='', profile_picture_url=DEFAULT_PROFILE_IMAGE):
     return api_client.post('/api/users', json={
         'username': username,
         'password': password,

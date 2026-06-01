@@ -12,6 +12,7 @@ from .clients import album_client
 from .clients import comment_client
 from .clients import user_client
 from .clients import image_client
+from .clients import review_client
 
 
 def login_required_api(view):
@@ -260,10 +261,13 @@ def all_search(request, query):
 
 def vault(request, vtype, id):
     if request.method == 'POST':
-        api_client.post(f'/api/vaults/{vtype}/{id}/posts', request=request, data={
-            'title': request.POST.get('title'),
-            'rating': request.POST.get('rating'),
-        })
+        review_client.create(
+            content=request.POST.get('title'),
+            rating=request.POST.get('rating'),
+            subject_type=vtype,
+            subject_id=id,
+            request=request,
+        )
         return redirect(request.path)
 
     if vtype == 'artist':
@@ -313,10 +317,19 @@ def vault(request, vtype, id):
     else:
         context = api_client.get_json(f'/api/vaults/{vtype}/{id}', request=request, default={}) or {}
 
+    posts = review_client.list_for(vtype, id, request=request)
+    counts = comment_client.counts_by_subject(request=request)
+    for post in posts:
+        post['comment_count'] = counts.get(str(post['post']['id']), 0)
+    ratings = [p['post']['rating'] for p in posts if isinstance(p['post']['rating'], int)]
+
     context.update({
         'vault_id': id,
         'is_post': True,
         'path': request.path,
+        'posts': posts,
+        'rating': round(sum(ratings) / len(ratings)) if ratings else 0,
+        'first_post': True,  # no per-user "already reviewed" check yet
     })
     return render(request, 'vault.html', context)
 
@@ -325,7 +338,7 @@ def vault_post(request, vtype, id, post_id):
     if request.method == 'POST':
         # NOTE: the comments API has no threading, so comment_answer_id (the
         # reply target) is not forwarded yet.
-        created_by = request.user.username if request.user.is_authenticated else None
+        created_by = request.user.id if request.user.is_authenticated else None
         comment_client.create(
             content=request.POST.get('content'),
             associated_to=post_id,
@@ -334,8 +347,8 @@ def vault_post(request, vtype, id, post_id):
         )
         return redirect(request.path)
 
-    # The post (review) itself awaits the review/user APIs; for now we render the
-    # comments thread attached to this post.
+    # The review being viewed, plus the comments thread attached to it.
+    review = review_client.get(post_id, request=request)
     comments = comment_client.list_for(post_id, request=request)
     context = {
         'comments': comments,
@@ -343,6 +356,10 @@ def vault_post(request, vtype, id, post_id):
         'is_post': False,
         'path': request.path,
     }
+    if review is not None:
+        context['post'] = review['post']
+        context['post_user'] = review['user']
+        context['is_liked'] = review['is_liked']
     return render(request, 'post.html', context)
 
 
@@ -376,6 +393,6 @@ def like_or_unlike_comment(request):
     if request.method == 'POST':
         comment_id = request.POST.get('comment_id')
         path = request.POST.get('path', '/')
-        comment_client.toggle_like(comment_id, request=request)
+        comment_client.toggle_like(comment_id, request.user.id, request=request)
         return redirect(path)
     return redirect('home')
