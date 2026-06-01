@@ -112,10 +112,11 @@ def _to_post(r: dict, request, cache) -> dict:
     author_id = str(r.get('author_id') or '')
     username, user_info = _author(author_id, request, cache)
     return {
+        'author_id': author_id,
         'post': {
             'id': r.get('id'),
             'user': username,
-            'title': r.get('content', ''),   
+            'title': r.get('content', ''),
             'date': r.get('created_at', ''),
             'rating': r.get('rating', 0),
             'vault_id': r.get('subject_id', ''),

@@ -321,6 +321,10 @@ def vault(request, vtype, id):
     for post in posts:
         post['comment_count'] = counts.get(str(post['post']['id']), 0)
     ratings = [p['post']['rating'] for p in posts if isinstance(p['post']['rating'], int)]
+    current_id = str(request.user.id) if request.user.is_authenticated else None
+    already_reviewed = bool(current_id) and any(
+        p.get('author_id') == current_id for p in posts
+    )
 
     context.update({
         'vault_id': id,
@@ -328,7 +332,7 @@ def vault(request, vtype, id):
         'path': request.path,
         'posts': posts,
         'rating': round(sum(ratings) / len(ratings)) if ratings else 0,
-        'first_post': True,
+        'first_post': not already_reviewed,
     })
     return render(request, 'vault.html', context)
 
