@@ -4,28 +4,59 @@ import { IsNull, QueryFailedError } from 'typeorm';
 import { CommentRepository } from '../src/adapter/comment.repository';
 import { CommentEntity } from '../src/entity/comment.entity';
 import { CommentDBException } from '../src/error/comment/comment-db.exception';
+import { ReviewModel, UserModel } from '../src/model';
+import { UserEntity } from '../src/entity';
+import { ReviewEntity } from '../src/entity/review.entity';
+import { SubjectReference } from '../src/model/subject-reference';
 
 describe('CommentRepository', () => {
   let repository: CommentRepository;
 
-  // A persisted entity as returned by TypeORM, with @RelationId columns populated.
-  const mockEntity = {
-    id: 1,
+  const mockUser = { id: 1 } as unknown as UserModel;
+
+  const mockReview = {
+    id: 10,
+    author: mockUser,
+    content: 'idk',
+    rating: 1,
+    createdAt: new Date('2024-01-01'),
+    subjectRef: new SubjectReference('artist', 'The Beatles'),
+  } as ReviewModel;
+
+  const mockComment = {
+    id: 100,
     content: 'Test comment',
     createdAt: new Date('2024-01-01'),
-    createdById: 1,
-    parentReviewId: 10,
+    createdBy: mockUser,
+    parentReview: mockReview,
     parentCommentId: null,
   };
 
-  // The domain model that mockEntity maps to.
-  const mockModel = {
-    id: 1,
+  const mockUserEntity = { id: 1 } as unknown as UserEntity;
+
+  const mockReviewEntity = {
+    id: 10,
+    author: mockUserEntity,
+    content: 'idk',
+    rating: 1,
+    createdAt: new Date('2024-01-01'),
+    subjectType: 'artist',
+    subjectId: 'The Beatles',
+  } as ReviewEntity;
+
+  // A persisted entity as returned by TypeORM, with @RelationId columns populated.
+  const mockEntity: CommentEntity = {
+    id: 100,
     content: 'Test comment',
     createdAt: new Date('2024-01-01'),
+    createdBy: mockUserEntity,
     createdById: 1,
+    parentReview: mockReviewEntity,
     parentReviewId: 10,
+    parentComment: null,
     parentCommentId: null,
+    likedBy: [],
+    replies: [],
   };
 
   const relationMock = {
@@ -77,19 +108,19 @@ describe('CommentRepository', () => {
 
       const result = await repository.create({
         content: 'Test comment',
-        createdById: 1,
-        parentReviewId: 10,
+        createdBy: mockUser,
+        parentReview: mockReview,
         parentCommentId: null,
       });
 
       expect(mockTypeOrmRepo.create).toHaveBeenCalledWith({
         content: 'Test comment',
-        createdBy: { id: 1 },
-        parentReview: { id: 10 },
+        createdBy: mockUser,
+        parentReview: mockReview,
         parentComment: null,
       });
       expect(mockTypeOrmRepo.findOneByOrFail).toHaveBeenCalledWith({ id: 1 });
-      expect(result).toEqual(mockModel);
+      expect(result).toEqual(mockComment);
     });
 
     it('maps a parentCommentId to a parentComment relation', async () => {
@@ -103,13 +134,13 @@ describe('CommentRepository', () => {
 
       await repository.create({
         content: 'reply',
-        createdById: 1,
-        parentReviewId: 10,
-        parentCommentId: 1,
+        createdBy: mockUser,
+        parentReview: mockReview,
+        parentCommentId: 100,
       });
 
       expect(mockTypeOrmRepo.create).toHaveBeenCalledWith(
-        expect.objectContaining({ parentComment: { id: 1 } }),
+        expect.objectContaining({ parentComment: { id: 100 } }),
       );
     });
 
@@ -121,8 +152,8 @@ describe('CommentRepository', () => {
       await expect(
         repository.create({
           content: 'x',
-          createdById: 1,
-          parentReviewId: 10,
+          createdBy: mockUser,
+          parentReview: mockReview,
           parentCommentId: null,
         }),
       ).rejects.toThrow(CommentDBException);
@@ -134,7 +165,7 @@ describe('CommentRepository', () => {
       mockTypeOrmRepo.findOneBy.mockResolvedValue(mockEntity);
       const result = await repository.findById(1);
       expect(mockTypeOrmRepo.findOneBy).toHaveBeenCalledWith({ id: 1 });
-      expect(result).toEqual(mockModel);
+      expect(result).toEqual(mockComment);
     });
 
     it('returns null when not found', async () => {
@@ -151,7 +182,7 @@ describe('CommentRepository', () => {
       const result = await repository.findLikesByCommentId(1);
       expect(qbMock.relation).toHaveBeenCalledWith(CommentEntity, 'likedBy');
       expect(relationMock.of).toHaveBeenCalledWith(1);
-      expect(result).toEqual([2, 3]);
+      expect(result).toEqual([{ id: 2 }, { id: 3 }]);
     });
 
     it('returns null when comment not found', async () => {
@@ -182,13 +213,18 @@ describe('CommentRepository', () => {
   describe('findReplies', () => {
     it('returns child comments of the given parent', async () => {
       mockTypeOrmRepo.findBy.mockResolvedValue([
-        { ...mockEntity, id: 2, parentCommentId: 1 },
+        {
+          ...mockEntity,
+          id: 2,
+          parentComment: mockEntity,
+          parentCommentId: 100,
+        },
       ]);
       const result = await repository.findReplies(1);
       expect(mockTypeOrmRepo.findBy).toHaveBeenCalledWith({
         parentComment: { id: 1 },
       });
-      expect(result).toEqual([{ ...mockModel, id: 2, parentCommentId: 1 }]);
+      expect(result).toEqual([{ ...mockComment, id: 2, parentCommentId: 100 }]);
     });
   });
 
@@ -207,7 +243,7 @@ describe('CommentRepository', () => {
           parentReview: { id: 10 },
         }),
       );
-      expect(result).toEqual([mockModel]);
+      expect(result).toEqual([mockComment]);
     });
 
     it('restricts to top-level comments when no filters are provided', async () => {

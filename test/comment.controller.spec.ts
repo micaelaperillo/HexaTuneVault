@@ -11,19 +11,40 @@ import {
 } from '../src/port/comment';
 import { CommentModel } from '../src/model/comment.model';
 import { CommentResponseDto } from '../src/dto/comment-response.dto';
-import { UserLinkDto } from '../src/dto/user-link.dto';
 import { CreateCommentDto } from '../src/dto/create-comment.dto';
 import { SetCommentLikeDto } from '../src/dto/set-comment-like.dto';
+import { SubjectReference } from '../src/model/subject-reference';
+import { ReviewModel, UserModel } from '../src/model';
+import { UserResponseDto } from '../src/dto/user-response.dto';
 
 describe('CommentController', () => {
   let controller: CommentController;
+
+  const mockUser: UserModel = {
+    id: 1,
+    username: 'a',
+    password: 'b',
+    firstName: 'A',
+    lastName: 'B',
+    email: 'a@b.c',
+    biography: 'abc',
+    profilePictureUrl: 'a.b',
+  };
 
   const mockComment: CommentModel = {
     id: 1,
     content: 'Test comment',
     createdAt: new Date('2024-01-01'),
-    createdById: 1,
-    parentReviewId: 10,
+    createdBy: mockUser,
+    parentReview: ReviewModel.reconstitute({
+      id: 10,
+      author: mockUser,
+      content: 'idk',
+      rating: 1,
+      subjectRef: new SubjectReference('artist', 'The Beatles'),
+      createdAt: new Date(),
+      updatedAt: null,
+    }),
     parentCommentId: null,
   };
 
@@ -67,8 +88,8 @@ describe('CommentController', () => {
 
       expect(mockCreate.create).toHaveBeenCalledWith({
         content: 'Test comment',
-        createdById: 1,
-        parentReviewId: 10,
+        createdBy: { id: 1 },
+        parentReview: { id: 10 },
         parentCommentId: null,
       });
       expect(result).toBeInstanceOf(CommentResponseDto);
@@ -92,8 +113,8 @@ describe('CommentController', () => {
 
       expect(mockCreate.create).toHaveBeenCalledWith({
         content: 'A reply',
-        createdById: 1,
-        parentReviewId: 10,
+        createdBy: { id: 1 },
+        parentReview: { id: 10 },
         parentCommentId: 5,
       });
       expect(result.parent).toBe('/api/comments/5');
@@ -145,14 +166,16 @@ describe('CommentController', () => {
 
   describe('getLikes', () => {
     it('calls getLikes port and returns an array of UserLinkDto', async () => {
-      mockGetLikes.getLikes.mockResolvedValue([2, 3]);
+      const mockUser2: UserModel = { ...mockUser, id: 2 };
+      mockGetLikes.getLikes.mockResolvedValue([mockUser, mockUser2]);
+
       const result = await controller.getLikes(1);
 
       expect(mockGetLikes.getLikes).toHaveBeenCalledWith(1);
       expect(result).toHaveLength(2);
-      expect(result[0]).toBeInstanceOf(UserLinkDto);
-      expect(result[0].user).toBe('/api/users/2');
-      expect(result[1].user).toBe('/api/users/3');
+      expect(result[0]).toBeInstanceOf(UserResponseDto);
+      expect(result[0].id).toBe(1);
+      expect(result[1].id).toBe(2);
     });
   });
 
