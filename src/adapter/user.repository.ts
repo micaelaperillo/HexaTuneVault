@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, QueryFailedError } from 'typeorm';
+import { ILike, Repository, QueryFailedError } from 'typeorm';
 
 import { UserEntity } from '../entity/user.entity';
 import { IUserRepository } from '../repository/i-user.repository';
@@ -28,10 +28,7 @@ export class UserRepository implements IUserRepository {
   }
 
   async findById(id: number): Promise<UserModel | null> {
-    // `followerCount`/`followingCount` are virtual columns selected automatically.
-    return this.run(() =>
-      this.repo.createQueryBuilder('u').where('u.id = :id', { id }).getOne(),
-    );
+    return this.run(() => this.repo.findOneBy({ id }));
   }
 
   async findByUsername(username: string): Promise<UserModel | null> {
@@ -47,27 +44,22 @@ export class UserRepository implements IUserRepository {
   }
 
   async search(filters: UserFilters): Promise<UserModel[]> {
-    return this.run(() => {
-      // `followerCount`/`followingCount` are virtual columns selected automatically.
-      const qb = this.repo.createQueryBuilder('u');
-
-      if (filters.username !== undefined)
-        qb.andWhere('u.username ILIKE :username', {
-          username: `%${filters.username}%`,
-        });
-      if (filters.email !== undefined)
-        qb.andWhere('u.email ILIKE :email', { email: `%${filters.email}%` });
-      if (filters.firstName !== undefined)
-        qb.andWhere('u.firstName ILIKE :firstName', {
-          firstName: `%${filters.firstName}%`,
-        });
-      if (filters.lastName !== undefined)
-        qb.andWhere('u.lastName ILIKE :lastName', {
-          lastName: `%${filters.lastName}%`,
-        });
-
-      return qb.getMany();
-    });
+    return this.run(() =>
+      this.repo.findBy({
+        ...(filters.username !== undefined && {
+          username: ILike(`%${filters.username}%`),
+        }),
+        ...(filters.email !== undefined && {
+          email: ILike(`%${filters.email}%`),
+        }),
+        ...(filters.firstName !== undefined && {
+          firstName: ILike(`%${filters.firstName}%`),
+        }),
+        ...(filters.lastName !== undefined && {
+          lastName: ILike(`%${filters.lastName}%`),
+        }),
+      }),
+    );
   }
 
   async update(user: Partial<UserModel>): Promise<UserModel> {
