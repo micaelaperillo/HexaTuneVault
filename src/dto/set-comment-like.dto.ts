@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer/types/decorators/type.decorator';
+import { Type } from 'class-transformer';
 import { IsBoolean, IsInt } from 'class-validator';
 
 export class SetCommentLikeDto {
