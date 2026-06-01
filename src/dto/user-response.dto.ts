@@ -30,4 +30,7 @@ export class UserResponseDto {
 
   @Expose()
   followingCount!: number;
+
+  @Expose()
+  self!: `/${string}`;
 }

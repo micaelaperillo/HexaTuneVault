@@ -148,6 +148,7 @@ export class UserController {
         location: user.location ?? '',
         followerCount: user.followerCount ?? 0,
         followingCount: user.followingCount ?? 0,
+        self: `/api/users/${user.id}`,
       },
       { excludeExtraneousValues: true },
     );
