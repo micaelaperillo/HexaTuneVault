@@ -18,6 +18,7 @@ import {
   NotFoundException,
   Logger,
   Inject,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 
@@ -31,14 +32,20 @@ export class AlbumController {
   ) {}
 
   @Get()
-  async search(@Query('q') name?: string, @Query('artist') artist?: string) {
+  async search(
+    @Query('q') name?: string,
+    @Query('artist') artist?: string,
+    @Query('year', ParseIntPipe) year?: number,
+  ) {
     this.logger.debug(`Search album with q=${name}, artist=${artist}`);
 
-    if (!name && !artist) throw new BadRequestException();
+    if (!name && !artist && (!year || year < 1))
+      throw new BadRequestException();
 
     const results = await this.searcher.search({
       name,
       artist,
+      year,
     });
 
     return results.map(AlbumController.toResponse);

@@ -59,6 +59,10 @@ export class SpotifyAlbumProvider implements IAlbumProvider {
       params.push(filters.artist);
     }
 
+    if (filters.year) {
+      params.push(`year:${filters.year}`);
+    }
+
     return params.join(' ');
   }
 
