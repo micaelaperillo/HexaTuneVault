@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   Index,
   ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 
 import type { SubjectType } from '../model/subject-reference';
