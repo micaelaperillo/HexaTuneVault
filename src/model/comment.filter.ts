@@ -1,7 +1,5 @@
-import { AssociatedType } from './comment.associated.type';
-
 export interface CommentFilters {
-  createdBy?: string;
+  createdById?: number;
   content?: string;
-  associatedType?: AssociatedType;
+  parentReviewId?: number;
 }

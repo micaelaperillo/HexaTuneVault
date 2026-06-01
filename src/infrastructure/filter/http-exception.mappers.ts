@@ -9,10 +9,8 @@ import {
 import { DomainException } from '../../error/domain.exception';
 
 import {
-  AlreadyLikedException,
   CommentDBException,
   CommentNotFoundException,
-  NotLikedException,
 } from '../../error/comment/';
 import { ArtistProviderError } from '../../error/artist/';
 import { PodcastProviderError } from '../../error/podcast/';
@@ -56,12 +54,7 @@ export class NotFoundMapper implements ExceptionFilter {
   }
 }
 
-@Catch(
-  AlreadyLikedException,
-  NotLikedException,
-  AlreadyFollowingException,
-  NotFollowingException,
-)
+@Catch(AlreadyFollowingException, NotFollowingException)
 export class ConflictMapper implements ExceptionFilter {
   catch(exception: Error, host: ArgumentsHost): void {
     send(host, HttpStatus.CONFLICT, exception, 'CONFLICT');
