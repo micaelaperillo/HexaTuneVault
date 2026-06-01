@@ -9,7 +9,6 @@ from __future__ import annotations
 
 
 class ApiUser:
-    """Wraps the JSON returned by ``GET /api/auth/me`` (or None if anonymous)."""
 
     def __init__(self, data: dict | None):
         # Use object.__setattr__ to avoid triggering __getattr__ during init.
@@ -28,7 +27,6 @@ class ApiUser:
         return self._data.get('username', '')
 
     def __getattr__(self, item):
-        # Only called when normal attribute lookup fails.
         data = object.__getattribute__(self, '_data')
         return data.get(item, '')
 

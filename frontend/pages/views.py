@@ -113,18 +113,22 @@ def profile(request, user=None):
 
     user_profile = user_client.get_by_username(user, request=request) or {}
     is_current_user = (user == request.user.username)
+    # A user's "posts" are the reviews they authored.
+    user_posts = []
+    if user_profile.get('id') is not None:
+        user_posts = review_client.list_by_author(user_profile['id'], request=request)
     context = {
         'user_profile': user_profile,
         'isCurrentUser': is_current_user,
         'button_text': 'Follow',
-        # The user API exposes no follower/post data yet; render the
-        # template's empty states until those APIs are wired.
+        # Follower/following data has no read API yet (only follow/unfollow);
+        # render the template's empty states until that lands.
         'user_followers_count': 0,
         'user_following_count': 0,
-        'user_post_length': 0,
-        'user_posts': [],
         'user_followers': {},
         'user_following': {},
+        'user_post_length': len(user_posts),
+        'user_posts': user_posts,
     }
     return render(request, 'profile.html', context)
 

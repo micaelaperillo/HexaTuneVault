@@ -19,6 +19,9 @@ class ApiAuthMiddleware:
                     'id': payload.get('sub'),
                     'username': payload.get('username', ''),
                 }
+                profile = user_client.get(data['id'], request=request)
+                if profile:
+                    data = {**profile, **data}
         request.user = ApiUser(data)
         request.user_data = data
         return self.get_response(request)
