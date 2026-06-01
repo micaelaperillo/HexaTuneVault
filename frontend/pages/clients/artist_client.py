@@ -22,10 +22,9 @@ def get(name: str, request=None) -> dict | None:
 def _to_vault(artist: dict) -> dict:
     name = artist.get('name', '')
     return {
-        'id': name,                      # artist detail is keyed by name, not an id
-        'artist': name,                  # title shown in previewVault
+        'id': name,              
+        'artist': name,      
         'image': artist.get('avatar', ''),
-        # Passthrough HATEOAS links for when the album/review APIs are wired.
         'self': artist.get('self'),
         'albums': artist.get('albums'),
         'reviews': artist.get('reviews'),

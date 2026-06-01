@@ -170,8 +170,8 @@ def music_search(request, query):
     albums = album_client.search(query, request=request)
     context = {
         'result': [
-            {'query': query, 'vaults': artists},  # 0 -> Artists
-            {'query': query, 'vaults': albums},   # 1 -> Albums
+            {'query': query, 'vaults': artists},
+            {'query': query, 'vaults': albums},  
         ],
     }
     return render(request, 'searchMusic.html', context)
@@ -230,8 +230,8 @@ def members_search(request, query):
     accounts = user_client.search(query, request=request)
     context = {
         'result': [
-            {'query': query, 'members': accounts},  # 0 -> Accounts tab
-            {'query': query, 'members': []},         # 1 -> Artists tab (no flag yet)
+            {'query': query, 'members': accounts},
+            {'query': query, 'members': []},
         ],
     }
     return render(request, 'searchMembers.html', context)
@@ -248,10 +248,10 @@ def all_search(request, query):
     members = user_client.search(query,request=request)
     context = {
         'result': [
-            {'query': query, 'vaults': artists},  # 0 -> Artists
-            {'query': query, 'vaults': albums},       # 1 -> Albums
-            {'query': query, 'vaults': podcasts}, # 2 -> Podcasts
-            {'query': query, 'members': members}, # 3 -> Members
+            {'query': query, 'vaults': artists},
+            {'query': query, 'vaults': albums},
+            {'query': query, 'vaults': podcasts},
+            {'query': query, 'members': members}, 
         ]
     }
     return render(request, 'searchResult.html', context)
@@ -328,7 +328,7 @@ def vault(request, vtype, id):
         'path': request.path,
         'posts': posts,
         'rating': round(sum(ratings) / len(ratings)) if ratings else 0,
-        'first_post': True,  # no per-user "already reviewed" check yet
+        'first_post': True,
     })
     return render(request, 'vault.html', context)
 

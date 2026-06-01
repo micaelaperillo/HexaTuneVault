@@ -121,7 +121,7 @@ def _to_post(r: dict, request, cache) -> dict:
             'vault_id': r.get('subject_id', ''),
         },
         'user': user_info,
-        'likes': 0,          # reviews have no like API yet
+        'likes': 0,
         'is_liked': False,
         'comment_count': 0,
     }

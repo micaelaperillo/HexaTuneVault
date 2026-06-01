@@ -29,7 +29,6 @@ def _to_vault(album: dict) -> dict:
         'date': album.get('releaseDate', ''),
         'total_tracks': album.get('totalTracks', ''),
         'artists': album.get('artists') or [],
-        # Passthrough HATEOAS links for when the review API is wired.
         'self': album.get('self'),
         'reviews': album.get('reviews'),
     }

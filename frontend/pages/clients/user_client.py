@@ -9,7 +9,7 @@ from .image_client import DEFAULT_PROFILE_IMAGE
 def decode_token(token: str) -> dict | None:
     try:
         payload = token.split('.')[1]
-        payload += '=' * (-len(payload) % 4)  # restore base64 padding
+        payload += '=' * (-len(payload) % 4)
         return json.loads(base64.urlsafe_b64decode(payload))
     except (ValueError, IndexError, TypeError):
         return None

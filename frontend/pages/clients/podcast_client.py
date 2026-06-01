@@ -27,7 +27,7 @@ def _to_vault(podcast: dict) -> dict:
     name = podcast.get('name', '')
     external_urls = podcast.get('external_urls') or {}
     return {
-        'id': name,                       # podcast detail is keyed by name, not an id
+        'id': name,   
         'show': name,                    
         'publisher': podcast.get('publisher', ''),
         'description': podcast.get('description', ''),
