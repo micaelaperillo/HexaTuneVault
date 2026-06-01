@@ -6,6 +6,7 @@ export interface UserModel {
   lastName: string;
   email: string;
   biography: string;
+  location?: string;
   profilePictureUrl: string;
   followerCount?: number;
   followingCount?: number;
