@@ -52,14 +52,19 @@ describe('AlbumController', () => {
 
     it('calls searcher port with name filter and returns mapped responses', async () => {
       mockSearch.search.mockResolvedValue([mockAlbum]);
-      const result = await controller.search('Abbey Road', undefined);
+      const result = await controller.search(
+        'Abbey Road',
+        undefined,
+        undefined,
+      );
 
       expect(mockSearch.search).toHaveBeenCalledWith({
         name: 'Abbey Road',
         artist: undefined,
+        year: undefined,
       });
       expect(result).toHaveLength(1);
-      expect(result[0]).toStrictEqual({
+      expect(result[0]).toEqual({
         name: 'Abbey Road',
         cover: 'cover-url',
         releaseDate: '1969',
@@ -75,11 +80,29 @@ describe('AlbumController', () => {
 
     it('calls searcher port with artist filter and returns mapped responses', async () => {
       mockSearch.search.mockResolvedValue([mockAlbum]);
-      const result = await controller.search(undefined, 'The Beatles');
+      const result = await controller.search(
+        undefined,
+        'The Beatles',
+        undefined,
+      );
 
       expect(mockSearch.search).toHaveBeenCalledWith({
         name: undefined,
         artist: 'The Beatles',
+        year: undefined,
+      });
+      expect(result).toHaveLength(1);
+      expect(result[0].self).toBe('/api/albums/Abbey%20Road');
+    });
+
+    it('calls searcher port with year filter and returns mapped responses', async () => {
+      mockSearch.search.mockResolvedValue([mockAlbum]);
+      const result = await controller.search(undefined, undefined, 1969);
+
+      expect(mockSearch.search).toHaveBeenCalledWith({
+        name: undefined,
+        artist: undefined,
+        year: 1969,
       });
       expect(result).toHaveLength(1);
       expect(result[0].self).toBe('/api/albums/Abbey%20Road');
@@ -92,7 +115,7 @@ describe('AlbumController', () => {
       const result = await controller.get('Abbey Road');
 
       expect(mockGet.get).toHaveBeenCalledWith({ name: 'Abbey Road' });
-      expect(result).toStrictEqual({
+      expect(result).toEqual({
         name: 'Abbey Road',
         cover: 'cover-url',
         releaseDate: '1969',
