@@ -260,15 +260,13 @@ def all_search(request, query):
 
 def vault(request, vtype, id):
     if request.method == 'POST':
-        if request.user.is_authenticated:
-            review_client.create(
-                content=request.POST.get('title'),
-                rating=request.POST.get('rating'),
-                subject_type=vtype,
-                subject_id=id,
-                created_by=request.user.id,
-                request=request,
-            )
+        review_client.create(
+            content=request.POST.get('title'),
+            rating=request.POST.get('rating'),
+            subject_type=vtype,
+            subject_id=id,
+            request=request,
+        )
         return redirect(request.path)
 
     if vtype == 'artist':

@@ -27,16 +27,13 @@ def get(review_id, request=None) -> dict | None:
     return _to_post(data, request, {})
 
 
-def create(content, rating, subject_type, subject_id, created_by=None, request=None):
-    body = {
+def create(content, rating, subject_type, subject_id, request=None):
+    return api_client.post(BASE, request=request, json={
         'content': content,
         'rating': _as_int(rating),
         'subject_type': subject_type,
         'subject_id': str(subject_id),
-    }
-    if created_by is not None:
-        body['author_id'] = str(created_by)
-    return api_client.post(BASE, request=request, json=body)
+    })
 
 
 def list_by_author(author_id, request=None) -> list[dict]:
