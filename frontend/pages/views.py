@@ -78,14 +78,12 @@ def signup(request):
             email=request.POST.get('email'),
         )
         if response is not None and response.ok:
-            # Create issues no token; authenticate to start the session.
             auth = user_client.authenticate(username, password)
             if auth is not None and auth.ok:
                 token = auth.json().get('accessToken')
                 return _set_token_cookie(redirect('profile'), token)
             return redirect('login')
 
-        # Surface the API's validation message when available.
         detail = 'Could not create account'
         if response is not None:
             try:
@@ -113,20 +111,22 @@ def profile(request, user=None):
 
     user_profile = user_client.get_by_username(user, request=request) or {}
     is_current_user = (user == request.user.username)
-    # A user's "posts" are the reviews they authored.
+    user_id = user_profile.get('id')
     user_posts = []
-    if user_profile.get('id') is not None:
-        user_posts = review_client.list_by_author(user_profile['id'], request=request)
+    followers = {'count': 0, 'users': []}
+    following = {'count': 0, 'users': []}
+    if user_id is not None:
+        user_posts = review_client.list_by_author(user_id, request=request)
+        followers = user_client.followers(user_id, request=request)
+        following = user_client.following(user_id, request=request)
     context = {
         'user_profile': user_profile,
         'isCurrentUser': is_current_user,
         'button_text': 'Follow',
-        # Follower/following data has no read API yet (only follow/unfollow);
-        # render the template's empty states until that lands.
-        'user_followers_count': 0,
-        'user_following_count': 0,
-        'user_followers': {},
-        'user_following': {},
+        'user_followers_count': followers['count'],
+        'user_following_count': following['count'],
+        'user_followers': {'followers': followers['users']},
+        'user_following': {'following': following['users']},
         'user_post_length': len(user_posts),
         'user_posts': user_posts,
     }
@@ -222,7 +222,6 @@ def podcasts_search(request, query):
 def members(request):
     if request.method == 'POST':
         return redirect('/members/' + request.POST.get('query', ''))
-    # No "recommended" endpoint yet; list all users as the recommended set.
     members_list = user_client.search(request=request)
     return render(request, 'members.html', {'membersList': members_list})
 

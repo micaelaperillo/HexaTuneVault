@@ -78,6 +78,47 @@ def toggle_follow(target_id, follower_id, request=None):
     return response
 
 
+def followers(user_id, request=None) -> dict:
+    return _follow_page(f'/api/users/{user_id}/followers', request)
+
+
+def following(user_id, request=None) -> dict:
+    return _follow_page(f'/api/users/{user_id}/following', request)
+
+
+def _id_from_link(link: str, default: str = '') -> str:
+    if not link:
+        return default
+    return link.rstrip('/').rsplit('/', 1)[-1]
+
+
+def _follow_page(path, request) -> dict:
+    data = api_client.get_json(path, request=request, default={})
+    if not isinstance(data, dict):
+        return {'count': 0, 'users': []}
+    items = data.get('items') or []
+    total = data.get('total', len(items))
+    cache: dict[str, dict] = {}
+    users = [_follow_user(_id_from_link(i.get('user')), request, cache) for i in items]
+    return {'count': total, 'users': users}
+
+
+def _follow_user(user_id, request, cache) -> dict:
+    if user_id in cache:
+        return cache[user_id]
+    profile = get(user_id, request=request) if user_id else None
+    if profile:
+        info = {
+            'username': profile.get('user', ''),
+            'img': profile.get('profileimg', ''),
+            'is_artist': profile.get('isArtist', False),
+        }
+    else:
+        info = {'username': user_id or '', 'img': DEFAULT_PROFILE_IMAGE, 'is_artist': False}
+    cache[user_id] = info
+    return info
+
+
 def _to_member(user: dict) -> dict:
     return {
         'id': user.get('id'),
