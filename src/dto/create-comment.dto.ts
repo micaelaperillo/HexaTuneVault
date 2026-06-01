@@ -1,19 +1,17 @@
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { AssociatedType } from '../model/comment.associated.type';
+import { IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateCommentDto {
   @IsString()
   @IsNotEmpty()
   content!: string;
 
-  @IsString()
-  @IsNotEmpty()
-  createdBy!: string;
+  @IsInt()
+  createdById!: number;
 
-  @IsString()
-  @IsNotEmpty()
-  associatedTo!: string;
+  @IsInt()
+  parentReviewId!: number;
 
-  @IsEnum(AssociatedType)
-  associatedType!: AssociatedType;
+  @IsOptional()
+  @IsInt()
+  parentCommentId?: number;
 }
