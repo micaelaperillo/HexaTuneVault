@@ -1,5 +1,5 @@
 export const LIKE_COMMENT = Symbol('ILikeComment');
 
 export interface ILikeComment {
-  like(commentId: number, userId: string): Promise<void>;
+  setLike(commentId: number, userId: number, liked: boolean): Promise<void>;
 }
