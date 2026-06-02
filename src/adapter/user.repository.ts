@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { MapErrors } from 'error-mapper-decorator';
 
 import { UserEntity } from '../entity/user.entity';
@@ -13,7 +13,7 @@ import {
   type IPasswordHasher,
   PASSWORD_HASHER,
 } from '../repository/password-hasher.port';
-import { escapeLike } from './like-escape';
+import { containsInsensitive } from './like-escape';
 import { userPersistenceFailure } from './user-error-mappings';
 
 @Injectable()
@@ -58,18 +58,10 @@ export class UserRepository implements IUserRepository {
       filters.pageSize && filters.pageSize > 0 ? filters.pageSize : 20;
     const [rows, total] = await this.repo.findAndCount({
       where: {
-        ...(filters.username !== undefined && {
-          username: ILike(`%${escapeLike(filters.username)}%`),
-        }),
-        ...(filters.email !== undefined && {
-          email: ILike(`%${escapeLike(filters.email)}%`),
-        }),
-        ...(filters.firstName !== undefined && {
-          firstName: ILike(`%${escapeLike(filters.firstName)}%`),
-        }),
-        ...(filters.lastName !== undefined && {
-          lastName: ILike(`%${escapeLike(filters.lastName)}%`),
-        }),
+        username: containsInsensitive(filters.username),
+        email: containsInsensitive(filters.email),
+        firstName: containsInsensitive(filters.firstName),
+        lastName: containsInsensitive(filters.lastName),
       },
       skip: (page - 1) * pageSize,
       take: pageSize,
