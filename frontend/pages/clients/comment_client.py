@@ -75,8 +75,10 @@ def toggle_like(comment_id, user_id, request=None):
 
 
 def has_liked(comment_id, user_id, request=None) -> bool:
-    response = api_client.get(f'{BASE}/{comment_id}/like', request=request)
-    return response is not None and response.status_code == 204
+    data = api_client.get_json(
+        f'{BASE}/{comment_id}/likes/me', request=request, default={},
+    )
+    return bool(data.get('liked')) if isinstance(data, dict) else False
 
 
 def _replies(comment_id, viewer_id, request, cache) -> list[dict]:
