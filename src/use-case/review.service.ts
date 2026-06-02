@@ -16,11 +16,9 @@ import type { IHasLikedReview } from '../port/in/review/has-liked-review.port';
 import {
   REVIEW_REPOSITORY,
   type IReviewRepository,
-} from '../port/out/review-repository.port';
-import {
   REVIEW_LIKE_REPOSITORY,
   type IReviewLikeRepository,
-} from '../port/out/review-like-repository.port';
+} from '../port/out';
 import {
   REVIEW_CONFIG,
   type IReviewConfig,

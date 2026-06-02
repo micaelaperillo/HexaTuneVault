@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, QueryFailedError, TypeORMError } from 'typeorm';
 import { ReviewLikeEntity } from './entity/review-like.entity';
 import { ReviewNotFoundException } from '../../../error/review/review-not-found.exception';
-import type { IReviewLikeRepository } from '../../../port/out/review-like-repository.port';
+import type { IReviewLikeRepository } from '../../../port/out';
 import { MapErrors } from 'error-mapper-decorator';
 import { ReviewRepositoryException } from '../../../port/out/persistence.error';
 

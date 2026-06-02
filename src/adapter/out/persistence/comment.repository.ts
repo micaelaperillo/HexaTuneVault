@@ -4,7 +4,7 @@ import { Repository, SelectQueryBuilder, TypeORMError } from 'typeorm';
 import { MapErrors } from 'error-mapper-decorator';
 import { CommentEntity } from './entity/comment.entity';
 import { CommentLikeEntity } from './entity/comment-like.entity';
-import { ICommentRepository } from '../../../port/out/comment-repository.port';
+import { ICommentRepository } from '../../../port/out';
 import type { CommentModel } from '../../../model/comment.model';
 import type { CommentFilters } from '../../../model/comment-filter.model';
 import type { ReviewModel, UserModel } from '../../../model';

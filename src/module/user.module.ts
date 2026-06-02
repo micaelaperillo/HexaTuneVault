@@ -2,11 +2,9 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { UserEntity } from '../adapter/out/persistence/entity/user.entity';
-import { USER_REPOSITORY } from '../port/out/user-repository.port';
+import { USER_REPOSITORY, PASSWORD_HASHER, TOKEN_ISSUER } from '../port/out';
 import { UserRepository } from '../adapter/out/persistence/user.repository';
-import { PASSWORD_HASHER } from '../port/out/password-hasher.port';
 import { Argon2idPasswordHasher } from '../adapter/out/auth/argon2id-password-hasher';
-import { TOKEN_ISSUER } from '../port/out/token-issuer.port';
 import { JwtTokenRepository } from '../adapter/out/auth/jwt-token.repository';
 
 import {

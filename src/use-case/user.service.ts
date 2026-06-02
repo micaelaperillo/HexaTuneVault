@@ -10,8 +10,9 @@ import { IListFollows } from '../port/in/user/list-follows.port';
 import {
   USER_REPOSITORY,
   type IUserRepository,
-} from '../port/out/user-repository.port';
-import { TOKEN_ISSUER, type ITokenIssuer } from '../port/out/token-issuer.port';
+  TOKEN_ISSUER,
+  type ITokenIssuer,
+} from '../port/out';
 
 export {
   AUTHENTICATE_USER,

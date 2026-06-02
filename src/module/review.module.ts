@@ -16,8 +16,7 @@ import { UNLIKE_REVIEW } from '../port/in/review/unlike-review.port';
 import { COUNT_REVIEW_LIKES } from '../port/in/review/count-review-likes.port';
 import { HAS_LIKED_REVIEW } from '../port/in/review/has-liked-review.port';
 import { REVIEW_CONFIG } from '../port/in/review/review-config.port';
-import { REVIEW_REPOSITORY } from '../port/out/review-repository.port';
-import { REVIEW_LIKE_REPOSITORY } from '../port/out/review-like-repository.port';
+import { REVIEW_REPOSITORY, REVIEW_LIKE_REPOSITORY } from '../port/out';
 
 @Module({
   imports: [
