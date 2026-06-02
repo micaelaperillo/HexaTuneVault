@@ -8,7 +8,7 @@ export class PodcastResponseDto {
   readonly avatar!: string;
 
   @Expose()
-  readonly publisher!: string;
+  readonly publisher?: string;
 
   @Expose()
   readonly description!: string;
