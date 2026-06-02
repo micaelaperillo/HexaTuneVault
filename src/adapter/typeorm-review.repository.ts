@@ -57,7 +57,9 @@ export class TypeOrmReviewRepository implements IReviewRepository {
   async search(
     criteria: ReviewSearchCriteria,
   ): Promise<PaginatedResult<ReviewModel>> {
-    const qb = this.repo.createQueryBuilder('review');
+    const qb = this.repo
+      .createQueryBuilder('review')
+      .innerJoinAndSelect('review.author', 'user');
 
     if (criteria.content) {
       const escaped = criteria.content.replace(/[%_\\]/g, '\\$&');

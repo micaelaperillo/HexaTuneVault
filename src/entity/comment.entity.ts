@@ -27,14 +27,22 @@ export class CommentEntity {
   @CreateDateColumn()
   createdAt!: Date;
 
-  @ManyToOne(() => UserEntity, { nullable: false, onDelete: 'CASCADE' })
+  @ManyToOne(() => UserEntity, {
+    nullable: false,
+    onDelete: 'CASCADE',
+    eager: true,
+  })
   @JoinColumn({ name: 'created_by_id' })
   createdBy!: UserEntity;
 
   @RelationId((comment: CommentEntity) => comment.createdBy)
   createdById!: number;
 
-  @ManyToOne(() => ReviewEntity, { nullable: false, onDelete: 'CASCADE' })
+  @ManyToOne(() => ReviewEntity, {
+    nullable: false,
+    onDelete: 'CASCADE',
+    eager: true,
+  })
   @JoinColumn({ name: 'parent_review_id' })
   parentReview!: ReviewEntity;
 
