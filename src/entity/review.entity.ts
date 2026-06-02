@@ -5,13 +5,17 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Index,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+
 import type { SubjectType } from '../model/subject-reference';
+import { UserEntity } from './user.entity';
 
 @Entity('reviews')
 @Index(['subjectType', 'subjectId'])
 @Index(['createdAt'])
-@Index(['authorId', 'subjectType', 'subjectId', 'createdAt'])
+@Index(['author', 'subjectType', 'subjectId', 'createdAt'])
 export class ReviewEntity {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -32,8 +36,12 @@ export class ReviewEntity {
   @Column({ name: 'subject_id', type: 'varchar', default: '' })
   subjectId!: string;
 
-  @Column({ name: 'author_id', type: 'varchar', default: '' })
-  authorId!: string;
+  @ManyToOne(() => UserEntity, (user) => user.reviews, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'author_id' })
+  author!: UserEntity;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt!: Date;

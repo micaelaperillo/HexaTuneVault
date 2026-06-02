@@ -4,10 +4,12 @@ import { Repository, MoreThan } from 'typeorm';
 import { ReviewEntity } from '../entity/review.entity';
 import { ReviewModel } from '../model/review.model';
 import { SubjectReference } from '../model/subject-reference';
-import type { PaginatedResult } from '../common/paginated-result';
+import type { Page } from '../model';
 import type { ReviewSearchCriteria } from '../model/review-search-criteria';
 import { SortField, SortOrder } from '../model/review-search-criteria';
 import type { IReviewRepository } from '../repository/review-repository.port';
+import type { UserModel } from '../model';
+import { UserEntity } from '../entity';
 
 const SORT_FIELD_COLUMN: Record<SortField, string> = {
   [SortField.CREATED_AT]: 'review.createdAt',
@@ -33,13 +35,13 @@ export class TypeOrmReviewRepository implements IReviewRepository {
   }
 
   async findRecentByAuthorAndSubject(
-    authorId: string,
+    author: Pick<UserModel, 'id'>,
     ref: SubjectReference,
     since: Date,
   ): Promise<ReviewModel | null> {
     const entity = await this.repo.findOne({
       where: {
-        authorId,
+        author,
         subjectType: ref.type,
         subjectId: ref.id,
         createdAt: MoreThan(since),
@@ -52,10 +54,10 @@ export class TypeOrmReviewRepository implements IReviewRepository {
     await this.repo.delete(id);
   }
 
-  async search(
-    criteria: ReviewSearchCriteria,
-  ): Promise<PaginatedResult<ReviewModel>> {
-    const qb = this.repo.createQueryBuilder('review');
+  async search(criteria: ReviewSearchCriteria): Promise<Page<ReviewModel>> {
+    const qb = this.repo
+      .createQueryBuilder('review')
+      .innerJoinAndSelect('review.author', 'user');
 
     if (criteria.content) {
       const escaped = criteria.content.replace(/[%_\\]/g, '\\$&');
@@ -64,7 +66,7 @@ export class TypeOrmReviewRepository implements IReviewRepository {
       });
     }
     if (criteria.authorId !== undefined) {
-      qb.andWhere('review.authorId = :authorId', {
+      qb.andWhere('review.author.id = :authorId', {
         authorId: criteria.authorId,
       });
     }
@@ -105,7 +107,12 @@ export class TypeOrmReviewRepository implements IReviewRepository {
     qb.take(criteria.pageSize);
 
     const [entities, total] = await qb.getManyAndCount();
-    return { data: entities.map((e) => this.toModel(e)), total };
+    return {
+      items: entities.map((e) => this.toModel(e)),
+      total,
+      page: criteria.page,
+      pageSize: criteria.pageSize,
+    };
   }
 
   private toModel(entity: ReviewEntity): ReviewModel {
@@ -115,7 +122,7 @@ export class TypeOrmReviewRepository implements IReviewRepository {
       content: entity.content,
       rating: entity.rating,
       createdAt: entity.createdAt,
-      authorId: entity.authorId,
+      author: entity.author,
       updatedAt: entity.updatedAt,
     });
   }
@@ -129,7 +136,7 @@ export class TypeOrmReviewRepository implements IReviewRepository {
     entity.rating = model.rating;
     entity.subjectType = model.subjectRef.type;
     entity.subjectId = model.subjectRef.id;
-    entity.authorId = model.authorId;
+    entity.author = { id: model.author.id } as UserEntity;
     if (model.createdAt !== undefined) {
       entity.createdAt = model.createdAt;
     }

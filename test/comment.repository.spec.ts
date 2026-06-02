@@ -4,31 +4,63 @@ import { QueryFailedError } from 'typeorm';
 import { CommentRepository } from '../src/adapter/comment.repository';
 import { CommentEntity } from '../src/entity/comment.entity';
 import { CommentDBException } from '../src/error/comment/comment-db.exception';
+import { ReviewModel, UserModel } from '../src/model';
+import { UserEntity } from '../src/entity';
+import { ReviewEntity } from '../src/entity/review.entity';
+import { SubjectReference } from '../src/model/subject-reference';
 
 describe('CommentRepository', () => {
   let repository: CommentRepository;
 
-  // A persisted entity as returned by TypeORM, with @RelationId columns and the
-  // mapped liker ids populated (length is the like count).
-  const mockEntity = {
-    id: 1,
+  const mockUser = { id: 1 } as unknown as UserModel;
+
+  const mockReview = {
+    id: 10,
+    author: mockUser,
+    content: 'idk',
+    rating: 1,
+    createdAt: new Date('2024-01-01'),
+    updatedAt: null,
+    subjectRef: new SubjectReference('artist', 'The Beatles'),
+  } as ReviewModel;
+
+  const mockComment = {
+    id: 100,
     content: 'Test comment',
     createdAt: new Date('2024-01-01'),
-    createdById: 1,
-    parentReviewId: 10,
+    createdBy: mockUser,
+    parentReview: mockReview,
     parentCommentId: null,
-    likedByIds: [5, 6],
+    likes: 0,
   };
 
-  // The domain model that mockEntity maps to.
-  const mockModel = {
-    id: 1,
+  const mockUserEntity = { id: 1 } as unknown as UserEntity;
+
+  const mockReviewEntity = {
+    id: 10,
+    author: mockUserEntity,
+    content: 'idk',
+    rating: 1,
+    createdAt: new Date('2024-01-01'),
+    updatedAt: null,
+    subjectType: 'artist',
+    subjectId: 'The Beatles',
+  } as ReviewEntity;
+
+  // A persisted entity as returned by TypeORM, with @RelationId columns populated.
+  const mockEntity: CommentEntity = {
+    id: 100,
     content: 'Test comment',
     createdAt: new Date('2024-01-01'),
+    createdBy: mockUserEntity,
     createdById: 1,
+    parentReview: mockReviewEntity,
     parentReviewId: 10,
+    parentComment: null,
     parentCommentId: null,
-    likes: 2,
+    likedBy: [],
+    replies: [],
+    likedByIds: [],
   };
 
   const relationMock = {
@@ -76,24 +108,26 @@ describe('CommentRepository', () => {
   describe('create', () => {
     it('persists the comment and returns the reloaded model with its like count', async () => {
       mockTypeOrmRepo.create.mockReturnValue({ id: undefined });
-      mockTypeOrmRepo.save.mockResolvedValue({ id: 1 });
+      mockTypeOrmRepo.save.mockResolvedValue({ id: 100 });
       qbMock.getOneOrFail.mockResolvedValue(mockEntity);
 
       const result = await repository.create({
         content: 'Test comment',
-        createdById: 1,
-        parentReviewId: 10,
+        createdBy: mockUser,
+        parentReview: mockReview,
         parentCommentId: null,
       });
 
       expect(mockTypeOrmRepo.create).toHaveBeenCalledWith({
         content: 'Test comment',
-        createdBy: { id: 1 },
-        parentReview: { id: 10 },
+        createdBy: mockUser,
+        parentReview: mockReview,
         parentComment: null,
       });
-      expect(qbMock.where).toHaveBeenCalledWith('comment.id = :id', { id: 1 });
-      expect(result).toEqual(mockModel);
+      expect(qbMock.where).toHaveBeenCalledWith('comment.id = :id', {
+        id: 100,
+      });
+      expect(result).toEqual(mockComment);
     });
 
     it('maps a parentCommentId to a parentComment relation', async () => {
@@ -107,13 +141,13 @@ describe('CommentRepository', () => {
 
       await repository.create({
         content: 'reply',
-        createdById: 1,
-        parentReviewId: 10,
-        parentCommentId: 1,
+        createdBy: mockUser,
+        parentReview: mockReview,
+        parentCommentId: 100,
       });
 
       expect(mockTypeOrmRepo.create).toHaveBeenCalledWith(
-        expect.objectContaining({ parentComment: { id: 1 } }),
+        expect.objectContaining({ parentComment: { id: 100 } }),
       );
     });
 
@@ -125,8 +159,8 @@ describe('CommentRepository', () => {
       await expect(
         repository.create({
           content: 'x',
-          createdById: 1,
-          parentReviewId: 10,
+          createdBy: mockUser,
+          parentReview: mockReview,
           parentCommentId: null,
         }),
       ).rejects.toThrow(CommentDBException);
@@ -136,13 +170,15 @@ describe('CommentRepository', () => {
   describe('findById', () => {
     it('returns the mapped model when found', async () => {
       qbMock.getOne.mockResolvedValue(mockEntity);
-      const result = await repository.findById(1);
-      expect(qbMock.where).toHaveBeenCalledWith('comment.id = :id', { id: 1 });
+      const result = await repository.findById(100);
+      expect(qbMock.where).toHaveBeenCalledWith('comment.id = :id', {
+        id: 100,
+      });
       expect(qbMock.loadRelationIdAndMap).toHaveBeenCalledWith(
         'comment.likedByIds',
         'comment.likedBy',
       );
-      expect(result).toEqual(mockModel);
+      expect(result).toEqual(mockComment);
     });
 
     it('returns null when not found', async () => {
@@ -172,14 +208,14 @@ describe('CommentRepository', () => {
   describe('findReplies', () => {
     it('returns child comments of the given parent', async () => {
       qbMock.getMany.mockResolvedValue([
-        { ...mockEntity, id: 2, parentCommentId: 1 },
+        { ...mockEntity, id: 2, parentComment: mockEntity },
       ]);
-      const result = await repository.findReplies(1);
+      const result = await repository.findReplies(100);
       expect(qbMock.where).toHaveBeenCalledWith(
         'comment.parentComment = :parentCommentId',
-        { parentCommentId: 1 },
+        { parentCommentId: 100 },
       );
-      expect(result).toEqual([{ ...mockModel, id: 2, parentCommentId: 1 }]);
+      expect(result).toEqual([{ ...mockComment, id: 2, parentCommentId: 100 }]);
     });
   });
 
@@ -206,7 +242,7 @@ describe('CommentRepository', () => {
         'comment.parentReview = :parentReviewId',
         { parentReviewId: 10 },
       );
-      expect(result).toEqual([mockModel]);
+      expect(result).toEqual([mockComment]);
     });
 
     it('restricts to top-level comments when no filters are provided', async () => {

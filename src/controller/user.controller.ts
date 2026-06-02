@@ -1,3 +1,5 @@
+import type { UserModel } from '../model';
+
 import {
   Controller,
   Inject,
@@ -11,6 +13,7 @@ import {
   ParseIntPipe,
   HttpCode,
 } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
 
 import {
   AUTHENTICATE_USER,
@@ -34,12 +37,10 @@ import {
 import { CreateUserDto } from '../dto/create-user.dto';
 import { EditUserDto } from '../dto/edit-user.dto';
 import { UserFiltersDto } from '../dto/user-filters.dto';
-import { LoginUserDto } from '../dto/login-user.dto';
 import { UserResponseDto } from '../dto/user-response.dto';
-import { AuthResponseDto } from '../dto/auth-response.dto';
-import { UserLinkDto } from '../dto/user-link.dto';
 import { PageDto } from '../dto/page.dto';
 import { PageQueryDto } from '../dto/page-query.dto';
+import { Public } from '../infrastructure/auth/public.decorator';
 
 @Controller('api/users')
 export class UserController {
@@ -55,28 +56,25 @@ export class UserController {
     @Inject(LIST_FOLLOWS) private readonly listFollows: IListFollows,
   ) {}
 
+  @Public()
   @Post()
   async create(@Body() dto: CreateUserDto): Promise<UserResponseDto> {
     const user = await this.createUser.create(dto);
-    return UserResponseDto.from(user);
+    return UserController.toResponse(user);
   }
 
-  @Post('authenticate')
-  async authenticate(@Body() dto: LoginUserDto): Promise<AuthResponseDto> {
-    const token = await this.authenticateUser.authenticate(dto);
-    return AuthResponseDto.from(token);
-  }
-
+  @Public()
   @Get()
   async search(@Query() filters: UserFiltersDto): Promise<UserResponseDto[]> {
     const users = await this.searchUser.search(filters);
-    return UserResponseDto.fromMany(users);
+    return users.map(UserController.toResponse);
   }
 
+  @Public()
   @Get(':id')
   async get(@Param('id', ParseIntPipe) id: number): Promise<UserResponseDto> {
     const user = await this.getUser.get(id);
-    return UserResponseDto.from(user);
+    return UserController.toResponse(user);
   }
 
   @Patch(':id')
@@ -85,7 +83,7 @@ export class UserController {
     @Body() dto: EditUserDto,
   ): Promise<UserResponseDto> {
     const user = await this.editUser.edit({ ...dto, id });
-    return UserResponseDto.from(user);
+    return UserController.toResponse(user);
   }
 
   @Delete(':id')
@@ -94,27 +92,29 @@ export class UserController {
     await this.deleteUser.deleteById(id);
   }
 
+  @Public()
   @Get(':id/followers')
   async followers(
     @Param('id', ParseIntPipe) id: number,
     @Query() page: PageQueryDto,
-  ): Promise<PageDto<UserLinkDto>> {
+  ): Promise<PageDto<UserResponseDto>> {
     const result = await this.listFollows.findFollowers(id, page);
     return PageDto.of(
-      UserLinkDto.fromMany(result.items.map(String)),
+      result.items.map(UserController.toResponse),
       page,
       result.total,
     );
   }
 
+  @Public()
   @Get(':id/following')
   async following(
     @Param('id', ParseIntPipe) id: number,
     @Query() page: PageQueryDto,
-  ): Promise<PageDto<UserLinkDto>> {
+  ): Promise<PageDto<UserResponseDto>> {
     const result = await this.listFollows.findFollowing(id, page);
     return PageDto.of(
-      UserLinkDto.fromMany(result.items.map(String)),
+      result.items.map(UserController.toResponse),
       page,
       result.total,
     );
@@ -134,5 +134,19 @@ export class UserController {
     @Body('follower_id', ParseIntPipe) followerId: number,
   ): Promise<void> {
     await this.followUser.unfollow(followerId, id);
+  }
+
+  private static toResponse(this: void, user: UserModel) {
+    return plainToInstance(
+      UserResponseDto,
+      {
+        ...user,
+        location: user.location ?? '',
+        followerCount: user.followerCount ?? 0,
+        followingCount: user.followingCount ?? 0,
+        self: `/api/users/${user.id}`,
+      },
+      { excludeExtraneousValues: true },
+    );
   }
 }

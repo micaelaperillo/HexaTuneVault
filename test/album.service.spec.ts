@@ -9,7 +9,7 @@ describe('AlbumService', () => {
   const mockAlbum: AlbumModel = {
     name: 'Abbey Road',
     cover: 'cover-url',
-    releaseDate: '1969',
+    releaseDate: new Date('1969'),
     totalTracks: 17,
     artists: ['The Beatles'],
     external_urls: {

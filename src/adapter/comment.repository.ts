@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, QueryFailedError, SelectQueryBuilder } from 'typeorm';
 import { CommentEntity } from '../entity/comment.entity';
-import { UserEntity } from '../entity/user.entity';
-import { ReviewEntity } from '../entity/review.entity';
 import { ICommentRepository } from '../repository/i-comment.repository';
 import { CommentModel } from '../model/comment.model';
 import { CommentFilters } from '../model/comment.filter';
 import { CommentDBException } from '../error/comment/comment-db.exception';
+import { ReviewModel, UserModel } from '../model';
+import { SubjectReference } from '../model/subject-reference';
 
 @Injectable()
 export class CommentRepository implements ICommentRepository {
@@ -17,18 +17,25 @@ export class CommentRepository implements ICommentRepository {
   ) {}
 
   async create(
-    comment: Omit<CommentModel, 'id' | 'createdAt' | 'likes'>,
+    comment: Omit<
+      CommentModel,
+      'id' | 'createdAt' | 'likes' | 'createdBy' | 'parentReview'
+    > & {
+      createdBy: Pick<UserModel, 'id'>;
+      parentReview: Pick<ReviewModel, 'id'>;
+    },
   ): Promise<CommentModel> {
     return this.run(async () => {
       const entity = this.repo.create({
         content: comment.content,
-        createdBy: { id: comment.createdById } as UserEntity,
-        parentReview: { id: comment.parentReviewId } as ReviewEntity,
+        createdBy: comment.createdBy,
+        parentReview: comment.parentReview,
         parentComment:
           comment.parentCommentId != null
             ? { id: comment.parentCommentId }
             : null,
       });
+
       const saved = await this.repo.save(entity);
       const reloaded = await this.baseQuery()
         .where('comment.id = :id', { id: saved.id })
@@ -127,9 +134,16 @@ export class CommentRepository implements ICommentRepository {
       id: entity.id,
       content: entity.content,
       createdAt: entity.createdAt,
-      createdById: entity.createdById,
-      parentReviewId: entity.parentReviewId,
-      parentCommentId: entity.parentCommentId ?? null,
+      createdBy: entity.createdBy,
+      parentReview: ReviewModel.reconstitute({
+        ...entity.parentReview,
+        author: entity.parentReview.author,
+        subjectRef: new SubjectReference(
+          entity.parentReview.subjectType,
+          entity.parentReview.subjectId,
+        ),
+      }),
+      parentCommentId: entity.parentComment?.id ?? null,
       likes: entity.likedByIds?.length ?? 0,
     };
   }

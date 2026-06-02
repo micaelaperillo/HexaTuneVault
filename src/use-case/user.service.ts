@@ -111,7 +111,7 @@ export class UserService
   async findFollowers(
     userId: number,
     page: PageRequest,
-  ): Promise<Page<number>> {
+  ): Promise<Page<UserModel>> {
     await this.get(userId);
     return this.repo.findFollowers(userId, page);
   }
@@ -119,7 +119,7 @@ export class UserService
   async findFollowing(
     userId: number,
     page: PageRequest,
-  ): Promise<Page<number>> {
+  ): Promise<Page<UserModel>> {
     await this.get(userId);
     return this.repo.findFollowing(userId, page);
   }

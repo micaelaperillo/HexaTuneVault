@@ -5,10 +5,14 @@ import { SubjectReference, SubjectType } from '../src/model/subject-reference';
 import { ReviewModel } from '../src/model/review.model';
 import { ReviewNotFoundException } from '../src/error/review/review-not-found.exception';
 import { ForbiddenDeletionException } from '../src/error/review/forbidden-deletion.exception';
+import { UserModel } from '../src/model';
 
 describe('DeleteReviewService', () => {
   let service: DeleteReviewService;
   let reviewRepo: jest.Mocked<IReviewRepository>;
+
+  const mockUser = { id: 1 } as unknown as UserModel;
+  const mockUser2 = { id: 2 } as unknown as UserModel;
 
   beforeEach(() => {
     reviewRepo = createMockReviewRepository();
@@ -20,7 +24,7 @@ describe('DeleteReviewService', () => {
     reviewRepo.findById.mockResolvedValue(null);
 
     await expect(
-      service.execute({ reviewId: 1, requesterId: '1' }),
+      service.execute({ reviewId: 1, requesterId: mockUser }),
     ).rejects.toThrow(ReviewNotFoundException);
   });
 
@@ -31,13 +35,13 @@ describe('DeleteReviewService', () => {
       content: 'Nice',
       rating: 5,
       createdAt: new Date(),
-      authorId: '2', // different author
+      author: mockUser2, // different author
       updatedAt: null,
     });
     reviewRepo.findById.mockResolvedValue(review);
 
     await expect(
-      service.execute({ reviewId: 1, requesterId: '1' }),
+      service.execute({ reviewId: 1, requesterId: mockUser }),
     ).rejects.toThrow(ForbiddenDeletionException);
   });
 
@@ -48,12 +52,12 @@ describe('DeleteReviewService', () => {
       content: 'Nice',
       rating: 5,
       createdAt: new Date(),
-      authorId: '1',
+      author: mockUser,
       updatedAt: null,
     });
     reviewRepo.findById.mockResolvedValue(review);
 
-    await service.execute({ reviewId: 1, requesterId: '1' });
+    await service.execute({ reviewId: 1, requesterId: mockUser });
 
     expect(reviewRepo.findById).toHaveBeenCalledWith(1);
     expect(reviewRepo.delete).toHaveBeenCalledWith(1);

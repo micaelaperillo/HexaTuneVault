@@ -1,4 +1,4 @@
-import { CommentModel } from '../../model/comment.model';
+import { CommentModel, UserModel, ReviewModel } from '../../model';
 
 /** DI token for {@link ICreateComment}. */
 export const CREATE_COMMENT = Symbol('ICreateComment');
@@ -16,6 +16,12 @@ export interface ICreateComment {
    * (with `likes` initialised to 0).
    */
   create(
-    comment: Omit<CommentModel, 'id' | 'createdAt' | 'likes'>,
+    comment: Omit<
+      CommentModel,
+      'id' | 'createdAt' | 'likes' | 'createdBy' | 'parentReview'
+    > & {
+      createdBy: Pick<UserModel, 'id'>;
+      parentReview: Pick<ReviewModel, 'id'>;
+    },
   ): Promise<CommentModel>;
 }

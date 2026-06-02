@@ -1,5 +1,9 @@
-import type { CommentFilters } from '../model/comment.filter';
-import type { CommentModel } from '../model';
+import type {
+  CommentFilters,
+  CommentModel,
+  ReviewModel,
+  UserModel,
+} from '../model';
 
 /** DI token for {@link ICommentRepository}. */
 export const COMMENT_REPOSITORY = Symbol('ICommentRepository');
@@ -22,7 +26,13 @@ export interface ICommentRepository {
    * when the author or parent review does not exist).
    */
   create(
-    comment: Omit<CommentModel, 'id' | 'createdAt' | 'likes'>,
+    comment: Omit<
+      CommentModel,
+      'id' | 'createdAt' | 'likes' | 'createdBy' | 'parentReview'
+    > & {
+      createdBy: Pick<UserModel, 'id'>;
+      parentReview: Pick<ReviewModel, 'id'>;
+    },
   ): Promise<CommentModel>;
 
   /**

@@ -14,6 +14,7 @@ import { SubjectType, SubjectReference } from '../src/model/subject-reference';
 import { ReviewModel } from '../src/model/review.model';
 import { SortField, SortOrder } from '../src/model/review-search-criteria';
 import type { Response, Request } from 'express';
+import { UserModel } from '../src/model';
 
 describe('ReviewController', () => {
   let controller: ReviewController;
@@ -24,6 +25,7 @@ describe('ReviewController', () => {
 
   let mockResponse: { header: jest.Mock };
   let mockRequest: { protocol: string; get: jest.Mock };
+  const mockUser = { id: 1 } as unknown as UserModel;
 
   beforeEach(async () => {
     createReview = { execute: jest.fn() };
@@ -67,7 +69,7 @@ describe('ReviewController', () => {
         content: 'Great stuff',
         rating: 5,
         createdAt: new Date('2023-01-01T00:00:00Z'),
-        authorId: '1',
+        author: mockUser,
         updatedAt: null,
       });
 
@@ -84,7 +86,7 @@ describe('ReviewController', () => {
         rating: dto.rating,
         subjectType: dto.subject_type,
         subjectId: dto.subject_id,
-        authorId: '1',
+        author: mockUser,
       });
       expect(mockResponse.header).toHaveBeenCalledWith(
         'Location',
@@ -93,9 +95,6 @@ describe('ReviewController', () => {
       expect(result.id).toBe(123);
       expect(result.content).toBe('Great stuff');
       expect(result.rating).toBe(5);
-      expect(result.subject_type).toBe('album');
-      expect(result.subject_id).toBe('1');
-      expect(result.author_id).toBe('1');
       expect(result.created_at).toEqual(new Date('2023-01-01T00:00:00Z'));
       expect(result.updated_at).toBeNull();
     });
@@ -109,7 +108,7 @@ describe('ReviewController', () => {
         content: 'Great stuff',
         rating: 5,
         createdAt: new Date('2023-01-01T00:00:00Z'),
-        authorId: '1',
+        author: mockUser,
         updatedAt: null,
       });
 
@@ -132,13 +131,15 @@ describe('ReviewController', () => {
         content: 'Search match',
         rating: 4,
         createdAt: new Date('2023-01-01T00:00:00Z'),
-        authorId: '1',
+        author: mockUser,
         updatedAt: null,
       });
 
       searchReview.execute.mockResolvedValue({
-        data: [reviewModel],
-        total: 10,
+        items: [reviewModel],
+        total: 1,
+        page: 1,
+        pageSize: 10,
       });
 
       const result = await controller.search(
@@ -154,9 +155,9 @@ describe('ReviewController', () => {
       expect(searchReview.execute).toHaveBeenCalledWith(
         expect.objectContaining({ page: 1, pageSize: 10 }),
       );
-      expect(mockResponse.header).toHaveBeenCalledWith('X-Total-Count', '10');
-      expect(result).toHaveLength(1);
-      expect(result[0].id).toBe(123);
+      expect(mockResponse.header).toHaveBeenCalledWith('X-Total-Count', '1');
+      expect(result.items).toHaveLength(1);
+      expect(result.items[0].id).toBe(123);
     });
   });
 
@@ -166,7 +167,7 @@ describe('ReviewController', () => {
 
       expect(deleteReview.execute).toHaveBeenCalledWith({
         reviewId: 123,
-        requesterId: '1',
+        requesterId: mockUser,
       });
     });
   });

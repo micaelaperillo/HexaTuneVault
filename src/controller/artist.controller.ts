@@ -1,3 +1,5 @@
+import type { ArtistModel } from '../model';
+
 import {
   type IGetArtist,
   GET_ARTIST,
@@ -16,7 +18,11 @@ import {
   Logger,
   Inject,
 } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
 
+import { Public } from '../infrastructure/auth/public.decorator';
+
+@Public()
 @Controller('api/artists')
 export class ArtistController {
   private readonly logger = new Logger(ArtistController.name);
@@ -34,7 +40,7 @@ export class ArtistController {
 
     const results = await this.searcher.search({ name, genre });
 
-    return ArtistResponseDto.fromMany(results);
+    return results.map(ArtistController.toResponse);
   }
 
   @Get(':name')
@@ -44,6 +50,21 @@ export class ArtistController {
     const artist = await this.getter.get({ name });
     if (!artist) throw new NotFoundException();
 
-    return ArtistResponseDto.from(artist);
+    return ArtistController.toResponse(artist);
+  }
+
+  static toResponse(this: void, artist: ArtistModel): ArtistResponseDto {
+    const params = new URLSearchParams({ artist: artist.name }).toString();
+
+    return plainToInstance(
+      ArtistResponseDto,
+      {
+        ...artist,
+        self: `/api/artists/${encodeURIComponent(artist.name)}`,
+        albums: `/api/albums?${params}`,
+        reviews: `/api/reviews?${params}`,
+      },
+      { excludeExtraneousValues: true },
+    );
   }
 }
