@@ -43,6 +43,7 @@ export class LoggerMiddleware implements NestMiddleware {
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggerMiddleware).forRoutes('api/*');
+    if (process.env.NODE_ENV === 'development')
+      consumer.apply(LoggerMiddleware).forRoutes('api/*');
   }
 }
