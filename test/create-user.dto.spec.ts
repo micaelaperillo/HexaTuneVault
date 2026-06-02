@@ -5,11 +5,11 @@ import { CreateUserDto } from '../src/dto/create-user.dto';
 const validUser = {
   username: 'ada',
   password: 'secret',
-  firstName: 'Ada',
-  lastName: 'Lovelace',
+  first_name: 'Ada',
+  last_name: 'Lovelace',
   email: 'ada@example.com',
   biography: '',
-  profilePictureUrl: '',
+  profile_picture_url: '',
 };
 
 describe('CreateUserDto location', () => {

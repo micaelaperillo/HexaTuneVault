@@ -3,7 +3,7 @@ import type { PageRequest } from '../model/page.model';
 export class PageDto<T> {
   readonly items: T[];
   readonly page: number;
-  readonly pageSize: number;
+  readonly page_size: number;
   readonly total: number;
 
   private constructor(
@@ -14,7 +14,7 @@ export class PageDto<T> {
   ) {
     this.items = items;
     this.page = page;
-    this.pageSize = pageSize;
+    this.page_size = pageSize;
     this.total = total;
   }
 

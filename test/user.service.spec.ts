@@ -1,7 +1,7 @@
 import { UserService } from '../src/use-case/user.service';
 import { InvalidCredentialsException } from '../src/error/user/invalid-credentials.exception';
-import type { IUserRepository } from '../src/repository/i-user.repository';
-import type { ITokenIssuer } from '../src/repository/i-token-issuer';
+import type { IUserRepository } from '../src/repository/user-repository.port';
+import type { ITokenIssuer } from '../src/repository/token-issuer.port';
 import type { UserModel } from '../src/model/user.model';
 import type { JwtModel } from '../src/model/jwt.model';
 import { UserNotFoundException } from '../src/error/user/user-not-found.exception';

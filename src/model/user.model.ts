@@ -1,4 +1,4 @@
-export interface UserModel {
+export type UserModel = {
   id: number;
   username: string;
   password: string;
@@ -10,4 +10,4 @@ export interface UserModel {
   profilePictureUrl: string;
   followerCount?: number;
   followingCount?: number;
-}
+};

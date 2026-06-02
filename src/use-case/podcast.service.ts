@@ -1,5 +1,5 @@
 import type { IGetPodcast, ISearchPodcast } from '../port/podcast';
-import type { PodcastFilters, PodcastModel } from '../model';
+import type { PodcastFilters, PodcastModel, Page } from '../model';
 
 import { type IPodcastProvider, PODCAST_PROVIDER } from '../repository';
 
@@ -13,7 +13,7 @@ export class PodcastService implements ISearchPodcast, IGetPodcast {
     @Inject(PODCAST_PROVIDER) private readonly provider: IPodcastProvider,
   ) {}
 
-  search(filter: PodcastFilters): Promise<PodcastModel[]> {
+  search(filter: PodcastFilters): Promise<Page<PodcastModel>> {
     return this.provider.search(filter);
   }
 

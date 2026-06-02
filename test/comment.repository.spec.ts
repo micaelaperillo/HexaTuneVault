@@ -7,7 +7,6 @@ import { CommentDBException } from '../src/error/comment/comment-db.exception';
 import { ReviewModel, UserModel } from '../src/model';
 import { UserEntity } from '../src/entity';
 import { ReviewEntity } from '../src/entity/review.entity';
-import { SubjectReference } from '../src/model/subject-reference';
 
 describe('CommentRepository', () => {
   let repository: CommentRepository;
@@ -21,7 +20,7 @@ describe('CommentRepository', () => {
     rating: 1,
     createdAt: new Date('2024-01-01'),
     updatedAt: null,
-    subjectRef: new SubjectReference('artist', 'The Beatles'),
+    subject: { artist: 'The Beatles' },
   } as ReviewModel;
 
   const mockComment = {
@@ -70,6 +69,7 @@ describe('CommentRepository', () => {
   };
 
   const qbMock = {
+    leftJoinAndSelect: jest.fn().mockReturnThis(),
     loadRelationIdAndMap: jest.fn().mockReturnThis(),
     where: jest.fn().mockReturnThis(),
     andWhere: jest.fn().mockReturnThis(),
@@ -78,6 +78,9 @@ describe('CommentRepository', () => {
     getOne: jest.fn(),
     getOneOrFail: jest.fn(),
     getMany: jest.fn(),
+    getManyAndCount: jest.fn(),
+    skip: jest.fn().mockReturnThis(),
+    take: jest.fn().mockReturnThis(),
     relation: jest.fn().mockReturnValue(relationMock),
   };
 
@@ -221,7 +224,7 @@ describe('CommentRepository', () => {
 
   describe('search', () => {
     it('always restricts to top-level comments and applies provided filters', async () => {
-      qbMock.getMany.mockResolvedValue([mockEntity]);
+      qbMock.getManyAndCount.mockResolvedValue([[mockEntity], 1]);
       const result = await repository.search({
         createdById: 1,
         content: 'test',
@@ -242,11 +245,12 @@ describe('CommentRepository', () => {
         'comment.parentReview = :parentReviewId',
         { parentReviewId: 10 },
       );
-      expect(result).toEqual([mockComment]);
+      expect(result.total).toBe(1);
+      expect(result.items).toEqual([mockComment]);
     });
 
     it('restricts to top-level comments when no filters are provided', async () => {
-      qbMock.getMany.mockResolvedValue([]);
+      qbMock.getManyAndCount.mockResolvedValue([[], 0]);
       await repository.search({});
       expect(qbMock.where).toHaveBeenCalledWith(
         'comment.parentComment IS NULL',

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as argon2 from 'argon2';
-import { IPasswordHasher } from '../repository/i-password-hasher';
+import { IPasswordHasher } from '../repository/password-hasher.port';
 
 @Injectable()
 export class Argon2idPasswordHasher implements IPasswordHasher {

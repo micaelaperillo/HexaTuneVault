@@ -6,7 +6,7 @@ import { PodcastProviderError } from '../src/error';
 
 import type { PodcastModel } from '../src/model';
 
-describe('SpotifyArtistProvider', () => {
+describe('SpotifyPodcastProvider', () => {
   let provider: SpotifyPodcastProvider;
 
   const mockApiResponse = {
@@ -85,6 +85,7 @@ describe('SpotifyArtistProvider', () => {
           total_episodes: 367,
         },
       ],
+      total: 2,
     },
   };
 
@@ -142,8 +143,10 @@ describe('SpotifyArtistProvider', () => {
         ['show'],
         'US',
         10,
+        0,
       );
-      expect(result).toStrictEqual(mockMappedApiResponse);
+      expect(result.items).toStrictEqual(mockMappedApiResponse);
+      expect(result.total).toBe(2);
     });
 
     it('searchs with API filters using the Spotify SDK', async () => {
@@ -157,8 +160,10 @@ describe('SpotifyArtistProvider', () => {
         ['show'],
         'AR',
         10,
+        0,
       );
-      expect(result).toStrictEqual(mockMappedApiResponse);
+      expect(result.items).toStrictEqual(mockMappedApiResponse);
+      expect(result.total).toBe(2);
     });
 
     it('applies custom filters', async () => {
@@ -177,7 +182,7 @@ describe('SpotifyArtistProvider', () => {
 
       const result = await provider.search(filters);
 
-      expect(result).toStrictEqual(mockMappedApiResponse);
+      expect(result.items).toStrictEqual(mockMappedApiResponse);
     });
 
     it('filters incomplete response', async () => {
@@ -190,7 +195,7 @@ describe('SpotifyArtistProvider', () => {
 
       const result = await provider.search(filters);
 
-      expect(result).toStrictEqual(mockMappedApiResponse);
+      expect(result.items).toStrictEqual(mockMappedApiResponse);
     });
 
     it('throws if the SDK fails', async () => {
@@ -222,6 +227,7 @@ describe('SpotifyArtistProvider', () => {
         ['show'],
         'US',
         10,
+        0,
       );
       expect(result).toStrictEqual(mockMappedApiResponse[0]);
     });

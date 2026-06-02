@@ -8,6 +8,7 @@ import {
 } from '../port';
 
 import { ArtistGetDto, ArtistFilterDto, ArtistResponseDto } from '../dto';
+import { PageDto } from '../dto/page.dto';
 
 import {
   Controller,
@@ -33,14 +34,21 @@ export class ArtistController {
   ) {}
 
   @Get()
-  async search(@Query() { q: name, genre }: ArtistFilterDto) {
+  async search(
+    @Query() { q: name, genre, page, page_size }: ArtistFilterDto,
+  ): Promise<PageDto<ArtistResponseDto>> {
     this.logger.debug(
       `Search artist with q=${name} genre=${JSON.stringify(genre)}`,
     );
 
-    const results = await this.searcher.search({ name, genre });
+    const { items, total, ...pageReq } = await this.searcher.search({
+      name,
+      genre,
+      page,
+      pageSize: page_size,
+    });
 
-    return results.map(ArtistController.toResponse);
+    return PageDto.of(items.map(ArtistController.toResponse), pageReq, total);
   }
 
   @Get(':name')

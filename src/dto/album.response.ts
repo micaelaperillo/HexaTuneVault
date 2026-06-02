@@ -8,10 +8,10 @@ export class AlbumResponseDto {
   readonly cover!: string;
 
   @Expose()
-  readonly releaseDate!: Date;
+  readonly release_date!: Date;
 
   @Expose()
-  readonly totalTracks!: number;
+  readonly total_tracks!: number;
 
   @Expose()
   readonly artists!: string[];

@@ -5,6 +5,8 @@ export interface DeleteReviewCommand {
   requesterId: Pick<UserModel, 'id'>;
 }
 
+export const DELETE_REVIEW = Symbol('IDeleteReview');
+
 export interface IDeleteReview {
-  execute(cmd: DeleteReviewCommand): Promise<void>;
+  delete(cmd: DeleteReviewCommand): Promise<void>;
 }

@@ -1,12 +1,14 @@
 import type { SpotifyApi, SimplifiedAlbum } from '@spotify/web-api-ts-sdk';
 
-import type { AlbumModel, AlbumFilters } from '../model';
+import type { AlbumModel, AlbumFilters, Page } from '../model';
 import type { IAlbumProvider } from '../repository';
 
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
 import { SPOTIFY_API } from '../infrastructure/api/provider';
 import { AlbumProviderError } from '../error/album';
+import { resolveSpotifyPage } from './spotify-pagination';
+import { MapErrors } from 'error-mapper-decorator';
 
 export { ALBUM_PROVIDER } from '../repository';
 
@@ -19,33 +21,33 @@ export class SpotifyAlbumProvider implements IAlbumProvider {
   /**
    * @override
    */
-  async search(filters: AlbumFilters): Promise<AlbumModel[]> {
-    try {
-      const query = SpotifyAlbumProvider.toQuery(filters);
-      this.logger.debug(query);
+  @MapErrors({ from: Error, to: (e) => new AlbumProviderError(e) })
+  async search(filters: AlbumFilters): Promise<Page<AlbumModel>> {
+    const query = SpotifyAlbumProvider.toQuery(filters);
+    const { page, pageSize, limit, offset } = resolveSpotifyPage(filters);
+    this.logger.debug(query);
 
-      const { albums } = await this.spotify.search(
-        query,
-        ['album'],
-        undefined,
-        10,
-      );
-      this.logger.debug(albums.items);
+    const { albums } = await this.spotify.search(
+      query,
+      ['album'],
+      undefined,
+      limit,
+      offset,
+    );
+    this.logger.debug(albums.items);
 
-      return albums.items
-        .filter((a) => a.images.length)
-        .map(SpotifyAlbumProvider.toModel);
-    } catch (e) {
-      const error = e instanceof Error ? e : new Error(String(e));
-      throw new AlbumProviderError(error);
-    }
+    const items = albums.items
+      .filter((a) => a.images.length)
+      .map(SpotifyAlbumProvider.toModel);
+
+    return { items, total: albums.total, page, pageSize };
   }
 
   /**
    * @override
    */
   async get(filters: AlbumFilters): Promise<AlbumModel | null> {
-    return (await this.search(filters))[0] ?? null;
+    return (await this.search(filters)).items[0] ?? null;
   }
 
   private static toQuery(filters: AlbumFilters) {

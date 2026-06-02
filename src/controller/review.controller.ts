@@ -2,6 +2,7 @@ import {
   Controller,
   Post,
   Get,
+  Put,
   Delete,
   Body,
   Param,
@@ -14,23 +15,33 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import type { Response, Request } from 'express';
-import type { ICreateReview } from '../port/review/create-review.port';
-import type { IDeleteReview } from '../port/review/delete-review.port';
-import type { ISearchReview } from '../port/review/search-review.port';
-import type { IGetReview } from '../port/review/get-review.port';
-import { CreateReviewRequest } from '../dto/create-review.request';
-import { SearchReviewQueryDto } from '../dto/search-review-query.dto';
-import { ReviewResponse } from '../dto/review-response.dto';
 import {
   CREATE_REVIEW,
+  type ICreateReview,
   DELETE_REVIEW,
+  type IDeleteReview,
   SEARCH_REVIEW,
+  type ISearchReview,
   GET_REVIEW,
-} from '../port/review/tokens';
-import { ReviewSearchCriteria } from '../model/review-search-criteria';
-import { ReviewModel, UserModel } from '../model';
+  type IGetReview,
+  LIKE_REVIEW,
+  type ILikeReview,
+  UNLIKE_REVIEW,
+  type IUnlikeReview,
+  COUNT_REVIEW_LIKES,
+  type ICountReviewLikes,
+} from '../port';
+import { CreateReviewDto } from '../dto/create-review.dto';
+import { ReviewFiltersDto } from '../dto/review-filters.dto';
+import { ReviewResponseDto } from '../dto/review-response.dto';
+import { ReviewLikeCountResponse } from '../dto/review-like-count-response.dto';
+import type { ReviewFilters } from '../model/review.filter';
+import type { ReviewModel } from '../model';
+import { splitSubject } from '../model/review-subject';
 import { plainToInstance } from 'class-transformer';
 import { Public } from '../infrastructure/auth/public.decorator';
+import { CurrentUser } from '../infrastructure/auth/current-user.decorator';
+import type { AuthenticatedUser } from '../model/authenticated-user';
 import { PageDto } from '../dto/page.dto';
 
 @Controller('api/reviews')
@@ -40,21 +51,23 @@ export class ReviewController {
     @Inject(DELETE_REVIEW) private readonly deleteReview: IDeleteReview,
     @Inject(SEARCH_REVIEW) private readonly searchReview: ISearchReview,
     @Inject(GET_REVIEW) private readonly getReview: IGetReview,
+    @Inject(LIKE_REVIEW) private readonly likeReview: ILikeReview,
+    @Inject(UNLIKE_REVIEW) private readonly unlikeReview: IUnlikeReview,
+    @Inject(COUNT_REVIEW_LIKES)
+    private readonly countReviewLikes: ICountReviewLikes,
   ) {}
 
   @Post()
   async create(
-    @Body() dto: CreateReviewRequest,
+    @Body() dto: CreateReviewDto,
+    @CurrentUser() user: AuthenticatedUser,
     @Res({ passthrough: true }) res: Response,
     @Req() req: Request,
-  ): Promise<ReviewResponse> {
-    // TODO: replace hardcoded user with @CurrentUser() from AuthGuard
-    const user = { id: 1 } as UserModel;
-    const review = await this.createReview.execute({
+  ): Promise<ReviewResponseDto> {
+    const review = await this.createReview.create({
       content: dto.content,
       rating: dto.rating,
-      subjectType: dto.subject_type,
-      subjectId: dto.subject_id,
+      subject: dto.subject,
       author: user,
     });
 
@@ -69,11 +82,11 @@ export class ReviewController {
   @Public()
   @Get()
   async search(
-    @Query() dto: SearchReviewQueryDto,
+    @Query() dto: ReviewFiltersDto,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<PageDto<ReviewResponse>> {
-    const criteria = ReviewSearchCriteriaMapper.fromDto(dto);
-    const { items, total, ...page } = await this.searchReview.execute(criteria);
+  ): Promise<PageDto<ReviewResponseDto>> {
+    const filters = ReviewFiltersMapper.fromDto(dto);
+    const { items, total, ...page } = await this.searchReview.search(filters);
     res.header('X-Total-Count', total.toString());
     return PageDto.of(items.map(ReviewController.toResponse), page, total);
   }
@@ -82,33 +95,59 @@ export class ReviewController {
   @Get(':id')
   async getById(
     @Param('id', ParseIntPipe) id: number,
-  ): Promise<ReviewResponse> {
-    const review = await this.getReview.execute(id);
+  ): Promise<ReviewResponseDto> {
+    const review = await this.getReview.get(id);
     return ReviewController.toResponse(review);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    // TODO: replace hardcoded userId with @CurrentUser() from AuthGuard
-    const user = { id: 1 } as UserModel;
-    await this.deleteReview.execute({ reviewId: id, requesterId: user });
+  async remove(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<void> {
+    await this.deleteReview.delete({ reviewId: id, requesterId: user });
+  }
+
+  @Put(':id/likes')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async like(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<void> {
+    await this.likeReview.like(id, user.id);
+  }
+
+  @Delete(':id/likes')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async unlike(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<void> {
+    await this.unlikeReview.unlike(id, user.id);
+  }
+
+  @Public()
+  @Get(':id/likes/count')
+  async likeCount(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ReviewLikeCountResponse> {
+    const count = await this.countReviewLikes.count(id);
+    return plainToInstance(ReviewLikeCountResponse, { review_id: id, count });
   }
 
   private static toResponse(this: void, review: ReviewModel) {
-    if (review.id === undefined || review.createdAt === undefined) {
-      throw new Error('Cannot create response from unsaved review');
-    }
+    const { type, id } = splitSubject(review.subject);
 
     return plainToInstance(
-      ReviewResponse,
+      ReviewResponseDto,
       {
         ...review,
         created_at: review.createdAt,
         updated_at: review.updatedAt,
         self: `/api/reviews/${review.id}`,
         collection: `/api/reviews`,
-        subject: `/api/${review.subjectRef.type}s/${review.subjectRef.id}`,
+        subject: `/api/${type}s/${id}`,
         author: `/api/users/${review.author.id}`,
       },
       { excludeExtraneousValues: true },
@@ -116,8 +155,8 @@ export class ReviewController {
   }
 }
 
-class ReviewSearchCriteriaMapper {
-  static fromDto(dto: SearchReviewQueryDto): ReviewSearchCriteria {
+class ReviewFiltersMapper {
+  static fromDto(dto: ReviewFiltersDto): ReviewFilters {
     const base = {
       page: dto.page,
       pageSize: dto.page_size,

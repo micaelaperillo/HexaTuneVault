@@ -1,12 +1,14 @@
 import type { SpotifyApi, Artist } from '@spotify/web-api-ts-sdk';
 
-import type { ArtistModel, ArtistFilters } from '../model';
+import type { ArtistModel, ArtistFilters, Page } from '../model';
 import type { IArtistProvider } from '../repository';
 
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
 import { SPOTIFY_API } from '../infrastructure/api/provider';
 import { ArtistProviderError } from '../error/artist';
+import { resolveSpotifyPage } from './spotify-pagination';
+import { MapErrors } from 'error-mapper-decorator';
 
 export { ARTIST_PROVIDER } from '../repository';
 
@@ -19,33 +21,33 @@ export class SpotifyArtistProvider implements IArtistProvider {
   /**
    * @override
    */
-  async search(filters: ArtistFilters): Promise<ArtistModel[]> {
-    try {
-      const query = SpotifyArtistProvider.toQuery(filters);
-      this.logger.debug(query);
+  @MapErrors({ from: Error, to: (e) => new ArtistProviderError(e) })
+  async search(filters: ArtistFilters): Promise<Page<ArtistModel>> {
+    const query = SpotifyArtistProvider.toQuery(filters);
+    const { page, pageSize, limit, offset } = resolveSpotifyPage(filters);
+    this.logger.debug(query);
 
-      const { artists } = await this.spotify.search(
-        query,
-        ['artist'],
-        undefined,
-        10,
-      );
-      this.logger.debug(artists.items);
+    const { artists } = await this.spotify.search(
+      query,
+      ['artist'],
+      undefined,
+      limit,
+      offset,
+    );
+    this.logger.debug(artists.items);
 
-      return artists.items
-        .filter((a) => a.images.length)
-        .map(SpotifyArtistProvider.toModel);
-    } catch (e) {
-      if (!(e instanceof Error)) throw e;
-      throw new ArtistProviderError(e);
-    }
+    const items = artists.items
+      .filter((a) => a.images.length)
+      .map(SpotifyArtistProvider.toModel);
+
+    return { items, total: artists.total, page, pageSize };
   }
 
   /**
    * @override
    */
   async get(filters: ArtistFilters): Promise<ArtistModel | null> {
-    return (await this.search(filters))[0] ?? null;
+    return (await this.search(filters)).items[0] ?? null;
   }
 
   private static toQuery(filters: ArtistFilters) {

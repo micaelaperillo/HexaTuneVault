@@ -11,6 +11,7 @@ import { DomainException } from '../../error/domain.exception';
 import {
   CommentDBException,
   CommentNotFoundException,
+  CommentDeletionForbiddenException,
 } from '../../error/comment/';
 import { AlbumProviderError } from '../../error/album/';
 import { ArtistProviderError } from '../../error/artist/';
@@ -22,11 +23,14 @@ import {
   AlreadyFollowingException,
   NotFollowingException,
   SelfFollowException,
+  ForbiddenUserActionException,
 } from '../../error/user/';
 import { ReviewNotFoundException } from '../../error/review/review-not-found.exception';
 import { ForbiddenDeletionException } from '../../error/review/forbidden-deletion.exception';
-import { InvalidReviewException } from '../../error/review/invalid-review.exception';
 import { ReviewCooldownException } from '../../error/review/review-cooldown.exception';
+import { NotLikedException } from '../../error/review/not-liked.exception';
+import { AlreadyLikedException } from '../../error/review/already-liked.exception';
+import { ReviewRepositoryException } from '../../error/review/review-repository.exception';
 
 // Single response envelope across the app: { statusCode, code, message }.
 // Domain exceptions carry a stable machine-readable `code`; for plain
@@ -55,7 +59,12 @@ export class NotFoundMapper implements ExceptionFilter {
   }
 }
 
-@Catch(AlreadyFollowingException, NotFollowingException)
+@Catch(
+  AlreadyFollowingException,
+  NotFollowingException,
+  AlreadyLikedException,
+  NotLikedException,
+)
 export class ConflictMapper implements ExceptionFilter {
   catch(exception: Error, host: ArgumentsHost): void {
     send(host, HttpStatus.CONFLICT, exception, 'CONFLICT');
@@ -69,17 +78,14 @@ export class UnauthorizedMapper implements ExceptionFilter {
   }
 }
 
-@Catch(ForbiddenDeletionException)
+@Catch(
+  ForbiddenDeletionException,
+  CommentDeletionForbiddenException,
+  ForbiddenUserActionException,
+)
 export class ForbiddenMapper implements ExceptionFilter {
   catch(exception: Error, host: ArgumentsHost): void {
     send(host, HttpStatus.FORBIDDEN, exception, 'FORBIDDEN');
-  }
-}
-
-@Catch(InvalidReviewException)
-export class BadRequestMapper implements ExceptionFilter {
-  catch(exception: Error, host: ArgumentsHost): void {
-    send(host, HttpStatus.BAD_REQUEST, exception, 'BAD_REQUEST');
   }
 }
 
@@ -102,13 +108,7 @@ export class TooManyRequestsMapper implements ExceptionFilter {
   }
 }
 
-@Catch(
-  CommentDBException,
-  UserDBException,
-  ArtistProviderError,
-  AlbumProviderError,
-  PodcastProviderError,
-)
+@Catch(CommentDBException, UserDBException, ReviewRepositoryException)
 export class InternalServerErrorMapper implements ExceptionFilter {
   catch(exception: Error, host: ArgumentsHost): void {
     send(
@@ -121,13 +121,28 @@ export class InternalServerErrorMapper implements ExceptionFilter {
   }
 }
 
+// Upstream catalog provider (Spotify) failures are gateway errors, not faults
+// in this service, so they surface as 502 rather than 500.
+@Catch(AlbumProviderError, ArtistProviderError, PodcastProviderError)
+export class BadGatewayMapper implements ExceptionFilter {
+  catch(exception: Error, host: ArgumentsHost): void {
+    send(
+      host,
+      HttpStatus.BAD_GATEWAY,
+      exception,
+      'BAD_GATEWAY',
+      'Upstream catalog provider failed',
+    );
+  }
+}
+
 export const filters = [
   new NotFoundMapper(),
   new ConflictMapper(),
   new UnauthorizedMapper(),
   new ForbiddenMapper(),
-  new BadRequestMapper(),
   new UnprocessableEntityMapper(),
   new TooManyRequestsMapper(),
   new InternalServerErrorMapper(),
+  new BadGatewayMapper(),
 ] as const;

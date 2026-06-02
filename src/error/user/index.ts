@@ -4,3 +4,4 @@ export * from './invalid-credentials.exception';
 export * from './already-following.exception';
 export * from './not-following.exception';
 export * from './self-follow.exception';
+export * from './forbidden-user-action.exception';

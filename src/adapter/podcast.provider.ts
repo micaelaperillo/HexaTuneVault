@@ -4,13 +4,15 @@ import type {
   Market,
 } from '@spotify/web-api-ts-sdk';
 
-import type { PodcastModel, PodcastFilters } from '../model';
+import type { PodcastModel, PodcastFilters, Page } from '../model';
 import type { IPodcastProvider } from '../repository';
 
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
 import { SPOTIFY_API } from '../infrastructure/api/provider';
 import { PodcastProviderError } from '../error/podcast';
+import { resolveSpotifyPage } from './spotify-pagination';
+import { MapErrors } from 'error-mapper-decorator';
 
 export { PODCAST_PROVIDER } from '../repository';
 
@@ -27,34 +29,34 @@ export class SpotifyPodcastProvider implements IPodcastProvider {
   /**
    * @override
    */
-  async search(filters: PodcastFilters): Promise<PodcastModel[]> {
-    try {
-      const market = (filters.market as Market) || DEFAULT_MARKET;
-      this.logger.debug(`${filters.name} (market=${market})`);
+  @MapErrors({ from: Error, to: (e) => new PodcastProviderError(e) })
+  async search(filters: PodcastFilters): Promise<Page<PodcastModel>> {
+    const market = (filters.market as Market) || DEFAULT_MARKET;
+    const { page, pageSize, limit, offset } = resolveSpotifyPage(filters);
+    this.logger.debug(`${filters.name} (market=${market})`);
 
-      const { shows } = await this.spotify.search(
-        filters.name,
-        ['show'],
-        market,
-        10,
-      );
-      this.logger.debug(shows.items);
+    const { shows } = await this.spotify.search(
+      filters.name,
+      ['show'],
+      market,
+      limit,
+      offset,
+    );
+    this.logger.debug(shows.items);
 
-      return shows.items
-        .filter((s) => s && s.images.length)
-        .filter((s) => SpotifyPodcastProvider.matchesFilters(s, filters))
-        .map(SpotifyPodcastProvider.toModel);
-    } catch (e) {
-      if (!(e instanceof Error)) throw e;
-      throw new PodcastProviderError(e);
-    }
+    const items = shows.items
+      .filter((s) => s && s.images.length)
+      .filter((s) => SpotifyPodcastProvider.matchesFilters(s, filters))
+      .map(SpotifyPodcastProvider.toModel);
+
+    return { items, total: shows.total, page, pageSize };
   }
 
   /**
    * @override
    */
   async get(filters: PodcastFilters): Promise<PodcastModel | null> {
-    return (await this.search(filters))[0] ?? null;
+    return (await this.search(filters)).items[0] ?? null;
   }
 
   private static matchesFilters(

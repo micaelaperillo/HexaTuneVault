@@ -1,4 +1,4 @@
-import { Transform } from 'class-transformer';
+import { TrimString } from './transforms';
 import {
   IsEmail,
   IsNotEmpty,
@@ -9,24 +9,24 @@ import {
 
 export class CreateUserDto {
   @IsString()
-  @Transform(({ value }) => (value as string).trim())
+  @TrimString()
   @IsNotEmpty()
   username!: string;
 
   @IsString()
-  @Transform(({ value }) => (value as string).trim())
+  @TrimString()
   @IsNotEmpty()
   password!: string;
 
   @IsString()
-  @Transform(({ value }) => (value as string).trim())
+  @TrimString()
   @IsNotEmpty()
-  firstName!: string;
+  first_name!: string;
 
   @IsString()
-  @Transform(({ value }) => (value as string).trim())
+  @TrimString()
   @IsNotEmpty()
-  lastName!: string;
+  last_name!: string;
 
   @IsEmail()
   email!: string;
@@ -36,10 +36,10 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsString()
-  @Transform(({ value }) => (value as string).trim())
+  @TrimString()
   @MaxLength(256)
   location?: string;
 
   @IsString()
-  profilePictureUrl!: string;
+  profile_picture_url!: string;
 }

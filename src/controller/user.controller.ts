@@ -5,6 +5,7 @@ import {
   Inject,
   Get,
   Post,
+  Put,
   Delete,
   Patch,
   Param,
@@ -14,6 +15,9 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
+import { CurrentUser } from '../infrastructure/auth/current-user.decorator';
+import type { AuthenticatedUser } from '../model/authenticated-user';
+import { ForbiddenUserActionException } from '../error/user/';
 
 import {
   AUTHENTICATE_USER,
@@ -41,6 +45,7 @@ import { UserResponseDto } from '../dto/user-response.dto';
 import { PageDto } from '../dto/page.dto';
 import { PageQueryDto } from '../dto/page-query.dto';
 import { Public } from '../infrastructure/auth/public.decorator';
+import { pruneUndefined } from './prune-undefined';
 
 @Controller('api/users')
 export class UserController {
@@ -59,15 +64,33 @@ export class UserController {
   @Public()
   @Post()
   async create(@Body() dto: CreateUserDto): Promise<UserResponseDto> {
-    const user = await this.createUser.create(dto);
+    const user = await this.createUser.create({
+      username: dto.username,
+      password: dto.password,
+      firstName: dto.first_name,
+      lastName: dto.last_name,
+      email: dto.email,
+      biography: dto.biography,
+      location: dto.location,
+      profilePictureUrl: dto.profile_picture_url,
+    });
     return UserController.toResponse(user);
   }
 
   @Public()
   @Get()
-  async search(@Query() filters: UserFiltersDto): Promise<UserResponseDto[]> {
-    const users = await this.searchUser.search(filters);
-    return users.map(UserController.toResponse);
+  async search(
+    @Query() filters: UserFiltersDto,
+  ): Promise<PageDto<UserResponseDto>> {
+    const { items, total, ...page } = await this.searchUser.search({
+      username: filters.username,
+      email: filters.email,
+      firstName: filters.first_name,
+      lastName: filters.last_name,
+      page: filters.page,
+      pageSize: filters.page_size,
+    });
+    return PageDto.of(items.map(UserController.toResponse), page, total);
   }
 
   @Public()
@@ -81,14 +104,35 @@ export class UserController {
   async edit(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: EditUserDto,
+    @CurrentUser() current: AuthenticatedUser,
   ): Promise<UserResponseDto> {
-    const user = await this.editUser.edit({ ...dto, id });
+    if (id !== current.id) {
+      throw new ForbiddenUserActionException();
+    }
+    const patch = pruneUndefined<Partial<UserModel>>({
+      id,
+      username: dto.username,
+      password: dto.password,
+      firstName: dto.first_name,
+      lastName: dto.last_name,
+      email: dto.email,
+      biography: dto.biography,
+      location: dto.location,
+      profilePictureUrl: dto.profile_picture_url,
+    });
+    const user = await this.editUser.edit(patch);
     return UserController.toResponse(user);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  async delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  async delete(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() current: AuthenticatedUser,
+  ): Promise<void> {
+    if (id !== current.id) {
+      throw new ForbiddenUserActionException();
+    }
     await this.deleteUser.deleteById(id);
   }
 
@@ -98,10 +142,11 @@ export class UserController {
     @Param('id', ParseIntPipe) id: number,
     @Query() page: PageQueryDto,
   ): Promise<PageDto<UserResponseDto>> {
-    const result = await this.listFollows.findFollowers(id, page);
+    const req = { page: page.page, pageSize: page.page_size };
+    const result = await this.listFollows.findFollowers(id, req);
     return PageDto.of(
       result.items.map(UserController.toResponse),
-      page,
+      req,
       result.total,
     );
   }
@@ -112,38 +157,47 @@ export class UserController {
     @Param('id', ParseIntPipe) id: number,
     @Query() page: PageQueryDto,
   ): Promise<PageDto<UserResponseDto>> {
-    const result = await this.listFollows.findFollowing(id, page);
+    const req = { page: page.page, pageSize: page.page_size };
+    const result = await this.listFollows.findFollowing(id, req);
     return PageDto.of(
       result.items.map(UserController.toResponse),
-      page,
+      req,
       result.total,
     );
   }
 
-  @Patch(':id/follow')
+  @Put(':id/followers')
+  @HttpCode(204)
   async follow(
     @Param('id', ParseIntPipe) id: number,
-    @Body('follower_id', ParseIntPipe) followerId: number,
+    @CurrentUser() current: AuthenticatedUser,
   ): Promise<void> {
-    await this.followUser.follow(followerId, id);
+    await this.followUser.follow(current.id, id);
   }
 
-  @Patch(':id/unfollow')
+  @Delete(':id/followers')
+  @HttpCode(204)
   async unfollow(
     @Param('id', ParseIntPipe) id: number,
-    @Body('follower_id', ParseIntPipe) followerId: number,
+    @CurrentUser() current: AuthenticatedUser,
   ): Promise<void> {
-    await this.followUser.unfollow(followerId, id);
+    await this.followUser.unfollow(current.id, id);
   }
 
   private static toResponse(this: void, user: UserModel) {
     return plainToInstance(
       UserResponseDto,
       {
-        ...user,
+        id: user.id,
+        username: user.username,
+        first_name: user.firstName,
+        last_name: user.lastName,
+        email: user.email,
+        biography: user.biography,
         location: user.location ?? '',
-        followerCount: user.followerCount ?? 0,
-        followingCount: user.followingCount ?? 0,
+        profile_picture_url: user.profilePictureUrl,
+        follower_count: user.followerCount ?? 0,
+        following_count: user.followingCount ?? 0,
         self: `/api/users/${user.id}`,
       },
       { excludeExtraneousValues: true },
