@@ -37,9 +37,7 @@ import {
 import { CreateUserDto } from '../dto/create-user.dto';
 import { EditUserDto } from '../dto/edit-user.dto';
 import { UserFiltersDto } from '../dto/user-filters.dto';
-import { LoginUserDto } from '../dto/login-user.dto';
 import { UserResponseDto } from '../dto/user-response.dto';
-import { AuthResponseDto } from '../dto/auth-response.dto';
 import { PageDto } from '../dto/page.dto';
 import { PageQueryDto } from '../dto/page-query.dto';
 import { Public } from '../infrastructure/auth/public.decorator';
@@ -63,15 +61,6 @@ export class UserController {
   async create(@Body() dto: CreateUserDto): Promise<UserResponseDto> {
     const user = await this.createUser.create(dto);
     return UserController.toResponse(user);
-  }
-
-  @Public()
-  @Post('authenticate')
-  async authenticate(@Body() dto: LoginUserDto): Promise<AuthResponseDto> {
-    const token = await this.authenticateUser.authenticate(dto);
-    return plainToInstance(AuthResponseDto, token, {
-      excludeExtraneousValues: true,
-    });
   }
 
   @Public()

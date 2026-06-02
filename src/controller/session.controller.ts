@@ -7,7 +7,9 @@ import { AUTHENTICATE_USER, type IAuthenticateUser } from '../port/user';
 
 import { LoginUserDto } from '../dto/login-user.dto';
 import { AuthResponseDto } from '../dto/auth-response.dto';
+import { Public } from '../infrastructure/auth/public.decorator';
 
+@Public()
 @Controller('api/sessions')
 export class SessionController {
   constructor(
