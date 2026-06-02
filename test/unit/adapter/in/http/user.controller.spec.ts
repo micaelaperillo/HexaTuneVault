@@ -21,7 +21,7 @@ import {
 import { ForbiddenUserActionException } from '../../../../../src/error/user/';
 import { UserResponseDto } from '../../../../../src/adapter/in/http/dto/out/user';
 import type { UserModel } from '../../../../../src/model';
-import type { AuthenticatedUser } from '../../../../../src/adapter/in/http/auth/authenticated-user';
+import type { AuthenticatedUser } from '../../../../../src/model/user';
 
 describe('UserController', () => {
   let controller: UserController;

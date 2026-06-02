@@ -9,7 +9,7 @@ import {
 import { Type } from 'class-transformer';
 import { TrimString, TrimStringArray, ToArray } from '../../transforms';
 
-export class ArtistFilterDto {
+export class ArtistSearchDto {
   @IsString()
   @TrimString()
   @IsNotEmpty()

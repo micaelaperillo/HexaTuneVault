@@ -3,12 +3,12 @@ import type {
   ValidationArguments,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import type { ReviewFilterDto } from '../in/review/review-filter.dto';
+import type { ReviewSearchDto } from '../in/review/review-search.dto';
 
 @ValidatorConstraint({ async: false })
 export class SubjectIdRequiresTypeDtoConstraint implements ValidatorConstraintInterface {
   validate(_: unknown, args: ValidationArguments): boolean {
-    const obj = args.object as ReviewFilterDto;
+    const obj = args.object as ReviewSearchDto;
     if (obj.subject_id === undefined) return true;
     return obj.subject_type !== undefined;
   }

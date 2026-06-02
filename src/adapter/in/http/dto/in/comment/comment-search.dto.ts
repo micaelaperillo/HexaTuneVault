@@ -1,7 +1,7 @@
 import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class CommentFilterDto {
+export class CommentSearchDto {
   @IsOptional()
   @Type(() => Number)
   @IsInt()

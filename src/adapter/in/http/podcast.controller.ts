@@ -7,7 +7,7 @@ import {
   SEARCH_PODCAST,
 } from '../../../port/in';
 
-import { PodcastGetDto, PodcastFilterDto } from './dto/in/podcast';
+import { PodcastGetDto, PodcastSearchDto } from './dto/in/podcast';
 import { PodcastResponseDto } from './dto/out/podcast';
 import { PageDto } from './dto/out';
 
@@ -44,7 +44,7 @@ export class PodcastController {
       market,
       page,
       page_size,
-    }: PodcastFilterDto,
+    }: PodcastSearchDto,
   ): Promise<PageDto<PodcastResponseDto>> {
     this.logger.debug(
       `Search podcast with q=${name} explicit=${explicit} media_type=${media_type} market=${market}`,

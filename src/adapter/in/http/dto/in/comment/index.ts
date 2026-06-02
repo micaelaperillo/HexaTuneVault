@@ -1,2 +1,2 @@
-export * from './comment-filter.dto';
+export * from './comment-search.dto';
 export * from './create-comment.dto';

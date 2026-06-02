@@ -10,7 +10,7 @@ import {
 import { Type } from 'class-transformer';
 import { TrimString } from '../../transforms';
 
-export class PodcastFilterDto {
+export class PodcastSearchDto {
   @IsString()
   @TrimString()
   @IsNotEmpty()

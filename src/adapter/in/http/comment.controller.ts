@@ -34,15 +34,15 @@ import {
   type ILikeComment,
 } from '../../../port/in';
 
-import { CreateCommentDto, CommentFilterDto } from './dto/in/comment';
+import { CreateCommentDto, CommentSearchDto } from './dto/in/comment';
 import {
   CommentResponseDto,
   CommentLikeCountResponse,
 } from './dto/out/comment';
-import { LikedResponseDto, PageDto } from './dto/out';
+import { PageDto } from './dto/out';
 import { Public } from './decorator/public.decorator';
 import { CurrentUser } from './decorator/current-user.decorator';
-import type { AuthenticatedUser } from './auth/authenticated-user';
+import type { AuthenticatedUser } from '../../../model/user';
 
 import { plainToInstance } from 'class-transformer';
 
@@ -85,7 +85,7 @@ export class CommentController {
   @Public()
   @Get()
   async search(
-    @Query() filters: CommentFilterDto,
+    @Query() filters: CommentSearchDto,
   ): Promise<PageDto<CommentResponseDto>> {
     const { items, total, ...page } = await this.searchComment.search({
       createdById: filters.created_by_id,
@@ -120,9 +120,9 @@ export class CommentController {
   async hasLiked(
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user: AuthenticatedUser,
-  ): Promise<LikedResponseDto> {
+  ): Promise<{ liked: boolean }> {
     const liked = await this.commentHasLiked.hasLiked(id, user.id);
-    return plainToInstance(LikedResponseDto, { liked });
+    return { liked };
   }
 
   @Public()

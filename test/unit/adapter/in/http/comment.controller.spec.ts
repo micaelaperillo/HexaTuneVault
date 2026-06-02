@@ -14,7 +14,7 @@ import { CommentModel } from '../../../../../src/model/comment';
 import { CommentResponseDto } from '../../../../../src/adapter/in/http/dto/out/comment';
 import { CreateCommentDto } from '../../../../../src/adapter/in/http/dto/in/comment';
 import { UserModel } from '../../../../../src/model';
-import type { AuthenticatedUser } from '../../../../../src/adapter/in/http/auth/authenticated-user';
+import type { AuthenticatedUser } from '../../../../../src/model/user';
 
 describe('CommentController', () => {
   let controller: CommentController;

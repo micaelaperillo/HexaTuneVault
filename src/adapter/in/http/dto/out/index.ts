@@ -6,4 +6,3 @@ export * from './podcast';
 export * from './review';
 export * from './user';
 export * from './page.dto';
-export * from './liked-response.dto';

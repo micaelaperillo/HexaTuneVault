@@ -33,15 +33,15 @@ import {
   HAS_LIKED_REVIEW,
   type IHasLikedReview,
 } from '../../../port/in';
-import { CreateReviewDto, ReviewFilterDto } from './dto/in/review';
+import { CreateReviewDto, ReviewSearchDto } from './dto/in/review';
 import { ReviewResponseDto, ReviewLikeCountResponse } from './dto/out/review';
-import { LikedResponseDto, PageDto } from './dto/out';
+import { PageDto } from './dto/out';
 import { type ReviewFilters, splitSubject } from '../../../model/review';
 import type { ReviewModel } from '../../../model';
 import { plainToInstance } from 'class-transformer';
 import { Public } from './decorator/public.decorator';
 import { CurrentUser } from './decorator/current-user.decorator';
-import type { AuthenticatedUser } from './auth/authenticated-user';
+import type { AuthenticatedUser } from '../../../model/user';
 
 @Controller('api/reviews')
 export class ReviewController {
@@ -83,7 +83,7 @@ export class ReviewController {
   @Public()
   @Get()
   async search(
-    @Query() dto: ReviewFilterDto,
+    @Query() dto: ReviewSearchDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<PageDto<ReviewResponseDto>> {
     const base = {
@@ -156,9 +156,9 @@ export class ReviewController {
   async hasLiked(
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user: AuthenticatedUser,
-  ): Promise<LikedResponseDto> {
+  ): Promise<{ liked: boolean }> {
     const liked = await this.hasLikedReview.hasLiked(id, user.id);
-    return plainToInstance(LikedResponseDto, { liked });
+    return { liked };
   }
 
   private static toResponse(this: void, review: ReviewModel) {

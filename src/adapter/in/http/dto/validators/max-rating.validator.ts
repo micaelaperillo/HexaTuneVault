@@ -3,12 +3,12 @@ import type {
   ValidationArguments,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import type { ReviewFilterDto } from '../in/review/review-filter.dto';
+import type { ReviewSearchDto } from '../in/review/review-search.dto';
 
 @ValidatorConstraint({ async: false })
 export class MaxRatingDtoConstraint implements ValidatorConstraintInterface {
   validate(_: unknown, args: ValidationArguments): boolean {
-    const obj = args.object as ReviewFilterDto;
+    const obj = args.object as ReviewSearchDto;
     if (obj.min_rating === undefined || obj.max_rating === undefined)
       return true;
     return obj.min_rating <= obj.max_rating;

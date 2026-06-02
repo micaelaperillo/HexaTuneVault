@@ -16,7 +16,7 @@ import {
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { CurrentUser } from './decorator/current-user.decorator';
-import type { AuthenticatedUser } from './auth/authenticated-user';
+import type { AuthenticatedUser } from '../../../model/user';
 import { ForbiddenUserActionException } from '../../../error/user/';
 
 import {
@@ -38,7 +38,7 @@ import {
   type IListFollows,
 } from '../../../port/in';
 
-import { CreateUserDto, EditUserDto, UserFilterDto } from './dto/in/user';
+import { CreateUserDto, EditUserDto, UserSearchDto } from './dto/in/user';
 import { UserResponseDto } from './dto/out/user';
 import { PageDto } from './dto/out';
 import { PageQueryDto } from './dto/in';
@@ -78,7 +78,7 @@ export class UserController {
   @Public()
   @Get()
   async search(
-    @Query() filters: UserFilterDto,
+    @Query() filters: UserSearchDto,
   ): Promise<PageDto<UserResponseDto>> {
     const { items, total, ...page } = await this.searchUser.search({
       username: filters.username,
