@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { NotFoundException } from '@nestjs/common';
 import { CommentController } from '../src/controller/comment.controller';
 import {
   CREATE_COMMENT,
@@ -11,7 +12,6 @@ import {
 } from '../src/port/comment';
 import { CommentModel } from '../src/model/comment.model';
 import { CommentResponseDto } from '../src/dto/comment-response.dto';
-import { CommentLikeStatusDto } from '../src/dto/comment-like-status.dto';
 import { CreateCommentDto } from '../src/dto/create-comment.dto';
 import { SetCommentLikeDto } from '../src/dto/set-comment-like.dto';
 
@@ -147,13 +147,21 @@ describe('CommentController', () => {
   });
 
   describe('hasLiked', () => {
-    it('calls hasLiked port with the comment id and user_id, returning a status dto', async () => {
+    it('resolves (204) when the user has liked the comment', async () => {
       mockHasLiked.hasLiked.mockResolvedValue(true);
-      const result = await controller.hasLiked(1, { user_id: 2 });
 
+      await expect(
+        controller.hasLiked(1, { user_id: 2 }),
+      ).resolves.toBeUndefined();
       expect(mockHasLiked.hasLiked).toHaveBeenCalledWith(1, 2);
-      expect(result).toBeInstanceOf(CommentLikeStatusDto);
-      expect(result.liked).toBe(true);
+    });
+
+    it('throws NotFoundException (404) when the user has not liked the comment', async () => {
+      mockHasLiked.hasLiked.mockResolvedValue(false);
+
+      await expect(controller.hasLiked(1, { user_id: 2 })).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

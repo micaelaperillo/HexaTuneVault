@@ -61,10 +61,6 @@ export class CommentService
   }
 
   async hasLiked(commentId: number, userId: number): Promise<boolean> {
-    const comment = await this.repo.findById(commentId);
-    if (!comment) {
-      throw new CommentNotFoundException(commentId);
-    }
     return this.repo.hasLike(commentId, userId);
   }
 

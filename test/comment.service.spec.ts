@@ -108,20 +108,11 @@ describe('CommentService', () => {
   });
 
   describe('hasLiked', () => {
-    it('returns the repo result when the comment exists', async () => {
-      mockRepo.findById.mockResolvedValue(mockComment);
+    it('delegates to repo.hasLike', async () => {
       mockRepo.hasLike.mockResolvedValue(true);
       const result = await service.hasLiked(1, 2);
       expect(mockRepo.hasLike).toHaveBeenCalledWith(1, 2);
       expect(result).toBe(true);
-    });
-
-    it('throws CommentNotFoundException when the comment does not exist', async () => {
-      mockRepo.findById.mockResolvedValue(null);
-      await expect(service.hasLiked(99, 2)).rejects.toThrow(
-        CommentNotFoundException,
-      );
-      expect(mockRepo.hasLike).not.toHaveBeenCalled();
     });
   });
 

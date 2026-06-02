@@ -10,6 +10,7 @@ import {
   Query,
   ParseIntPipe,
   HttpCode,
+  NotFoundException,
 } from '@nestjs/common';
 
 import {
@@ -33,7 +34,6 @@ import { CreateCommentDto } from '../dto/create-comment.dto';
 import { CommentFiltersDto } from '../dto/comment-filters.dto';
 import { CommentResponseDto } from '../dto/comment-response.dto';
 import { CommentLikeQueryDto } from '../dto/comment-like-query.dto';
-import { CommentLikeStatusDto } from '../dto/comment-like-status.dto';
 import { SetCommentLikeDto } from '../dto/set-comment-like.dto';
 
 @Controller('api/comments')
@@ -90,12 +90,15 @@ export class CommentController {
   }
 
   @Get(':id/like')
+  @HttpCode(204)
   async hasLiked(
     @Param('id', ParseIntPipe) id: number,
     @Query() query: CommentLikeQueryDto,
-  ): Promise<CommentLikeStatusDto> {
+  ): Promise<void> {
     const liked = await this.commentHasLiked.hasLiked(id, query.user_id);
-    return new CommentLikeStatusDto(liked);
+    if (!liked) {
+      throw new NotFoundException();
+    }
   }
 
   @Delete(':id')
