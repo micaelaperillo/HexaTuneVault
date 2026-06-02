@@ -30,7 +30,7 @@ export class SpotifyAlbumProvider implements IAlbumProvider {
         query,
         ['album'],
         undefined,
-        limit as Parameters<SpotifyApi['search']>[3],
+        limit,
         offset,
       );
       this.logger.debug(albums.items);

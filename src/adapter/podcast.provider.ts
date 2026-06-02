@@ -38,7 +38,7 @@ export class SpotifyPodcastProvider implements IPodcastProvider {
         filters.name,
         ['show'],
         market,
-        limit as Parameters<SpotifyApi['search']>[3],
+        limit,
         offset,
       );
       this.logger.debug(shows.items);

@@ -30,7 +30,7 @@ export class SpotifyArtistProvider implements IArtistProvider {
         query,
         ['artist'],
         undefined,
-        limit as Parameters<SpotifyApi['search']>[3],
+        limit,
         offset,
       );
       this.logger.debug(artists.items);
