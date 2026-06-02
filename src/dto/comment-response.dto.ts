@@ -2,6 +2,9 @@ import { Expose } from 'class-transformer';
 
 export class CommentResponseDto {
   @Expose()
+  id!: number;
+
+  @Expose()
   content!: string;
 
   @Expose()

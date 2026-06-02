@@ -175,6 +175,7 @@ describe('CommentController', () => {
 
       expect(mockGet.get).toHaveBeenCalledWith(1);
       expect(result).toBeInstanceOf(CommentResponseDto);
+      expect(result.id).toBe(1);
       expect(result.self).toBe('/api/comments/1');
       expect(result.like).toBe('/api/comments/1/likes/me');
       expect(result.likes).toBe(3);
