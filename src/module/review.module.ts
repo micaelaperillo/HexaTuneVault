@@ -14,6 +14,7 @@ import { GET_REVIEW } from '../port/review/get-review.port';
 import { LIKE_REVIEW } from '../port/review/like-review.port';
 import { UNLIKE_REVIEW } from '../port/review/unlike-review.port';
 import { COUNT_REVIEW_LIKES } from '../port/review/count-review-likes.port';
+import { HAS_LIKED_REVIEW } from '../port/review/has-liked-review.port';
 import { REVIEW_CONFIG } from '../port/review/review-config.port';
 import { REVIEW_REPOSITORY } from '../repository/review-repository.port';
 import { REVIEW_LIKE_REPOSITORY } from '../repository/review-like-repository.port';
@@ -47,6 +48,7 @@ import { REVIEW_LIKE_REPOSITORY } from '../repository/review-like-repository.por
     { provide: LIKE_REVIEW, useExisting: ReviewService },
     { provide: UNLIKE_REVIEW, useExisting: ReviewService },
     { provide: COUNT_REVIEW_LIKES, useExisting: ReviewService },
+    { provide: HAS_LIKED_REVIEW, useExisting: ReviewService },
   ],
 })
 export class ReviewModule {}

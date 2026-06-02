@@ -12,6 +12,7 @@ import type { ISearchReview } from '../port/review/search-review.port';
 import type { ILikeReview } from '../port/review/like-review.port';
 import type { IUnlikeReview } from '../port/review/unlike-review.port';
 import type { ICountReviewLikes } from '../port/review/count-review-likes.port';
+import type { IHasLikedReview } from '../port/review/has-liked-review.port';
 import {
   REVIEW_REPOSITORY,
   type IReviewRepository,
@@ -30,7 +31,6 @@ import type { ReviewFilters } from '../model/review.filter';
 import { ReviewCooldownException } from '../error/review/review-cooldown.exception';
 import { ReviewNotFoundException } from '../error/review/review-not-found.exception';
 import { ForbiddenDeletionException } from '../error/review/forbidden-deletion.exception';
-import { NotLikedException } from '../error/review/not-liked.exception';
 
 @Injectable()
 export class ReviewService
@@ -41,7 +41,8 @@ export class ReviewService
     ISearchReview,
     ILikeReview,
     IUnlikeReview,
-    ICountReviewLikes
+    ICountReviewLikes,
+    IHasLikedReview
 {
   private readonly cooldownSeconds: number;
 
@@ -94,21 +95,23 @@ export class ReviewService
   }
 
   async like(reviewId: number, userId: number): Promise<void> {
-    await this.ensureReviewExists(reviewId);
+    // Idempotent. A missing review surfaces as ReviewNotFoundException via the
+    // repository's foreign-key mapping, so no separate existence check is needed.
     await this.likes.addLike(reviewId, userId);
   }
 
   async unlike(reviewId: number, userId: number): Promise<void> {
     await this.ensureReviewExists(reviewId);
-    const removed = await this.likes.removeLike(reviewId, userId);
-    if (!removed) {
-      throw new NotLikedException();
-    }
+    await this.likes.removeLike(reviewId, userId);
   }
 
   async count(reviewId: number): Promise<number> {
     await this.ensureReviewExists(reviewId);
     return this.likes.countLikes(reviewId);
+  }
+
+  async hasLiked(reviewId: number, userId: number): Promise<boolean> {
+    return this.likes.hasLike(reviewId, userId);
   }
 
   private async ensureReviewExists(reviewId: number): Promise<void> {

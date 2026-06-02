@@ -1,7 +1,6 @@
 import { ReviewLikeRepository } from '../src/adapter/review-like.repository';
 import { ReviewLikeEntity } from '../src/entity/review-like.entity';
 import { ReviewNotFoundException } from '../src/error/review/review-not-found.exception';
-import { AlreadyLikedException } from '../src/error/review/already-liked.exception';
 import { ReviewRepositoryException } from '../src/error/review/review-repository.exception';
 import { QueryFailedError, type Repository } from 'typeorm';
 
@@ -19,6 +18,7 @@ describe('ReviewLikeRepository', () => {
     mockInsertQb = {
       insert: jest.fn().mockReturnThis(),
       values: jest.fn().mockReturnThis(),
+      orIgnore: jest.fn().mockReturnThis(),
       execute: jest.fn().mockResolvedValue({}),
     };
 
@@ -34,7 +34,7 @@ describe('ReviewLikeRepository', () => {
   });
 
   describe('addLike', () => {
-    it('should insert the like row', async () => {
+    it('should insert the like row, ignoring duplicates', async () => {
       await repository.addLike(1, 42);
 
       expect(mockInsertQb.insert).toHaveBeenCalled();
@@ -42,18 +42,8 @@ describe('ReviewLikeRepository', () => {
         reviewId: 1,
         userId: 42,
       });
+      expect(mockInsertQb.orIgnore).toHaveBeenCalled();
       expect(mockInsertQb.execute).toHaveBeenCalled();
-    });
-
-    it('should translate a unique violation into AlreadyLikedException', async () => {
-      const dupError = new QueryFailedError('insert', [], {
-        code: '23505',
-      } as unknown as Error);
-      mockInsertQb.execute.mockRejectedValue(dupError);
-
-      await expect(repository.addLike(1, 42)).rejects.toThrow(
-        AlreadyLikedException,
-      );
     });
 
     it('should translate a FK violation into ReviewNotFoundException', async () => {
@@ -87,32 +77,15 @@ describe('ReviewLikeRepository', () => {
   });
 
   describe('removeLike', () => {
-    it('should return true when a row was removed', async () => {
+    it('should delete the like row (idempotent)', async () => {
       mockRepo.delete.mockResolvedValue({ affected: 1, raw: [] });
 
-      const result = await repository.removeLike(1, 42);
+      await repository.removeLike(1, 42);
 
-      expect(result).toBe(true);
       expect(mockRepo.delete).toHaveBeenCalledWith({
         reviewId: 1,
         userId: 42,
       });
-    });
-
-    it('should return false when no row was removed', async () => {
-      mockRepo.delete.mockResolvedValue({ affected: 0, raw: [] });
-
-      const result = await repository.removeLike(1, 42);
-
-      expect(result).toBe(false);
-    });
-
-    it('should return false when affected is undefined', async () => {
-      mockRepo.delete.mockResolvedValue({ raw: [] });
-
-      const result = await repository.removeLike(1, 42);
-
-      expect(result).toBe(false);
     });
   });
 
@@ -124,6 +97,27 @@ describe('ReviewLikeRepository', () => {
 
       expect(result).toBe(7);
       expect(mockRepo.count).toHaveBeenCalledWith({ where: { reviewId: 1 } });
+    });
+  });
+
+  describe('hasLike', () => {
+    it('should return true when a like row exists', async () => {
+      mockRepo.count.mockResolvedValue(1);
+
+      const result = await repository.hasLike(1, 42);
+
+      expect(result).toBe(true);
+      expect(mockRepo.count).toHaveBeenCalledWith({
+        where: { reviewId: 1, userId: 42 },
+      });
+    });
+
+    it('should return false when no like row exists', async () => {
+      mockRepo.count.mockResolvedValue(0);
+
+      const result = await repository.hasLike(1, 42);
+
+      expect(result).toBe(false);
     });
   });
 });

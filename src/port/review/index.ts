@@ -5,4 +5,5 @@ export * from './search-review.port';
 export * from './like-review.port';
 export * from './unlike-review.port';
 export * from './count-review-likes.port';
+export * from './has-liked-review.port';
 export * from './review-config.port';

@@ -28,8 +28,6 @@ import {
 import { ReviewNotFoundException } from '../../error/review/review-not-found.exception';
 import { ForbiddenDeletionException } from '../../error/review/forbidden-deletion.exception';
 import { ReviewCooldownException } from '../../error/review/review-cooldown.exception';
-import { NotLikedException } from '../../error/review/not-liked.exception';
-import { AlreadyLikedException } from '../../error/review/already-liked.exception';
 import { ReviewRepositoryException } from '../../error/review/review-repository.exception';
 
 // Single response envelope across the app: { statusCode, code, message }.
@@ -59,12 +57,7 @@ export class NotFoundMapper implements ExceptionFilter {
   }
 }
 
-@Catch(
-  AlreadyFollowingException,
-  NotFollowingException,
-  AlreadyLikedException,
-  NotLikedException,
-)
+@Catch(AlreadyFollowingException, NotFollowingException)
 export class ConflictMapper implements ExceptionFilter {
   catch(exception: Error, host: ArgumentsHost): void {
     send(host, HttpStatus.CONFLICT, exception, 'CONFLICT');

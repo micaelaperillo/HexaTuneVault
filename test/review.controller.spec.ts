@@ -7,6 +7,7 @@ import type { IGetReview } from '../src/port/review/get-review.port';
 import type { ILikeReview } from '../src/port/review/like-review.port';
 import type { IUnlikeReview } from '../src/port/review/unlike-review.port';
 import type { ICountReviewLikes } from '../src/port/review/count-review-likes.port';
+import type { IHasLikedReview } from '../src/port/review/has-liked-review.port';
 import { CREATE_REVIEW } from '../src/port/review/create-review.port';
 import { DELETE_REVIEW } from '../src/port/review/delete-review.port';
 import { SEARCH_REVIEW } from '../src/port/review/search-review.port';
@@ -14,6 +15,7 @@ import { GET_REVIEW } from '../src/port/review/get-review.port';
 import { LIKE_REVIEW } from '../src/port/review/like-review.port';
 import { UNLIKE_REVIEW } from '../src/port/review/unlike-review.port';
 import { COUNT_REVIEW_LIKES } from '../src/port/review/count-review-likes.port';
+import { HAS_LIKED_REVIEW } from '../src/port/review/has-liked-review.port';
 import { SortField, SortOrder } from '../src/model/review.filter';
 import type { ReviewModel, UserModel } from '../src/model';
 import type { Response, Request } from 'express';
@@ -27,6 +29,7 @@ describe('ReviewController', () => {
   let likeReview: jest.Mocked<ILikeReview>;
   let unlikeReview: jest.Mocked<IUnlikeReview>;
   let countReviewLikes: jest.Mocked<ICountReviewLikes>;
+  let hasLikedReview: jest.Mocked<IHasLikedReview>;
 
   let mockResponse: { header: jest.Mock };
   let mockRequest: { protocol: string; get: jest.Mock };
@@ -51,6 +54,7 @@ describe('ReviewController', () => {
     likeReview = { like: jest.fn() };
     unlikeReview = { unlike: jest.fn() };
     countReviewLikes = { count: jest.fn() };
+    hasLikedReview = { hasLiked: jest.fn() };
 
     mockResponse = {
       header: jest.fn(),
@@ -70,6 +74,7 @@ describe('ReviewController', () => {
         { provide: LIKE_REVIEW, useValue: likeReview },
         { provide: UNLIKE_REVIEW, useValue: unlikeReview },
         { provide: COUNT_REVIEW_LIKES, useValue: countReviewLikes },
+        { provide: HAS_LIKED_REVIEW, useValue: hasLikedReview },
       ],
     }).compile();
 
@@ -189,6 +194,17 @@ describe('ReviewController', () => {
       expect(countReviewLikes.count).toHaveBeenCalledWith(123);
       expect(result.review_id).toBe(123);
       expect(result.count).toBe(12);
+    });
+  });
+
+  describe('hasLiked', () => {
+    it('returns whether the current user has liked the review', async () => {
+      hasLikedReview.hasLiked.mockResolvedValue(true);
+
+      const result = await controller.hasLiked(123, mockUser);
+
+      expect(hasLikedReview.hasLiked).toHaveBeenCalledWith(123, 1);
+      expect(result.liked).toBe(true);
     });
   });
 });

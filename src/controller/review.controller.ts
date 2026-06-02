@@ -30,11 +30,14 @@ import {
   type IUnlikeReview,
   COUNT_REVIEW_LIKES,
   type ICountReviewLikes,
+  HAS_LIKED_REVIEW,
+  type IHasLikedReview,
 } from '../port';
 import { CreateReviewDto } from '../dto/create-review.dto';
 import { ReviewFiltersDto } from '../dto/review-filters.dto';
 import { ReviewResponseDto } from '../dto/review-response.dto';
 import { ReviewLikeCountResponse } from '../dto/review-like-count-response.dto';
+import { LikedResponseDto } from '../dto/liked-response.dto';
 import type { ReviewFilters } from '../model/review.filter';
 import type { ReviewModel } from '../model';
 import { splitSubject } from '../model/review-subject';
@@ -55,6 +58,8 @@ export class ReviewController {
     @Inject(UNLIKE_REVIEW) private readonly unlikeReview: IUnlikeReview,
     @Inject(COUNT_REVIEW_LIKES)
     private readonly countReviewLikes: ICountReviewLikes,
+    @Inject(HAS_LIKED_REVIEW)
+    private readonly hasLikedReview: IHasLikedReview,
   ) {}
 
   @Post()
@@ -85,7 +90,22 @@ export class ReviewController {
     @Query() dto: ReviewFiltersDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<PageDto<ReviewResponseDto>> {
-    const filters = ReviewFiltersMapper.fromDto(dto);
+    const base = {
+      page: dto.page,
+      pageSize: dto.page_size,
+      content: dto.content_contains,
+      authorId: dto.author_id,
+      minRating: dto.min_rating,
+      maxRating: dto.max_rating,
+      dateFrom: dto.date_from,
+      dateTo: dto.date_to,
+      sortBy: dto.sort_by,
+      sortOrder: dto.sort_order,
+    };
+    const filters: ReviewFilters =
+      dto.subject_type !== undefined
+        ? { ...base, subjectType: dto.subject_type, subjectId: dto.subject_id }
+        : { ...base, subjectType: undefined, subjectId: undefined };
     const { items, total, ...page } = await this.searchReview.search(filters);
     res.header('X-Total-Count', total.toString());
     return PageDto.of(items.map(ReviewController.toResponse), page, total);
@@ -136,6 +156,15 @@ export class ReviewController {
     return plainToInstance(ReviewLikeCountResponse, { review_id: id, count });
   }
 
+  @Get(':id/likes/me')
+  async hasLiked(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<LikedResponseDto> {
+    const liked = await this.hasLikedReview.hasLiked(id, user.id);
+    return plainToInstance(LikedResponseDto, { liked });
+  }
+
   private static toResponse(this: void, review: ReviewModel) {
     const { type, id } = splitSubject(review.subject);
 
@@ -152,31 +181,5 @@ export class ReviewController {
       },
       { excludeExtraneousValues: true },
     );
-  }
-}
-
-class ReviewFiltersMapper {
-  static fromDto(dto: ReviewFiltersDto): ReviewFilters {
-    const base = {
-      page: dto.page,
-      pageSize: dto.page_size,
-      content: dto.content_contains,
-      authorId: dto.author_id,
-      minRating: dto.min_rating,
-      maxRating: dto.max_rating,
-      dateFrom: dto.date_from,
-      dateTo: dto.date_to,
-      sortBy: dto.sort_by,
-      sortOrder: dto.sort_order,
-    };
-
-    if (dto.subject_type !== undefined) {
-      return {
-        ...base,
-        subjectType: dto.subject_type,
-        subjectId: dto.subject_id,
-      };
-    }
-    return { ...base, subjectType: undefined, subjectId: undefined };
   }
 }
