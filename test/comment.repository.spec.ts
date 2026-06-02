@@ -3,6 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { QueryFailedError } from 'typeorm';
 import { CommentRepository } from '../src/adapter/comment.repository';
 import { CommentEntity } from '../src/entity/comment.entity';
+import { CommentLikeEntity } from '../src/entity/comment-like.entity';
 import { CommentDBException } from '../src/error/comment/comment-db.exception';
 import { ReviewModel, UserModel } from '../src/model';
 import { UserEntity } from '../src/entity';
@@ -57,31 +58,22 @@ describe('CommentRepository', () => {
     parentReviewId: 10,
     parentComment: null,
     parentCommentId: null,
-    likedBy: [],
     replies: [],
-    likedByIds: [],
-  };
-
-  const relationMock = {
-    of: jest.fn().mockReturnThis(),
-    add: jest.fn().mockResolvedValue(undefined),
-    remove: jest.fn().mockResolvedValue(undefined),
+    likeRows: [],
+    likeCount: 0,
   };
 
   const qbMock = {
     leftJoinAndSelect: jest.fn().mockReturnThis(),
-    loadRelationIdAndMap: jest.fn().mockReturnThis(),
+    loadRelationCountAndMap: jest.fn().mockReturnThis(),
     where: jest.fn().mockReturnThis(),
     andWhere: jest.fn().mockReturnThis(),
-    innerJoin: jest.fn().mockReturnThis(),
-    getCount: jest.fn().mockResolvedValue(0),
     getOne: jest.fn(),
     getOneOrFail: jest.fn(),
     getMany: jest.fn(),
     getManyAndCount: jest.fn(),
     skip: jest.fn().mockReturnThis(),
     take: jest.fn().mockReturnThis(),
-    relation: jest.fn().mockReturnValue(relationMock),
   };
 
   const mockTypeOrmRepo = {
@@ -91,9 +83,26 @@ describe('CommentRepository', () => {
     createQueryBuilder: jest.fn(() => qbMock),
   };
 
+  const likeInsertQb = {
+    insert: jest.fn().mockReturnThis(),
+    values: jest.fn().mockReturnThis(),
+    orIgnore: jest.fn().mockReturnThis(),
+    execute: jest.fn().mockResolvedValue({}),
+    select: jest.fn().mockReturnThis(),
+    addSelect: jest.fn().mockReturnThis(),
+    where: jest.fn().mockReturnThis(),
+    groupBy: jest.fn().mockReturnThis(),
+    getRawMany: jest.fn().mockResolvedValue([]),
+  };
+
+  const mockLikeRepo = {
+    count: jest.fn().mockResolvedValue(0),
+    delete: jest.fn().mockResolvedValue(undefined),
+    createQueryBuilder: jest.fn(() => likeInsertQb),
+  };
+
   beforeEach(async () => {
     jest.clearAllMocks();
-    qbMock.getCount.mockResolvedValue(0);
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -101,6 +110,10 @@ describe('CommentRepository', () => {
         {
           provide: getRepositoryToken(CommentEntity),
           useValue: mockTypeOrmRepo,
+        },
+        {
+          provide: getRepositoryToken(CommentLikeEntity),
+          useValue: mockLikeRepo,
         },
       ],
     }).compile();
@@ -177,10 +190,6 @@ describe('CommentRepository', () => {
       expect(qbMock.where).toHaveBeenCalledWith('comment.id = :id', {
         id: 100,
       });
-      expect(qbMock.loadRelationIdAndMap).toHaveBeenCalledWith(
-        'comment.likedByIds',
-        'comment.likedBy',
-      );
       expect(result).toEqual(mockComment);
     });
 
@@ -260,47 +269,41 @@ describe('CommentRepository', () => {
   });
 
   describe('hasLike', () => {
-    it('returns true when the user has liked the comment', async () => {
-      qbMock.getCount.mockResolvedValue(1);
+    it('returns true when a like row exists', async () => {
+      mockLikeRepo.count.mockResolvedValue(1);
       const result = await repository.hasLike(1, 2);
-      expect(qbMock.innerJoin).toHaveBeenCalledWith(
-        'comment.likedBy',
-        'user',
-        'user.id = :userId',
-        { userId: 2 },
-      );
+      expect(mockLikeRepo.count).toHaveBeenCalledWith({
+        where: { commentId: 1, userId: 2 },
+      });
       expect(result).toBe(true);
     });
 
-    it('returns false when the user has not liked the comment', async () => {
-      qbMock.getCount.mockResolvedValue(0);
+    it('returns false when no like row exists', async () => {
+      mockLikeRepo.count.mockResolvedValue(0);
       const result = await repository.hasLike(1, 2);
       expect(result).toBe(false);
     });
   });
 
   describe('addLike', () => {
-    it('adds the user to likedBy when not already liked', async () => {
-      qbMock.getCount.mockResolvedValue(0);
+    it('inserts the like row, ignoring duplicates', async () => {
       await repository.addLike(1, 3);
-      expect(qbMock.relation).toHaveBeenCalledWith(CommentEntity, 'likedBy');
-      expect(relationMock.of).toHaveBeenCalledWith(1);
-      expect(relationMock.add).toHaveBeenCalledWith(3);
-    });
-
-    it('does nothing when the user already liked the comment', async () => {
-      qbMock.getCount.mockResolvedValue(1);
-      await repository.addLike(1, 2);
-      expect(relationMock.add).not.toHaveBeenCalled();
+      expect(likeInsertQb.values).toHaveBeenCalledWith({
+        commentId: 1,
+        userId: 3,
+      });
+      expect(likeInsertQb.orIgnore).toHaveBeenCalled();
+      expect(likeInsertQb.execute).toHaveBeenCalled();
     });
   });
 
   describe('removeLike', () => {
-    it('removes the user from likedBy', async () => {
+    it('deletes the like row (idempotent)', async () => {
       await repository.removeLike(1, 2);
-      expect(qbMock.relation).toHaveBeenCalledWith(CommentEntity, 'likedBy');
-      expect(relationMock.of).toHaveBeenCalledWith(1);
-      expect(relationMock.remove).toHaveBeenCalledWith(2);
+      expect(mockLikeRepo.delete).toHaveBeenCalledWith({
+        commentId: 1,
+        userId: 2,
+      });
     });
   });
 });

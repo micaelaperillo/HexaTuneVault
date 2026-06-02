@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder, TypeORMError } from 'typeorm';
 import { MapErrors } from 'error-mapper-decorator';
 import { CommentEntity } from '../entity/comment.entity';
+import { CommentLikeEntity } from '../entity/comment-like.entity';
 import { ICommentRepository } from '../repository/comment-repository.port';
 import type { CommentModel } from '../model/comment.model';
 import type { CommentFilters } from '../model/comment.filter';
@@ -24,6 +25,8 @@ export class CommentRepository implements ICommentRepository {
   constructor(
     @InjectRepository(CommentEntity)
     private readonly repo: Repository<CommentEntity>,
+    @InjectRepository(CommentLikeEntity)
+    private readonly likeRepo: Repository<CommentLikeEntity>,
   ) {}
   async create(
     comment: Omit<
@@ -48,6 +51,7 @@ export class CommentRepository implements ICommentRepository {
     const reloaded = await this.baseQuery()
       .where('comment.id = :id', { id: saved.id })
       .getOneOrFail();
+    await this.attachLikeCounts([reloaded]);
     return this.toModel(reloaded);
   }
 
@@ -55,7 +59,11 @@ export class CommentRepository implements ICommentRepository {
     const entity = await this.baseQuery()
       .where('comment.id = :id', { id })
       .getOne();
-    return entity ? this.toModel(entity) : null;
+    if (!entity) {
+      return null;
+    }
+    await this.attachLikeCounts([entity]);
+    return this.toModel(entity);
   }
 
   async deleteById(id: number): Promise<void> {
@@ -66,29 +74,26 @@ export class CommentRepository implements ICommentRepository {
     const entities = await this.baseQuery()
       .where('comment.parentComment = :parentCommentId', { parentCommentId })
       .getMany();
+    await this.attachLikeCounts(entities);
     return entities.map((e) => this.toModel(e));
   }
 
   async hasLike(commentId: number, userId: number): Promise<boolean> {
-    return this.likeExists(commentId, userId);
+    return (await this.likeRepo.count({ where: { commentId, userId } })) > 0;
   }
 
   async addLike(commentId: number, userId: number): Promise<void> {
-    if (!(await this.likeExists(commentId, userId))) {
-      await this.repo
-        .createQueryBuilder()
-        .relation(CommentEntity, 'likedBy')
-        .of(commentId)
-        .add(userId);
-    }
+    // Idempotent: a duplicate (PK) like is silently ignored.
+    await this.likeRepo
+      .createQueryBuilder()
+      .insert()
+      .values({ commentId, userId })
+      .orIgnore()
+      .execute();
   }
 
   async removeLike(commentId: number, userId: number): Promise<void> {
-    await this.repo
-      .createQueryBuilder()
-      .relation(CommentEntity, 'likedBy')
-      .of(commentId)
-      .remove(userId);
+    await this.likeRepo.delete({ commentId, userId });
   }
 
   async search(filters: CommentFilters): Promise<Page<CommentModel>> {
@@ -116,6 +121,7 @@ export class CommentRepository implements ICommentRepository {
       .skip((page - 1) * pageSize)
       .take(pageSize)
       .getManyAndCount();
+    await this.attachLikeCounts(entities);
     return {
       items: entities.map((e) => this.toModel(e)),
       page,
@@ -124,26 +130,35 @@ export class CommentRepository implements ICommentRepository {
     };
   }
 
-  private async likeExists(
-    commentId: number,
-    userId: number,
-  ): Promise<boolean> {
-    const count = await this.repo
-      .createQueryBuilder('comment')
-      .innerJoin('comment.likedBy', 'user', 'user.id = :userId', { userId })
-      .where('comment.id = :commentId', { commentId })
-      .getCount();
-    return count > 0;
-  }
-
   private baseQuery(): SelectQueryBuilder<CommentEntity> {
     return this.repo
       .createQueryBuilder('comment')
       .leftJoinAndSelect('comment.createdBy', 'createdBy')
       .leftJoinAndSelect('comment.parentReview', 'parentReview')
       .leftJoinAndSelect('parentReview.author', 'parentReviewAuthor')
-      .leftJoinAndSelect('comment.parentComment', 'parentComment')
-      .loadRelationIdAndMap('comment.likedByIds', 'comment.likedBy');
+      .leftJoinAndSelect('comment.parentComment', 'parentComment');
+  }
+
+  // Populates `likeCount` for the given comments with a single grouped count
+  // query, avoiding both an N+1 per comment and loading every liker row.
+  private async attachLikeCounts(comments: CommentEntity[]): Promise<void> {
+    if (comments.length === 0) {
+      return;
+    }
+    const ids = comments.map((c) => c.id);
+    const rows = await this.likeRepo
+      .createQueryBuilder('cl')
+      .select('cl.commentId', 'commentId')
+      .addSelect('COUNT(*)', 'count')
+      .where('cl.commentId IN (:...ids)', { ids })
+      .groupBy('cl.commentId')
+      .getRawMany<{ commentId: number; count: string }>();
+    const counts = new Map<number, number>(
+      rows.map((r) => [Number(r.commentId), Number(r.count)]),
+    );
+    for (const comment of comments) {
+      comment.likeCount = counts.get(comment.id) ?? 0;
+    }
   }
 
   private toModel(entity: CommentEntity): CommentModel {
@@ -165,7 +180,7 @@ export class CommentRepository implements ICommentRepository {
         updatedAt: entity.parentReview.updatedAt,
       },
       parentCommentId: entity.parentComment?.id ?? null,
-      likes: entity.likedByIds?.length ?? 0,
+      likes: entity.likeCount ?? 0,
     };
   }
 }

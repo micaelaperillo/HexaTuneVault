@@ -5,14 +5,13 @@ import {
   CreateDateColumn,
   ManyToOne,
   OneToMany,
-  ManyToMany,
   JoinColumn,
-  JoinTable,
   RelationId,
   Index,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { ReviewEntity } from './review.entity';
+import { CommentLikeEntity } from './comment-like.entity';
 
 @Entity('comments')
 @Index(['parentReview'])
@@ -62,13 +61,9 @@ export class CommentEntity {
   @OneToMany(() => CommentEntity, (comment) => comment.parentComment)
   replies!: CommentEntity[];
 
-  @ManyToMany(() => UserEntity)
-  @JoinTable({
-    name: 'comment_likes',
-    joinColumn: { name: 'comment_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
-  })
-  likedBy!: UserEntity[];
+  @OneToMany(() => CommentLikeEntity, (like) => like.comment)
+  likeRows!: CommentLikeEntity[];
 
-  likedByIds!: number[];
+  // Populated via loadRelationCountAndMap; not a stored column.
+  likeCount!: number;
 }

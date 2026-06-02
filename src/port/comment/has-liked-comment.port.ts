@@ -5,8 +5,7 @@ export const HAS_LIKED_COMMENT = Symbol('IHasLikedComment');
 export interface IHasLikedComment {
   /**
    * Reports whether the given user has liked the given comment. Absence-tolerant:
-   * returns `false` for a non-existent comment rather than distinguishing it (the
-   * HTTP layer maps both `false` cases to a single 404).
+   * returns `false` for a non-existent comment rather than distinguishing it.
    *
    * @param commentId - Id of the comment.
    * @param userId - Id of the user.

@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { NotFoundException } from '@nestjs/common';
+import type { Response, Request } from 'express';
 import { CommentController } from '../src/controller/comment.controller';
 import {
   CREATE_COMMENT,
@@ -31,6 +31,12 @@ describe('CommentController', () => {
   };
 
   const currentUser: AuthenticatedUser = { id: 1 };
+
+  const mockResponse = { header: jest.fn() } as unknown as Response;
+  const mockRequest = {
+    protocol: 'http',
+    get: jest.fn().mockReturnValue('localhost:3000'),
+  } as unknown as Request;
 
   const mockComment: CommentModel = {
     id: 1,
@@ -85,7 +91,12 @@ describe('CommentController', () => {
         parent_review_id: 10,
       };
 
-      const result = await controller.create(dto, currentUser);
+      const result = await controller.create(
+        dto,
+        currentUser,
+        mockResponse,
+        mockRequest,
+      );
 
       expect(mockCreate.create).toHaveBeenCalledWith({
         content: 'Test comment',
@@ -93,6 +104,10 @@ describe('CommentController', () => {
         parentReview: { id: 10 },
         parentCommentId: null,
       });
+      expect(mockResponse.header).toHaveBeenCalledWith(
+        'Location',
+        'http://localhost:3000/api/comments/1',
+      );
       expect(result).toBeInstanceOf(CommentResponseDto);
       expect(result.self).toBe('/api/comments/1');
       expect(result.review).toBe('/api/reviews/10');
@@ -109,7 +124,12 @@ describe('CommentController', () => {
         parent_comment_id: 5,
       };
 
-      const result = await controller.create(dto, currentUser);
+      const result = await controller.create(
+        dto,
+        currentUser,
+        mockResponse,
+        mockRequest,
+      );
 
       expect(mockCreate.create).toHaveBeenCalledWith({
         content: 'A reply',
@@ -156,7 +176,7 @@ describe('CommentController', () => {
       expect(mockGet.get).toHaveBeenCalledWith(1);
       expect(result).toBeInstanceOf(CommentResponseDto);
       expect(result.self).toBe('/api/comments/1');
-      expect(result.like).toBe('/api/comments/1/like');
+      expect(result.like).toBe('/api/comments/1/likes/me');
       expect(result.likes).toBe(3);
     });
   });
@@ -187,19 +207,21 @@ describe('CommentController', () => {
   });
 
   describe('hasLiked', () => {
-    it('resolves (204) when the current user has liked the comment', async () => {
+    it('returns { liked: true } when the current user has liked the comment', async () => {
       mockHasLiked.hasLiked.mockResolvedValue(true);
 
-      await expect(controller.hasLiked(1, { id: 2 })).resolves.toBeUndefined();
+      const result = await controller.hasLiked(1, { id: 2 });
+
+      expect(result.liked).toBe(true);
       expect(mockHasLiked.hasLiked).toHaveBeenCalledWith(1, 2);
     });
 
-    it('throws NotFoundException (404) when the current user has not liked the comment', async () => {
+    it('returns { liked: false } when the current user has not liked the comment', async () => {
       mockHasLiked.hasLiked.mockResolvedValue(false);
 
-      await expect(controller.hasLiked(1, { id: 2 })).rejects.toThrow(
-        NotFoundException,
-      );
+      const result = await controller.hasLiked(1, { id: 2 });
+
+      expect(result.liked).toBe(false);
     });
   });
 

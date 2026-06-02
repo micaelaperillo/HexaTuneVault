@@ -10,10 +10,12 @@ import {
   Param,
   Body,
   Query,
+  Req,
+  Res,
   ParseIntPipe,
   HttpCode,
-  NotFoundException,
 } from '@nestjs/common';
+import type { Response, Request } from 'express';
 
 import {
   CREATE_COMMENT,
@@ -36,6 +38,7 @@ import { CreateCommentDto } from '../dto/create-comment.dto';
 import { CommentFiltersDto } from '../dto/comment-filters.dto';
 import { CommentResponseDto } from '../dto/comment-response.dto';
 import { CommentLikeCountResponse } from '../dto/comment-like-count-response.dto';
+import { LikedResponseDto } from '../dto/liked-response.dto';
 import { PageDto } from '../dto/page.dto';
 import { Public } from '../infrastructure/auth/public.decorator';
 import { CurrentUser } from '../infrastructure/auth/current-user.decorator';
@@ -61,6 +64,8 @@ export class CommentController {
   async create(
     @Body() dto: CreateCommentDto,
     @CurrentUser() user: AuthenticatedUser,
+    @Res({ passthrough: true }) res: Response,
+    @Req() req: Request,
   ): Promise<CommentResponseDto> {
     const comment = await this.createComment.create({
       content: dto.content,
@@ -68,6 +73,11 @@ export class CommentController {
       parentReview: { id: dto.parent_review_id },
       parentCommentId: dto.parent_comment_id ?? null,
     });
+
+    res.header(
+      'Location',
+      `${req.protocol}://${req.get('host')}/api/comments/${comment.id}`,
+    );
 
     return CommentController.toResponse(comment);
   }
@@ -106,16 +116,13 @@ export class CommentController {
     return replies.map(CommentController.toResponse);
   }
 
-  @Get(':id/like')
-  @HttpCode(204)
+  @Get(':id/likes/me')
   async hasLiked(
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user: AuthenticatedUser,
-  ): Promise<void> {
+  ): Promise<LikedResponseDto> {
     const liked = await this.commentHasLiked.hasLiked(id, user.id);
-    if (!liked) {
-      throw new NotFoundException();
-    }
+    return plainToInstance(LikedResponseDto, { liked });
   }
 
   @Public()
@@ -164,7 +171,7 @@ export class CommentController {
         ...comment,
         created_at: comment.createdAt,
         self: `/api/comments/${comment.id}`,
-        like: `/api/comments/${comment.id}/like`,
+        like: `/api/comments/${comment.id}/likes/me`,
         replies: `/api/comments/${comment.id}/replies`,
         collection: `/api/comments`,
         author: `/api/users/${comment.createdBy.id}`,
