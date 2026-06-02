@@ -70,6 +70,7 @@ describe('CommentRepository', () => {
   };
 
   const qbMock = {
+    leftJoinAndSelect: jest.fn().mockReturnThis(),
     loadRelationIdAndMap: jest.fn().mockReturnThis(),
     where: jest.fn().mockReturnThis(),
     andWhere: jest.fn().mockReturnThis(),

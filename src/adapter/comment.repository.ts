@@ -126,6 +126,10 @@ export class CommentRepository implements ICommentRepository {
   private baseQuery(): SelectQueryBuilder<CommentEntity> {
     return this.repo
       .createQueryBuilder('comment')
+      .leftJoinAndSelect('comment.createdBy', 'createdBy')
+      .leftJoinAndSelect('comment.parentReview', 'parentReview')
+      .leftJoinAndSelect('parentReview.author', 'parentReviewAuthor')
+      .leftJoinAndSelect('comment.parentComment', 'parentComment')
       .loadRelationIdAndMap('comment.likedByIds', 'comment.likedBy');
   }
 
