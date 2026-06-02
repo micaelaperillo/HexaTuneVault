@@ -138,7 +138,7 @@ describe('SpotifyArtistProvider', () => {
     });
 
     it('filters incomplete response', async () => {
-      const res = { ...mockApiResponse };
+      const res = structuredClone(mockApiResponse);
       const fake_beatles = { ...mockApiResponse.artists.items[0] };
       fake_beatles.images = [];
       res.artists.items.push(fake_beatles);
@@ -184,7 +184,7 @@ describe('SpotifyArtistProvider', () => {
     });
 
     it('returns null when not found', async () => {
-      const res = { ...mockApiResponse };
+      const res = structuredClone(mockApiResponse);
       res.artists.items = [];
       mockInfrastructure.search.mockResolvedValue(res);
       const filters = { name: 'Unknown Artist' };
