@@ -4,5 +4,5 @@ export interface DeleteReviewCommand {
 }
 
 export interface IDeleteReview {
-  execute(cmd: DeleteReviewCommand): Promise<void>;
+  delete(cmd: DeleteReviewCommand): Promise<void>;
 }

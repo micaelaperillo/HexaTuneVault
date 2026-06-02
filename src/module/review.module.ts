@@ -5,11 +5,7 @@ import { ReviewEntity } from '../entity/review.entity';
 import { ReviewLikeEntity } from '../entity/review-like.entity';
 import { TypeOrmReviewRepository } from '../adapter/typeorm-review.repository';
 import { TypeOrmReviewLikeRepository } from '../adapter/typeorm-review-like.repository';
-import { CreateReviewService } from '../use-case/create-review.service';
-import { DeleteReviewService } from '../use-case/delete-review.service';
-import { SearchReviewService } from '../use-case/search-review.service';
-import { GetReviewService } from '../use-case/get-review.service';
-import { ReviewLikeService } from '../use-case/review-like.service';
+import { ReviewService } from '../use-case/review.service';
 import { ReviewController } from '../controller/review.controller';
 import {
   CREATE_REVIEW,
@@ -45,13 +41,14 @@ import {
       }),
       inject: [ConfigService],
     },
-    { provide: CREATE_REVIEW, useClass: CreateReviewService },
-    { provide: DELETE_REVIEW, useClass: DeleteReviewService },
-    { provide: SEARCH_REVIEW, useClass: SearchReviewService },
-    { provide: GET_REVIEW, useClass: GetReviewService },
-    { provide: LIKE_REVIEW, useClass: ReviewLikeService },
-    { provide: UNLIKE_REVIEW, useClass: ReviewLikeService },
-    { provide: COUNT_REVIEW_LIKES, useClass: ReviewLikeService },
+    ReviewService,
+    { provide: CREATE_REVIEW, useExisting: ReviewService },
+    { provide: DELETE_REVIEW, useExisting: ReviewService },
+    { provide: SEARCH_REVIEW, useExisting: ReviewService },
+    { provide: GET_REVIEW, useExisting: ReviewService },
+    { provide: LIKE_REVIEW, useExisting: ReviewService },
+    { provide: UNLIKE_REVIEW, useExisting: ReviewService },
+    { provide: COUNT_REVIEW_LIKES, useExisting: ReviewService },
   ],
 })
 export class ReviewModule {}

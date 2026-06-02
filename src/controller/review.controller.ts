@@ -58,7 +58,7 @@ export class ReviewController {
   ): Promise<ReviewResponse> {
     // TODO: replace hardcoded userId with @CurrentUser() from AuthGuard
     const userId = '1';
-    const review = await this.createReview.execute({
+    const review = await this.createReview.create({
       content: dto.content,
       rating: dto.rating,
       subjectType: dto.subject_type,
@@ -79,7 +79,7 @@ export class ReviewController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<ReviewResponse[]> {
     const criteria = ReviewSearchCriteriaMapper.fromDto(dto);
-    const { data, total } = await this.searchReview.execute(criteria);
+    const { data, total } = await this.searchReview.search(criteria);
     res.header('X-Total-Count', total.toString());
     return data.map((review) => ReviewResponse.fromDomain(review));
   }
@@ -88,7 +88,7 @@ export class ReviewController {
   async getById(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<ReviewResponse> {
-    const review = await this.getReview.execute(id);
+    const review = await this.getReview.get(id);
     return ReviewResponse.fromDomain(review);
   }
 
@@ -97,7 +97,7 @@ export class ReviewController {
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     // TODO: replace hardcoded userId with @CurrentUser() from AuthGuard
     const userId = '1';
-    await this.deleteReview.execute({ reviewId: id, requesterId: userId });
+    await this.deleteReview.delete({ reviewId: id, requesterId: userId });
   }
 
   @Put(':id/likes')

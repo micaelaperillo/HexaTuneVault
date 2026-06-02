@@ -10,5 +10,5 @@ export interface CreateReviewCommand {
 }
 
 export interface ICreateReview {
-  execute(cmd: CreateReviewCommand): Promise<ReviewModel>;
+  create(cmd: CreateReviewCommand): Promise<ReviewModel>;
 }

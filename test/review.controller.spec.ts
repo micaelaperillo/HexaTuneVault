@@ -35,10 +35,10 @@ describe('ReviewController', () => {
   let mockRequest: { protocol: string; get: jest.Mock };
 
   beforeEach(async () => {
-    createReview = { execute: jest.fn() };
-    deleteReview = { execute: jest.fn() };
-    searchReview = { execute: jest.fn() };
-    getReview = { execute: jest.fn() };
+    createReview = { create: jest.fn() };
+    deleteReview = { delete: jest.fn() };
+    searchReview = { search: jest.fn() };
+    getReview = { get: jest.fn() };
     likeReview = { like: jest.fn() };
     unlikeReview = { unlike: jest.fn() };
     countReviewLikes = { count: jest.fn() };
@@ -86,7 +86,7 @@ describe('ReviewController', () => {
         updatedAt: null,
       });
 
-      createReview.execute.mockResolvedValue(createdModel);
+      createReview.create.mockResolvedValue(createdModel);
 
       const result = await controller.create(
         dto,
@@ -94,7 +94,7 @@ describe('ReviewController', () => {
         mockRequest as unknown as Request,
       );
 
-      expect(createReview.execute).toHaveBeenCalledWith({
+      expect(createReview.create).toHaveBeenCalledWith({
         content: dto.content,
         rating: dto.rating,
         subjectType: dto.subject_type,
@@ -128,11 +128,11 @@ describe('ReviewController', () => {
         updatedAt: null,
       });
 
-      getReview.execute.mockResolvedValue(reviewModel);
+      getReview.get.mockResolvedValue(reviewModel);
 
       const result = await controller.getById(123);
 
-      expect(getReview.execute).toHaveBeenCalledWith(123);
+      expect(getReview.get).toHaveBeenCalledWith(123);
       expect(result.id).toBe(123);
       expect(result.content).toBe('Great stuff');
       expect(result.rating).toBe(5);
@@ -151,7 +151,7 @@ describe('ReviewController', () => {
         updatedAt: null,
       });
 
-      searchReview.execute.mockResolvedValue({
+      searchReview.search.mockResolvedValue({
         data: [reviewModel],
         total: 10,
       });
@@ -166,7 +166,7 @@ describe('ReviewController', () => {
         mockResponse as unknown as Response,
       );
 
-      expect(searchReview.execute).toHaveBeenCalledWith(
+      expect(searchReview.search).toHaveBeenCalledWith(
         expect.objectContaining({ page: 1, pageSize: 10 }),
       );
       expect(mockResponse.header).toHaveBeenCalledWith('X-Total-Count', '10');
@@ -179,7 +179,7 @@ describe('ReviewController', () => {
     it('should delete a review', async () => {
       await controller.remove(123);
 
-      expect(deleteReview.execute).toHaveBeenCalledWith({
+      expect(deleteReview.delete).toHaveBeenCalledWith({
         reviewId: 123,
         requesterId: '1',
       });
