@@ -58,10 +58,10 @@ export class UserRepository implements IUserRepository {
       filters.pageSize && filters.pageSize > 0 ? filters.pageSize : 20;
     const [rows, total] = await this.repo.findAndCount({
       where: {
-        username: containsInsensitive(filters.username),
-        email: containsInsensitive(filters.email),
-        firstName: containsInsensitive(filters.firstName),
-        lastName: containsInsensitive(filters.lastName),
+        username: containsInsensitive(filters.username ?? ''),
+        email: containsInsensitive(filters.email ?? ''),
+        firstName: containsInsensitive(filters.firstName ?? ''),
+        lastName: containsInsensitive(filters.lastName ?? ''),
       },
       skip: (page - 1) * pageSize,
       take: pageSize,

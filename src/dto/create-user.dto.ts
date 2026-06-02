@@ -20,12 +20,10 @@ export class CreateUserDto {
 
   @IsString()
   @TrimString()
-  @IsNotEmpty()
   first_name!: string;
 
   @IsString()
   @TrimString()
-  @IsNotEmpty()
   last_name!: string;
 
   @IsEmail()
