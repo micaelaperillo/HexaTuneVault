@@ -8,10 +8,14 @@ export interface ICreateComment {
   /**
    * Persists a new comment.
    *
-   * @param comment - The comment to create. `id` and `createdAt` are assigned by
-   * the persistence layer, so they are omitted from the input. Set `parentCommentId`
-   * to nest the comment as a reply, or `null` for a top-level comment.
-   * @returns The created comment, including its generated `id` and `createdAt`.
+   * @param comment - The comment to create. `id`, `createdAt` and `likes` are
+   * assigned by the persistence layer, so they are omitted from the input. Set
+   * `parentCommentId` to nest the comment as a reply, or `null` for a top-level
+   * comment.
+   * @returns The created comment, including its generated `id` and `createdAt`
+   * (with `likes` initialised to 0).
    */
-  create(comment: Omit<CommentModel, 'id' | 'createdAt'>): Promise<CommentModel>;
+  create(
+    comment: Omit<CommentModel, 'id' | 'createdAt' | 'likes'>,
+  ): Promise<CommentModel>;
 }
