@@ -3,7 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { JwtAuthGuard } from '../../../../src/infrastructure/auth/jwt-auth.guard';
 import { Public } from '../../../../src/infrastructure/auth/public.decorator';
 import { InvalidTokenException } from '../../../../src/error/auth/invalid-token.exception';
-import type { ITokenVerifier } from '../../../../src/repository/token-verifier.port';
+import type { ITokenVerifier } from '../../../../src/port/out/token-verifier.port';
 
 const verifier: ITokenVerifier = {
   verify: (token) =>

@@ -2,29 +2,29 @@ import { Injectable, Inject } from '@nestjs/common';
 import type {
   ICreateReview,
   CreateReviewCommand,
-} from '../port/review/create-review.port';
+} from '../port/in/review/create-review.port';
 import type {
   IDeleteReview,
   DeleteReviewCommand,
-} from '../port/review/delete-review.port';
-import type { IGetReview } from '../port/review/get-review.port';
-import type { ISearchReview } from '../port/review/search-review.port';
-import type { ILikeReview } from '../port/review/like-review.port';
-import type { IUnlikeReview } from '../port/review/unlike-review.port';
-import type { ICountReviewLikes } from '../port/review/count-review-likes.port';
-import type { IHasLikedReview } from '../port/review/has-liked-review.port';
+} from '../port/in/review/delete-review.port';
+import type { IGetReview } from '../port/in/review/get-review.port';
+import type { ISearchReview } from '../port/in/review/search-review.port';
+import type { ILikeReview } from '../port/in/review/like-review.port';
+import type { IUnlikeReview } from '../port/in/review/unlike-review.port';
+import type { ICountReviewLikes } from '../port/in/review/count-review-likes.port';
+import type { IHasLikedReview } from '../port/in/review/has-liked-review.port';
 import {
   REVIEW_REPOSITORY,
   type IReviewRepository,
-} from '../repository/review-repository.port';
+} from '../port/out/review-repository.port';
 import {
   REVIEW_LIKE_REPOSITORY,
   type IReviewLikeRepository,
-} from '../repository/review-like-repository.port';
+} from '../port/out/review-like-repository.port';
 import {
   REVIEW_CONFIG,
   type IReviewConfig,
-} from '../port/review/review-config.port';
+} from '../port/in/review/review-config.port';
 import type { Page } from '../model';
 import type { ReviewModel } from '../model/review.model';
 import type { ReviewFilters } from '../model/review.filter';

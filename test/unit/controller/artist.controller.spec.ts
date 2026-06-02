@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 
 import { ArtistController } from '../../../src/controller/artist.controller';
-import { GET_ARTIST, SEARCH_ARTIST } from '../../../src/port';
+import { GET_ARTIST, SEARCH_ARTIST } from '../../../src/port/in';
 import { ArtistResponseDto } from '../../../src/dto';
 
 import type { ArtistModel } from '../../../src/model';

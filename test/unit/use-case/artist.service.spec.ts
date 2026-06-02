@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { ArtistService } from '../../../src/use-case/artist.service';
-import { ARTIST_PROVIDER } from '../../../src/repository';
+import { ARTIST_PROVIDER } from '../../../src/port/out';
 
 import type { ArtistModel } from '../../../src/model';
 

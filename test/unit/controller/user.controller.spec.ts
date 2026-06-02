@@ -17,7 +17,7 @@ import {
   type IFollowUser,
   LIST_FOLLOWS,
   type IListFollows,
-} from '../../../src/port/user/';
+} from '../../../src/port/in/user/';
 import { ForbiddenUserActionException } from '../../../src/error/user/';
 import { UserResponseDto } from '../../../src/dto/user-response.dto';
 import type { UserModel } from '../../../src/model';

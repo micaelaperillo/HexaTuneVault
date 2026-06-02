@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AlbumService } from '../../../src/use-case/album.service';
-import { ALBUM_PROVIDER } from '../../../src/repository/album-provider.port';
+import { ALBUM_PROVIDER } from '../../../src/port/out/album-provider.port';
 import type { AlbumModel } from '../../../src/model/album.model';
 
 describe('AlbumService', () => {

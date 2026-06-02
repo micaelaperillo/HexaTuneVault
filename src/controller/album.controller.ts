@@ -5,7 +5,7 @@ import {
   GET_ALBUM,
   type ISearchAlbum,
   SEARCH_ALBUM,
-} from '../port';
+} from '../port/in';
 
 import { AlbumResponseDto } from '../dto';
 import { PageDto } from '../dto/page.dto';

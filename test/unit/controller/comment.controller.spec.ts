@@ -9,7 +9,7 @@ import {
   GET_COMMENT_REPLIES,
   HAS_LIKED_COMMENT,
   LIKE_COMMENT,
-} from '../../../src/port/comment';
+} from '../../../src/port/in/comment';
 import { CommentModel } from '../../../src/model/comment.model';
 import { CommentResponseDto } from '../../../src/dto/comment-response.dto';
 import { CreateCommentDto } from '../../../src/dto/create-comment.dto';

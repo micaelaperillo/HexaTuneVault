@@ -1,7 +1,7 @@
 import type { SpotifyApi, SimplifiedAlbum } from '@spotify/web-api-ts-sdk';
 
 import type { AlbumModel, AlbumFilters, Page } from '../model';
-import type { IAlbumProvider } from '../repository';
+import type { IAlbumProvider } from '../port/out';
 
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
@@ -11,7 +11,7 @@ import { resolveSpotifyPage } from './spotify-pagination';
 import { escapeSpotifyTerm } from './spotify-query';
 import { MapErrors } from 'error-mapper-decorator';
 
-export { ALBUM_PROVIDER } from '../repository';
+export { ALBUM_PROVIDER } from '../port/out';
 
 @Injectable()
 export class SpotifyAlbumProvider implements IAlbumProvider {

@@ -3,7 +3,7 @@ import { SessionController } from '../../../src/controller/session.controller';
 import {
   AUTHENTICATE_USER,
   type IAuthenticateUser,
-} from '../../../src/port/user/';
+} from '../../../src/port/in/user/';
 import type { JwtModel } from '../../../src/model';
 import { AuthResponseDto } from '../../../src/dto/auth-response.dto';
 

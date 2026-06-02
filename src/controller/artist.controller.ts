@@ -5,7 +5,7 @@ import {
   GET_ARTIST,
   type ISearchArtist,
   SEARCH_ARTIST,
-} from '../port';
+} from '../port/in';
 
 import { ArtistGetDto, ArtistFilterDto, ArtistResponseDto } from '../dto';
 import { PageDto } from '../dto/page.dto';

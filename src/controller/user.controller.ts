@@ -36,7 +36,7 @@ import {
   type IFollowUser,
   LIST_FOLLOWS,
   type IListFollows,
-} from '../port/user/';
+} from '../port/in/user/';
 
 import { CreateUserDto } from '../dto/create-user.dto';
 import { EditUserDto } from '../dto/edit-user.dto';

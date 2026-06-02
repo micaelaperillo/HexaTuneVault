@@ -32,7 +32,7 @@ import {
   type IHasLikedComment,
   LIKE_COMMENT,
   type ILikeComment,
-} from '../port/comment/';
+} from '../port/in/comment/';
 
 import { CreateCommentDto } from '../dto/create-comment.dto';
 import { CommentFiltersDto } from '../dto/comment-filters.dto';

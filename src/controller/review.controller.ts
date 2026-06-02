@@ -32,7 +32,7 @@ import {
   type ICountReviewLikes,
   HAS_LIKED_REVIEW,
   type IHasLikedReview,
-} from '../port';
+} from '../port/in';
 import { CreateReviewDto } from '../dto/create-review.dto';
 import { ReviewFiltersDto } from '../dto/review-filters.dto';
 import { ReviewResponseDto } from '../dto/review-response.dto';

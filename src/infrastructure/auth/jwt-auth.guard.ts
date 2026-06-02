@@ -13,7 +13,7 @@ import { Public } from './public.decorator';
 import {
   TOKEN_VERIFIER,
   type ITokenVerifier,
-} from '../../repository/token-verifier.port';
+} from '../../port/out/token-verifier.port';
 import type { AuthenticatedRequest } from './authenticated-request';
 import { InvalidTokenException } from '../../error/auth/invalid-token.exception';
 

@@ -5,7 +5,7 @@ import {
   GET_PODCAST,
   type ISearchPodcast,
   SEARCH_PODCAST,
-} from '../port';
+} from '../port/in';
 
 import { PodcastGetDto, PodcastFilterDto, PodcastResponseDto } from '../dto';
 import { PageDto } from '../dto/page.dto';

@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 
 import { PodcastController } from '../../../src/controller/podcast.controller';
-import { GET_PODCAST, SEARCH_PODCAST } from '../../../src/port';
+import { GET_PODCAST, SEARCH_PODCAST } from '../../../src/port/in';
 import { PodcastResponseDto } from '../../../src/dto';
 
 import type { PodcastModel } from '../../../src/model';

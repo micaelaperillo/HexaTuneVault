@@ -5,7 +5,7 @@ import type {
 } from '@spotify/web-api-ts-sdk';
 
 import type { PodcastModel, PodcastFilters, Page } from '../model';
-import type { IPodcastProvider } from '../repository';
+import type { IPodcastProvider } from '../port/out';
 
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
@@ -14,7 +14,7 @@ import { PodcastProviderError } from '../error/podcast';
 import { resolveSpotifyPage } from './spotify-pagination';
 import { MapErrors } from 'error-mapper-decorator';
 
-export { PODCAST_PROVIDER } from '../repository';
+export { PODCAST_PROVIDER } from '../port/out';
 
 // Spotify only returns shows scoped to a market; default when the caller
 // does not specify one so searches return results out of the box.

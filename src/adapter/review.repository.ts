@@ -8,7 +8,7 @@ import type { ReviewSubject } from '../model/review-subject';
 import type { Page } from '../model';
 import type { ReviewFilters } from '../model/review.filter';
 import { SortField, SortOrder } from '../model/review.filter';
-import type { IReviewRepository } from '../repository/review-repository.port';
+import type { IReviewRepository } from '../port/out/review-repository.port';
 import { MapErrors } from 'error-mapper-decorator';
 import { ReviewRepositoryException } from '../error/review/review-repository.exception';
 import type { UserModel } from '../model';

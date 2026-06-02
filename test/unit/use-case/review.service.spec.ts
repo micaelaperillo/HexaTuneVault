@@ -1,12 +1,12 @@
 import { ReviewService } from '../../../src/use-case/review.service';
 import { createMockReviewRepository } from './review-repository.mock';
 import { createMockReviewLikeRepository } from './review-like-repository.mock';
-import type { IReviewRepository } from '../../../src/repository/review-repository.port';
-import type { IReviewLikeRepository } from '../../../src/repository/review-like-repository.port';
-import type { IReviewConfig } from '../../../src/port/review/review-config.port';
+import type { IReviewRepository } from '../../../src/port/out/review-repository.port';
+import type { IReviewLikeRepository } from '../../../src/port/out/review-like-repository.port';
+import type { IReviewConfig } from '../../../src/port/in/review/review-config.port';
 import type { ReviewFilters } from '../../../src/model/review.filter';
 import { SortField, SortOrder } from '../../../src/model/review.filter';
-import type { CreateReviewCommand } from '../../../src/port/review/create-review.port';
+import type { CreateReviewCommand } from '../../../src/port/in/review/create-review.port';
 import type { ReviewModel, UserModel } from '../../../src/model';
 import { ReviewCooldownException } from '../../../src/error/review/review-cooldown.exception';
 import { ReviewNotFoundException } from '../../../src/error/review/review-not-found.exception';

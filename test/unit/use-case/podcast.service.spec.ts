@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { PodcastService } from '../../../src/use-case/podcast.service';
-import { PODCAST_PROVIDER } from '../../../src/repository';
+import { PODCAST_PROVIDER } from '../../../src/port/out';
 
 import type { PodcastModel } from '../../../src/model';
 
