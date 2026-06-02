@@ -5,7 +5,7 @@ import { ReviewLikeEntity } from '../entity/review-like.entity';
 import { ReviewNotFoundException } from '../error/review/review-not-found.exception';
 import { AlreadyLikedException } from '../error/review/already-liked.exception';
 import type { IReviewLikeRepository } from '../repository/review-like-repository.port';
-import { MapErrors } from '../common/map-errors.decorator';
+import { MapErrors } from 'error-mapper-decorator';
 import { reviewPersistenceFailure } from './review-error-mappings';
 
 const UNIQUE_VIOLATION = '23505';

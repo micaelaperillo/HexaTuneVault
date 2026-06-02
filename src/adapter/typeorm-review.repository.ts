@@ -8,7 +8,7 @@ import type { PaginatedResult } from '../common/paginated-result';
 import type { ReviewSearchCriteria } from '../model/review-search-criteria';
 import { SortField, SortOrder } from '../model/review-search-criteria';
 import type { IReviewRepository } from '../repository/review-repository.port';
-import { MapErrors } from '../common/map-errors.decorator';
+import { MapErrors } from 'error-mapper-decorator';
 import { reviewPersistenceFailure } from './review-error-mappings';
 
 const SORT_FIELD_COLUMN: Record<SortField, string> = {
