@@ -15,14 +15,14 @@ import type {
   ValidationArguments,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { SortField, SortOrder } from '../model/review-search-criteria';
-import { SubjectType } from '../model/subject-reference';
+import { SortField, SortOrder } from '../model/review.filter';
+import { SubjectType } from '../model/review-subject';
 import { RATING_MIN, RATING_MAX } from '../model/review-constraints';
 
 @ValidatorConstraint({ async: false })
 class MaxRatingDtoConstraint implements ValidatorConstraintInterface {
   validate(_: unknown, args: ValidationArguments): boolean {
-    const obj = args.object as SearchReviewQueryDto;
+    const obj = args.object as ReviewFiltersDto;
     if (obj.min_rating === undefined || obj.max_rating === undefined)
       return true;
     return obj.min_rating <= obj.max_rating;
@@ -35,7 +35,7 @@ class MaxRatingDtoConstraint implements ValidatorConstraintInterface {
 @ValidatorConstraint({ async: false })
 class DateRangeDtoConstraint implements ValidatorConstraintInterface {
   validate(_: unknown, args: ValidationArguments): boolean {
-    const obj = args.object as SearchReviewQueryDto;
+    const obj = args.object as ReviewFiltersDto;
     if (!obj.date_from || !obj.date_to) return true;
     return obj.date_from.getTime() <= obj.date_to.getTime();
   }
@@ -47,7 +47,7 @@ class DateRangeDtoConstraint implements ValidatorConstraintInterface {
 @ValidatorConstraint({ async: false })
 class SubjectIdRequiresTypeDtoConstraint implements ValidatorConstraintInterface {
   validate(_: unknown, args: ValidationArguments): boolean {
-    const obj = args.object as SearchReviewQueryDto;
+    const obj = args.object as ReviewFiltersDto;
     if (obj.subject_id === undefined) return true;
     return obj.subject_type !== undefined;
   }
@@ -56,7 +56,7 @@ class SubjectIdRequiresTypeDtoConstraint implements ValidatorConstraintInterface
   }
 }
 
-export class SearchReviewQueryDto {
+export class ReviewFiltersDto {
   @IsOptional()
   @Type(() => Number)
   @IsInt()
@@ -76,8 +76,10 @@ export class SearchReviewQueryDto {
   content_contains?: string;
 
   @IsOptional()
-  @IsString()
-  author_id?: string;
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  author_id?: number;
 
   @IsOptional()
   @Type(() => Number)

@@ -3,8 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ReviewEntity } from '../entity/review.entity';
 import { ReviewLikeEntity } from '../entity/review-like.entity';
-import { TypeOrmReviewRepository } from '../adapter/typeorm-review.repository';
-import { TypeOrmReviewLikeRepository } from '../adapter/typeorm-review-like.repository';
+import { ReviewRepository } from '../adapter/review.repository';
+import { ReviewLikeRepository } from '../adapter/review-like.repository';
 import { ReviewService } from '../use-case/review.service';
 import { ReviewController } from '../controller/review.controller';
 import { CREATE_REVIEW } from '../port/review/create-review.port';
@@ -25,10 +25,10 @@ import { REVIEW_LIKE_REPOSITORY } from '../repository/review-like-repository.por
   ],
   controllers: [ReviewController],
   providers: [
-    { provide: REVIEW_REPOSITORY, useClass: TypeOrmReviewRepository },
+    { provide: REVIEW_REPOSITORY, useClass: ReviewRepository },
     {
       provide: REVIEW_LIKE_REPOSITORY,
-      useClass: TypeOrmReviewLikeRepository,
+      useClass: ReviewLikeRepository,
     },
     {
       provide: REVIEW_CONFIG,

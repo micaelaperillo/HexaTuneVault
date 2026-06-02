@@ -1,12 +1,12 @@
-import { TypeOrmReviewLikeRepository } from '../src/adapter/typeorm-review-like.repository';
+import { ReviewLikeRepository } from '../src/adapter/review-like.repository';
 import { ReviewLikeEntity } from '../src/entity/review-like.entity';
 import { ReviewNotFoundException } from '../src/error/review/review-not-found.exception';
 import { AlreadyLikedException } from '../src/error/review/already-liked.exception';
 import { ReviewRepositoryException } from '../src/error/review/review-repository.exception';
 import { QueryFailedError, type Repository } from 'typeorm';
 
-describe('TypeOrmReviewLikeRepository', () => {
-  let repository: TypeOrmReviewLikeRepository;
+describe('ReviewLikeRepository', () => {
+  let repository: ReviewLikeRepository;
   let mockRepo: jest.Mocked<
     Pick<
       Repository<ReviewLikeEntity>,
@@ -28,7 +28,7 @@ describe('TypeOrmReviewLikeRepository', () => {
       createQueryBuilder: jest.fn().mockReturnValue(mockInsertQb),
     };
 
-    repository = new TypeOrmReviewLikeRepository(
+    repository = new ReviewLikeRepository(
       mockRepo as unknown as Repository<ReviewLikeEntity>,
     );
   });

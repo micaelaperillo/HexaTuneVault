@@ -5,7 +5,6 @@ import { CommentModel } from '../src/model/comment.model';
 import { CommentNotFoundException } from '../src/error/comment/comment-not-found.exception';
 import { CommentDeletionForbiddenException } from '../src/error/comment/comment-deletion-forbidden.exception';
 import { ReviewModel, UserModel } from '../src/model';
-import { SubjectReference } from '../src/model/subject-reference';
 
 describe('CommentService', () => {
   let service: CommentService;
@@ -18,7 +17,8 @@ describe('CommentService', () => {
     content: 'idk',
     rating: 1,
     createdAt: new Date('2024-01-01'),
-    subjectRef: new SubjectReference('artist', 'The Beatles'),
+    updatedAt: null,
+    subject: { artist: 'The Beatles' },
   } as ReviewModel;
 
   const mockComment: CommentModel = {

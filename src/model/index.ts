@@ -9,6 +9,8 @@ export * from './comment.filter';
 export * from './user.model';
 export * from './user.filter';
 export * from './review.model';
+export * from './review-subject';
+export * from './review.filter';
 export * from './jwt.model';
 export * from './authenticated-user';
 export * from './page.model';

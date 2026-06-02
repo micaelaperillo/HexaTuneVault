@@ -27,7 +27,6 @@ import {
 } from '../../error/user/';
 import { ReviewNotFoundException } from '../../error/review/review-not-found.exception';
 import { ForbiddenDeletionException } from '../../error/review/forbidden-deletion.exception';
-import { InvalidReviewException } from '../../error/review/invalid-review.exception';
 import { ReviewCooldownException } from '../../error/review/review-cooldown.exception';
 import { NotLikedException } from '../../error/review/not-liked.exception';
 import { AlreadyLikedException } from '../../error/review/already-liked.exception';
@@ -90,13 +89,6 @@ export class ForbiddenMapper implements ExceptionFilter {
   }
 }
 
-@Catch(InvalidReviewException)
-export class BadRequestMapper implements ExceptionFilter {
-  catch(exception: Error, host: ArgumentsHost): void {
-    send(host, HttpStatus.BAD_REQUEST, exception, 'BAD_REQUEST');
-  }
-}
-
 @Catch(SelfFollowException)
 export class UnprocessableEntityMapper implements ExceptionFilter {
   catch(exception: Error, host: ArgumentsHost): void {
@@ -149,7 +141,6 @@ export const filters = [
   new ConflictMapper(),
   new UnauthorizedMapper(),
   new ForbiddenMapper(),
-  new BadRequestMapper(),
   new UnprocessableEntityMapper(),
   new TooManyRequestsMapper(),
   new InternalServerErrorMapper(),

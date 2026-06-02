@@ -24,10 +24,9 @@ import {
   REVIEW_CONFIG,
   type IReviewConfig,
 } from '../port/review/review-config.port';
-import type { Page, UserModel } from '../model';
-import type { ReviewSearchCriteria } from '../model/review-search-criteria';
-import { ReviewModel } from '../model/review.model';
-import { SubjectReference } from '../model/subject-reference';
+import type { Page } from '../model';
+import type { ReviewModel } from '../model/review.model';
+import type { ReviewFilters } from '../model/review.filter';
 import { ReviewCooldownException } from '../error/review/review-cooldown.exception';
 import { ReviewNotFoundException } from '../error/review/review-not-found.exception';
 import { ForbiddenDeletionException } from '../error/review/forbidden-deletion.exception';
@@ -56,26 +55,17 @@ export class ReviewService
   }
 
   async create(cmd: CreateReviewCommand): Promise<ReviewModel> {
-    const subjectRef = new SubjectReference(cmd.subjectType, cmd.subjectId);
-
-    const model = ReviewModel.create({
-      subjectRef,
-      content: cmd.content,
-      rating: cmd.rating,
-      author: cmd.author as UserModel,
-    });
-
     const since = new Date(Date.now() - this.cooldownSeconds * 1000);
     const recent = await this.reviews.findRecentByAuthorAndSubject(
       cmd.author,
-      subjectRef,
+      cmd.subject,
       since,
     );
     if (recent) {
       throw new ReviewCooldownException();
     }
 
-    return this.reviews.save(model);
+    return this.reviews.create(cmd);
   }
 
   async delete(cmd: DeleteReviewCommand): Promise<void> {
@@ -84,7 +74,7 @@ export class ReviewService
       throw new ReviewNotFoundException();
     }
 
-    if (!review.isOwnedBy(cmd.requesterId)) {
+    if (review.author.id !== cmd.requesterId.id) {
       throw new ForbiddenDeletionException();
     }
 
@@ -99,8 +89,8 @@ export class ReviewService
     return review;
   }
 
-  async search(criteria: ReviewSearchCriteria): Promise<Page<ReviewModel>> {
-    return this.reviews.search(criteria);
+  async search(filters: ReviewFilters): Promise<Page<ReviewModel>> {
+    return this.reviews.search(filters);
   }
 
   async like(reviewId: number, userId: number): Promise<void> {

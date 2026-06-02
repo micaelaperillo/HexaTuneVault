@@ -1,4 +1,5 @@
-import type { SubjectType } from './subject-reference';
+import type { PageableFilters } from './page.model';
+import type { SubjectType } from './review-subject';
 
 export const SortField = {
   CREATED_AT: 'createdAt',
@@ -14,15 +15,15 @@ export const SortOrder = {
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder];
 
+// A subject filter is all-or-nothing: a type is required before an id can
+// narrow it.
 export type SubjectFilter =
   | { subjectType?: undefined; subjectId?: undefined }
   | { subjectType: SubjectType; subjectId?: string };
 
-export type ReviewSearchCriteria = {
-  page: number;
-  pageSize: number;
+export type ReviewFilters = PageableFilters & {
   content?: string;
-  authorId?: string;
+  authorId?: number;
   minRating?: number;
   maxRating?: number;
   dateFrom?: Date;

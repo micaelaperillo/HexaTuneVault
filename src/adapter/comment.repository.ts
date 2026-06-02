@@ -6,9 +6,9 @@ import { CommentEntity } from '../entity/comment.entity';
 import { ICommentRepository } from '../repository/comment-repository.port';
 import type { CommentModel } from '../model/comment.model';
 import type { CommentFilters } from '../model/comment.filter';
-import { ReviewModel, UserModel } from '../model';
+import type { ReviewModel, UserModel } from '../model';
 import type { Page } from '../model';
-import { SubjectReference } from '../model/subject-reference';
+import { buildSubject } from '../model/review-subject';
 import { escapeLike } from './like-escape';
 import { commentPersistenceFailure } from './comment-error-mappings';
 
@@ -154,14 +154,18 @@ export class CommentRepository implements ICommentRepository {
       content: entity.content,
       createdAt: entity.createdAt,
       createdBy: entity.createdBy,
-      parentReview: ReviewModel.reconstitute({
-        ...entity.parentReview,
-        author: entity.parentReview.author,
-        subjectRef: new SubjectReference(
+      parentReview: {
+        id: entity.parentReview.id,
+        subject: buildSubject(
           entity.parentReview.subjectType,
           entity.parentReview.subjectId,
         ),
-      }),
+        content: entity.parentReview.content,
+        rating: entity.parentReview.rating,
+        createdAt: entity.parentReview.createdAt,
+        author: entity.parentReview.author,
+        updatedAt: entity.parentReview.updatedAt,
+      },
       parentCommentId: entity.parentComment?.id ?? null,
       likes: entity.likedByIds?.length ?? 0,
     };

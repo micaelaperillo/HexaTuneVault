@@ -1,11 +1,10 @@
 import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
-import { CreateReviewRequest } from '../src/dto/create-review.request';
-import { SubjectType } from '../src/model/subject-reference';
+import { CreateReviewDto } from '../src/dto/create-review.dto';
 
-describe('CreateReviewRequest', () => {
-  function transform(data: Record<string, unknown>): CreateReviewRequest {
-    return plainToInstance(CreateReviewRequest, data);
+describe('CreateReviewDto', () => {
+  function transform(data: Record<string, unknown>): CreateReviewDto {
+    return plainToInstance(CreateReviewDto, data);
   }
 
   function validate(data: Record<string, unknown>): string[] {
@@ -14,11 +13,10 @@ describe('CreateReviewRequest', () => {
     return errors.flatMap((e) => Object.values(e.constraints ?? {}));
   }
 
-  it('should trim string content via @Transform', () => {
+  it('should trim string content via @TrimString', () => {
     const dto = transform({
       content: '  Great album!  ',
-      subject_type: SubjectType.ALBUM,
-      subject_id: '1',
+      subject: { album: '1' },
       rating: 5,
     });
     expect(dto.content).toBe('Great album!');
@@ -27,8 +25,7 @@ describe('CreateReviewRequest', () => {
   it('should pass non-string content through unchanged', () => {
     const dto = transform({
       content: 123,
-      subject_type: SubjectType.ALBUM,
-      subject_id: '1',
+      subject: { album: '1' },
       rating: 5,
     });
     expect(dto.content).toBe(123);
@@ -38,18 +35,27 @@ describe('CreateReviewRequest', () => {
     expect(
       validate({
         content: 'Great album!',
-        subject_type: SubjectType.ALBUM,
-        subject_id: '1',
+        subject: { album: '1' },
         rating: 5,
       }),
     ).toHaveLength(0);
   });
 
+  it('accepts each subject variant', () => {
+    for (const subject of [
+      { album: '1' },
+      { artist: '1' },
+      { podcast: '1' },
+      { track: '1' },
+    ]) {
+      expect(validate({ content: 'Test', subject, rating: 5 })).toHaveLength(0);
+    }
+  });
+
   it('should fail when rating is out of range', () => {
     const msgs = validate({
       content: 'Test',
-      subject_type: SubjectType.ALBUM,
-      subject_id: '1',
+      subject: { album: '1' },
       rating: 6,
     });
     expect(msgs.length).toBeGreaterThan(0);
@@ -58,8 +64,7 @@ describe('CreateReviewRequest', () => {
   it('should fail when rating is below minimum', () => {
     const msgs = validate({
       content: 'Test',
-      subject_type: SubjectType.ALBUM,
-      subject_id: '1',
+      subject: { album: '1' },
       rating: 0,
     });
     expect(msgs.length).toBeGreaterThan(0);
@@ -68,18 +73,34 @@ describe('CreateReviewRequest', () => {
   it('should fail when content is empty', () => {
     const msgs = validate({
       content: '',
-      subject_type: SubjectType.ALBUM,
-      subject_id: '1',
+      subject: { album: '1' },
       rating: 5,
     });
     expect(msgs.length).toBeGreaterThan(0);
   });
 
-  it('should fail when subject_type is invalid', () => {
+  it('should fail when the subject key is not a known type', () => {
     const msgs = validate({
       content: 'Test',
-      subject_type: 'invalid',
-      subject_id: '1',
+      subject: { invalid: '1' },
+      rating: 5,
+    });
+    expect(msgs.length).toBeGreaterThan(0);
+  });
+
+  it('should fail when the subject has more than one key', () => {
+    const msgs = validate({
+      content: 'Test',
+      subject: { album: '1', artist: '2' },
+      rating: 5,
+    });
+    expect(msgs.length).toBeGreaterThan(0);
+  });
+
+  it('should fail when the subject id is an empty string', () => {
+    const msgs = validate({
+      content: 'Test',
+      subject: { album: '' },
       rating: 5,
     });
     expect(msgs.length).toBeGreaterThan(0);
@@ -87,16 +108,6 @@ describe('CreateReviewRequest', () => {
 
   it('should fail when all required fields are missing', () => {
     const msgs = validate({});
-    expect(msgs.length).toBeGreaterThan(0);
-  });
-
-  it('should fail when subject_id is an empty string', () => {
-    const msgs = validate({
-      content: 'Test',
-      subject_type: SubjectType.ALBUM,
-      subject_id: '',
-      rating: 5,
-    });
     expect(msgs.length).toBeGreaterThan(0);
   });
 });

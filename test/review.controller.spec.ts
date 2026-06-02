@@ -14,11 +14,9 @@ import { GET_REVIEW } from '../src/port/review/get-review.port';
 import { LIKE_REVIEW } from '../src/port/review/like-review.port';
 import { UNLIKE_REVIEW } from '../src/port/review/unlike-review.port';
 import { COUNT_REVIEW_LIKES } from '../src/port/review/count-review-likes.port';
-import { SubjectType, SubjectReference } from '../src/model/subject-reference';
-import { ReviewModel } from '../src/model/review.model';
-import { SortField, SortOrder } from '../src/model/review-search-criteria';
+import { SortField, SortOrder } from '../src/model/review.filter';
+import type { ReviewModel, UserModel } from '../src/model';
 import type { Response, Request } from 'express';
-import { UserModel } from '../src/model';
 
 describe('ReviewController', () => {
   let controller: ReviewController;
@@ -33,6 +31,17 @@ describe('ReviewController', () => {
   let mockResponse: { header: jest.Mock };
   let mockRequest: { protocol: string; get: jest.Mock };
   const mockUser = { id: 1 } as unknown as UserModel;
+
+  const reviewModel = (overrides: Partial<ReviewModel> = {}): ReviewModel => ({
+    id: 123,
+    subject: { album: '1' },
+    content: 'Great stuff',
+    rating: 5,
+    createdAt: new Date('2023-01-01T00:00:00Z'),
+    author: mockUser,
+    updatedAt: null,
+    ...overrides,
+  });
 
   beforeEach(async () => {
     createReview = { create: jest.fn() };
@@ -72,21 +81,10 @@ describe('ReviewController', () => {
       const dto = {
         content: 'Great stuff',
         rating: 5,
-        subject_type: SubjectType.ALBUM,
-        subject_id: '1',
+        subject: { album: '1' },
       };
 
-      const createdModel = ReviewModel.reconstitute({
-        id: 123,
-        subjectRef: new SubjectReference(SubjectType.ALBUM, '1'),
-        content: 'Great stuff',
-        rating: 5,
-        createdAt: new Date('2023-01-01T00:00:00Z'),
-        author: mockUser,
-        updatedAt: null,
-      });
-
-      createReview.create.mockResolvedValue(createdModel);
+      createReview.create.mockResolvedValue(reviewModel());
 
       const result = await controller.create(
         dto,
@@ -98,8 +96,7 @@ describe('ReviewController', () => {
       expect(createReview.create).toHaveBeenCalledWith({
         content: dto.content,
         rating: dto.rating,
-        subjectType: dto.subject_type,
-        subjectId: dto.subject_id,
+        subject: dto.subject,
         author: mockUser,
       });
       expect(mockResponse.header).toHaveBeenCalledWith(
@@ -109,6 +106,7 @@ describe('ReviewController', () => {
       expect(result.id).toBe(123);
       expect(result.content).toBe('Great stuff');
       expect(result.rating).toBe(5);
+      expect(result.subject).toBe('/api/albums/1');
       expect(result.created_at).toEqual(new Date('2023-01-01T00:00:00Z'));
       expect(result.updated_at).toBeNull();
     });
@@ -116,17 +114,7 @@ describe('ReviewController', () => {
 
   describe('getById', () => {
     it('should return a specific review', async () => {
-      const reviewModel = ReviewModel.reconstitute({
-        id: 123,
-        subjectRef: new SubjectReference(SubjectType.ALBUM, '1'),
-        content: 'Great stuff',
-        rating: 5,
-        createdAt: new Date('2023-01-01T00:00:00Z'),
-        author: mockUser,
-        updatedAt: null,
-      });
-
-      getReview.get.mockResolvedValue(reviewModel);
+      getReview.get.mockResolvedValue(reviewModel());
 
       const result = await controller.getById(123);
 
@@ -139,18 +127,8 @@ describe('ReviewController', () => {
 
   describe('search', () => {
     it('should return search results and set X-Total-Count header', async () => {
-      const reviewModel = ReviewModel.reconstitute({
-        id: 123,
-        subjectRef: new SubjectReference(SubjectType.ALBUM, '1'),
-        content: 'Search match',
-        rating: 4,
-        createdAt: new Date('2023-01-01T00:00:00Z'),
-        author: mockUser,
-        updatedAt: null,
-      });
-
       searchReview.search.mockResolvedValue({
-        items: [reviewModel],
+        items: [reviewModel({ content: 'Search match', rating: 4 })],
         total: 1,
         page: 1,
         pageSize: 10,

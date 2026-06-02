@@ -15,7 +15,7 @@ const driverCode = (error: QueryFailedError): string | undefined =>
   (error.driverError as { code?: string } | undefined)?.code;
 
 @Injectable()
-export class TypeOrmReviewLikeRepository implements IReviewLikeRepository {
+export class ReviewLikeRepository implements IReviewLikeRepository {
   constructor(
     @InjectRepository(ReviewLikeEntity)
     private readonly repo: Repository<ReviewLikeEntity>,

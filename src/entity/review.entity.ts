@@ -9,7 +9,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 
-import type { SubjectType } from '../model/subject-reference';
+import type { SubjectType } from '../model/review-subject';
 import { UserEntity } from './user.entity';
 
 @Entity('reviews')
@@ -33,7 +33,7 @@ export class ReviewEntity {
   })
   subjectType!: SubjectType;
 
-  @Column({ name: 'subject_id', type: 'varchar', default: '' })
+  @Column({ name: 'subject_id', type: 'varchar' })
   subjectId!: string;
 
   @ManyToOne(() => UserEntity, (user) => user.reviews, {

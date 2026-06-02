@@ -37,12 +37,13 @@ import {
   COUNT_REVIEW_LIKES,
   type ICountReviewLikes,
 } from '../port/review/count-review-likes.port';
-import { CreateReviewRequest } from '../dto/create-review.request';
-import { SearchReviewQueryDto } from '../dto/search-review-query.dto';
-import { ReviewResponse } from '../dto/review-response.dto';
+import { CreateReviewDto } from '../dto/create-review.dto';
+import { ReviewFiltersDto } from '../dto/review-filters.dto';
+import { ReviewResponseDto } from '../dto/review-response.dto';
 import { ReviewLikeCountResponse } from '../dto/review-like-count-response.dto';
-import { ReviewSearchCriteria } from '../model/review-search-criteria';
-import { ReviewModel } from '../model';
+import type { ReviewFilters } from '../model/review.filter';
+import type { ReviewModel } from '../model';
+import { splitSubject } from '../model/review-subject';
 import { plainToInstance } from 'class-transformer';
 import { Public } from '../infrastructure/auth/public.decorator';
 import { CurrentUser } from '../infrastructure/auth/current-user.decorator';
@@ -64,16 +65,15 @@ export class ReviewController {
 
   @Post()
   async create(
-    @Body() dto: CreateReviewRequest,
+    @Body() dto: CreateReviewDto,
     @CurrentUser() user: AuthenticatedUser,
     @Res({ passthrough: true }) res: Response,
     @Req() req: Request,
-  ): Promise<ReviewResponse> {
+  ): Promise<ReviewResponseDto> {
     const review = await this.createReview.create({
       content: dto.content,
       rating: dto.rating,
-      subjectType: dto.subject_type,
-      subjectId: dto.subject_id,
+      subject: dto.subject,
       author: user,
     });
 
@@ -88,11 +88,11 @@ export class ReviewController {
   @Public()
   @Get()
   async search(
-    @Query() dto: SearchReviewQueryDto,
+    @Query() dto: ReviewFiltersDto,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<PageDto<ReviewResponse>> {
-    const criteria = ReviewSearchCriteriaMapper.fromDto(dto);
-    const { items, total, ...page } = await this.searchReview.search(criteria);
+  ): Promise<PageDto<ReviewResponseDto>> {
+    const filters = ReviewFiltersMapper.fromDto(dto);
+    const { items, total, ...page } = await this.searchReview.search(filters);
     res.header('X-Total-Count', total.toString());
     return PageDto.of(items.map(ReviewController.toResponse), page, total);
   }
@@ -101,7 +101,7 @@ export class ReviewController {
   @Get(':id')
   async getById(
     @Param('id', ParseIntPipe) id: number,
-  ): Promise<ReviewResponse> {
+  ): Promise<ReviewResponseDto> {
     const review = await this.getReview.get(id);
     return ReviewController.toResponse(review);
   }
@@ -143,19 +143,17 @@ export class ReviewController {
   }
 
   private static toResponse(this: void, review: ReviewModel) {
-    if (review.id === undefined || review.createdAt === undefined) {
-      throw new Error('Cannot create response from unsaved review');
-    }
+    const { type, id } = splitSubject(review.subject);
 
     return plainToInstance(
-      ReviewResponse,
+      ReviewResponseDto,
       {
         ...review,
         created_at: review.createdAt,
         updated_at: review.updatedAt,
         self: `/api/reviews/${review.id}`,
         collection: `/api/reviews`,
-        subject: `/api/${review.subjectRef.type}s/${review.subjectRef.id}`,
+        subject: `/api/${type}s/${id}`,
         author: `/api/users/${review.author.id}`,
       },
       { excludeExtraneousValues: true },
@@ -163,8 +161,8 @@ export class ReviewController {
   }
 }
 
-class ReviewSearchCriteriaMapper {
-  static fromDto(dto: SearchReviewQueryDto): ReviewSearchCriteria {
+class ReviewFiltersMapper {
+  static fromDto(dto: ReviewFiltersDto): ReviewFilters {
     const base = {
       page: dto.page,
       pageSize: dto.page_size,

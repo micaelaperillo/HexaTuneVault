@@ -1,9 +1,9 @@
 import type { Page } from '../../model';
 import type { ReviewModel } from '../../model/review.model';
-import type { ReviewSearchCriteria } from '../../model/review-search-criteria';
+import type { ReviewFilters } from '../../model/review.filter';
 
 export const SEARCH_REVIEW = Symbol('ISearchReview');
 
 export interface ISearchReview {
-  search(criteria: ReviewSearchCriteria): Promise<Page<ReviewModel>>;
+  search(filters: ReviewFilters): Promise<Page<ReviewModel>>;
 }

@@ -1,13 +1,13 @@
 import 'reflect-metadata';
 import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
-import { SearchReviewQueryDto } from '../src/dto/search-review-query.dto';
-import { SubjectType } from '../src/model/subject-reference';
-import { SortField, SortOrder } from '../src/model/review-search-criteria';
+import { ReviewFiltersDto } from '../src/dto/review-filters.dto';
+import { SubjectType } from '../src/model/review-subject';
+import { SortField, SortOrder } from '../src/model/review.filter';
 
-describe('SearchReviewQueryDto', () => {
+describe('ReviewFiltersDto', () => {
   function validate(data: Record<string, unknown>): string[] {
-    const dto = plainToInstance(SearchReviewQueryDto, data);
+    const dto = plainToInstance(ReviewFiltersDto, data);
     const errors = validateSync(dto);
     return errors.flatMap((e) => Object.values(e.constraints ?? {}));
   }
@@ -22,7 +22,7 @@ describe('SearchReviewQueryDto', () => {
         page: 1,
         page_size: 50,
         content_contains: 'test',
-        author_id: '5',
+        author_id: 5,
         min_rating: 1,
         max_rating: 5,
         date_from: new Date('2025-01-01'),
@@ -43,6 +43,10 @@ describe('SearchReviewQueryDto', () => {
     expect(
       validate({ content_contains: 'a'.repeat(201) }).length,
     ).toBeGreaterThan(0);
+  });
+
+  it('should fail when author_id is not an integer', () => {
+    expect(validate({ author_id: 'abc' }).length).toBeGreaterThan(0);
   });
 
   it('should fail when min_rating > max_rating', () => {

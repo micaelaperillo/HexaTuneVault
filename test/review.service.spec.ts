@@ -4,13 +4,11 @@ import { createMockReviewLikeRepository } from './mock-review-like-repository';
 import type { IReviewRepository } from '../src/repository/review-repository.port';
 import type { IReviewLikeRepository } from '../src/repository/review-like-repository.port';
 import type { IReviewConfig } from '../src/port/review/review-config.port';
-import type { ReviewSearchCriteria } from '../src/model/review-search-criteria';
-import { SortField, SortOrder } from '../src/model/review-search-criteria';
-import { SubjectReference, SubjectType } from '../src/model/subject-reference';
-import { ReviewModel } from '../src/model/review.model';
-import type { UserModel } from '../src/model';
+import type { ReviewFilters } from '../src/model/review.filter';
+import { SortField, SortOrder } from '../src/model/review.filter';
+import type { CreateReviewCommand } from '../src/port/review/create-review.port';
+import type { ReviewModel, UserModel } from '../src/model';
 import { ReviewCooldownException } from '../src/error/review/review-cooldown.exception';
-import { InvalidReviewException } from '../src/error/review/invalid-review.exception';
 import { ReviewNotFoundException } from '../src/error/review/review-not-found.exception';
 import { ForbiddenDeletionException } from '../src/error/review/forbidden-deletion.exception';
 import { NotLikedException } from '../src/error/review/not-liked.exception';
@@ -23,16 +21,15 @@ describe('ReviewService', () => {
   const mockUser = { id: 1 } as unknown as UserModel;
   const mockUser2 = { id: 2 } as unknown as UserModel;
 
-  const reviewBy = (author: UserModel) =>
-    ReviewModel.reconstitute({
-      id: 1,
-      subjectRef: new SubjectReference(SubjectType.ALBUM, '1'),
-      content: 'Okay',
-      rating: 3,
-      createdAt: new Date(),
-      author,
-      updatedAt: null,
-    });
+  const reviewBy = (author: UserModel): ReviewModel => ({
+    id: 1,
+    subject: { album: '1' },
+    content: 'Okay',
+    rating: 3,
+    createdAt: new Date(),
+    author,
+    updatedAt: null,
+  });
 
   beforeEach(() => {
     reviewRepo = createMockReviewRepository();
@@ -41,9 +38,8 @@ describe('ReviewService', () => {
   });
 
   describe('create', () => {
-    const cmd = {
-      subjectType: SubjectType.ALBUM,
-      subjectId: '1',
+    const cmd: CreateReviewCommand = {
+      subject: { album: '1' },
       content: 'Great stuff',
       rating: 5,
       author: mockUser,
@@ -52,18 +48,16 @@ describe('ReviewService', () => {
     it('creates and saves a review', async () => {
       reviewRepo.findRecentByAuthorAndSubject.mockResolvedValue(null);
       const saved = reviewBy(mockUser);
-      reviewRepo.save.mockResolvedValue(saved);
+      reviewRepo.create.mockResolvedValue(saved);
 
       const result = await service.create(cmd);
 
       expect(reviewRepo.findRecentByAuthorAndSubject).toHaveBeenCalledWith(
         mockUser,
-        expect.objectContaining({ type: SubjectType.ALBUM, id: '1' }),
+        { album: '1' },
         expect.any(Date),
       );
-      expect(reviewRepo.save).toHaveBeenCalledWith(
-        expect.objectContaining({ content: 'Great stuff', rating: 5 }),
-      );
+      expect(reviewRepo.create).toHaveBeenCalledWith(cmd);
       expect(result).toEqual(saved);
     });
 
@@ -75,15 +69,7 @@ describe('ReviewService', () => {
       await expect(service.create(cmd)).rejects.toThrow(
         ReviewCooldownException,
       );
-      expect(reviewRepo.save).not.toHaveBeenCalled();
-    });
-
-    it('propagates InvalidReviewException before any I/O', async () => {
-      await expect(service.create({ ...cmd, rating: 0 })).rejects.toThrow(
-        InvalidReviewException,
-      );
-      expect(reviewRepo.findRecentByAuthorAndSubject).not.toHaveBeenCalled();
-      expect(reviewRepo.save).not.toHaveBeenCalled();
+      expect(reviewRepo.create).not.toHaveBeenCalled();
     });
   });
 
@@ -132,7 +118,7 @@ describe('ReviewService', () => {
   });
 
   describe('search', () => {
-    const criteria: ReviewSearchCriteria = {
+    const filters: ReviewFilters = {
       page: 1,
       pageSize: 10,
       sortBy: SortField.CREATED_AT,
@@ -148,18 +134,18 @@ describe('ReviewService', () => {
         pageSize: 10,
       });
 
-      const result = await service.search(criteria);
+      const result = await service.search(filters);
 
-      expect(reviewRepo.search).toHaveBeenCalledWith(criteria);
+      expect(reviewRepo.search).toHaveBeenCalledWith(filters);
       expect(result.total).toBe(1);
       expect(result.items[0]).toEqual(review);
     });
 
-    it('passes criteria filters through unchanged', async () => {
-      const filtered = {
-        ...criteria,
+    it('passes filters through unchanged', async () => {
+      const filtered: ReviewFilters = {
+        ...filters,
         content: 'x',
-        authorId: '5',
+        authorId: 5,
         minRating: 3,
       };
       reviewRepo.search.mockResolvedValue({

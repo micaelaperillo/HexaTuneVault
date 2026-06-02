@@ -2,11 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThan } from 'typeorm';
 import { ReviewEntity } from '../entity/review.entity';
-import { ReviewModel } from '../model/review.model';
-import { SubjectReference } from '../model/subject-reference';
+import type { ReviewModel } from '../model/review.model';
+import { splitSubject, buildSubject } from '../model/review-subject';
+import type { ReviewSubject } from '../model/review-subject';
 import type { Page } from '../model';
-import type { ReviewSearchCriteria } from '../model/review-search-criteria';
-import { SortField, SortOrder } from '../model/review-search-criteria';
+import type { ReviewFilters } from '../model/review.filter';
+import { SortField, SortOrder } from '../model/review.filter';
 import type { IReviewRepository } from '../repository/review-repository.port';
 import { MapErrors } from 'error-mapper-decorator';
 import { reviewPersistenceFailure } from './review-error-mappings';
@@ -20,17 +21,28 @@ const SORT_FIELD_COLUMN: Record<SortField, string> = {
 };
 
 @Injectable()
-export class TypeOrmReviewRepository implements IReviewRepository {
+export class ReviewRepository implements IReviewRepository {
   constructor(
     @InjectRepository(ReviewEntity)
     private readonly repo: Repository<ReviewEntity>,
   ) {}
 
   @MapErrors(reviewPersistenceFailure)
-  async save(review: ReviewModel): Promise<ReviewModel> {
-    const entity = this.toEntity(review);
+  async create(
+    review: Omit<ReviewModel, 'id' | 'createdAt' | 'updatedAt' | 'author'> & {
+      author: Pick<UserModel, 'id'>;
+    },
+  ): Promise<ReviewModel> {
+    const { type, id } = splitSubject(review.subject);
+    const entity = this.repo.create({
+      content: review.content,
+      rating: review.rating,
+      subjectType: type,
+      subjectId: id,
+      author: Object.assign(new UserEntity(), { id: review.author.id }),
+    });
     const saved = await this.repo.save(entity);
-    return this.toModel(saved);
+    return ReviewRepository.toModel(saved);
   }
 
   @MapErrors(reviewPersistenceFailure)
@@ -39,24 +51,25 @@ export class TypeOrmReviewRepository implements IReviewRepository {
       where: { id },
       relations: { author: true },
     });
-    return entity ? this.toModel(entity) : null;
+    return entity ? ReviewRepository.toModel(entity) : null;
   }
 
   @MapErrors(reviewPersistenceFailure)
   async findRecentByAuthorAndSubject(
     author: Pick<UserModel, 'id'>,
-    ref: SubjectReference,
+    subject: ReviewSubject,
     since: Date,
   ): Promise<ReviewModel | null> {
+    const { type, id } = splitSubject(subject);
     const entity = await this.repo.findOne({
       where: {
         author,
-        subjectType: ref.type,
-        subjectId: ref.id,
+        subjectType: type,
+        subjectId: id,
         createdAt: MoreThan(since),
       },
     });
-    return entity ? this.toModel(entity) : null;
+    return entity ? ReviewRepository.toModel(entity) : null;
   }
 
   @MapErrors(reviewPersistenceFailure)
@@ -65,93 +78,79 @@ export class TypeOrmReviewRepository implements IReviewRepository {
   }
 
   @MapErrors(reviewPersistenceFailure)
-  async search(criteria: ReviewSearchCriteria): Promise<Page<ReviewModel>> {
+  async search(filters: ReviewFilters): Promise<Page<ReviewModel>> {
+    const page = filters.page && filters.page > 0 ? filters.page : 1;
+    const pageSize =
+      filters.pageSize && filters.pageSize > 0 ? filters.pageSize : 20;
+
     const qb = this.repo
       .createQueryBuilder('review')
       .innerJoinAndSelect('review.author', 'user');
 
-    if (criteria.content) {
-      const escaped = escapeLike(criteria.content);
+    if (filters.content) {
       qb.andWhere('review.content ILIKE :content', {
-        content: `%${escaped}%`,
+        content: `%${escapeLike(filters.content)}%`,
       });
     }
-    if (criteria.authorId !== undefined) {
+    if (filters.authorId !== undefined) {
       qb.andWhere('review.author.id = :authorId', {
-        authorId: criteria.authorId,
+        authorId: filters.authorId,
       });
     }
-    if (criteria.minRating !== undefined) {
+    if (filters.minRating !== undefined) {
       qb.andWhere('review.rating >= :minRating', {
-        minRating: criteria.minRating,
+        minRating: filters.minRating,
       });
     }
-    if (criteria.maxRating !== undefined) {
+    if (filters.maxRating !== undefined) {
       qb.andWhere('review.rating <= :maxRating', {
-        maxRating: criteria.maxRating,
+        maxRating: filters.maxRating,
       });
     }
-    if (criteria.dateFrom) {
+    if (filters.dateFrom) {
       qb.andWhere('review.createdAt >= :dateFrom', {
-        dateFrom: criteria.dateFrom,
+        dateFrom: filters.dateFrom,
       });
     }
-    if (criteria.dateTo) {
-      qb.andWhere('review.createdAt <= :dateTo', { dateTo: criteria.dateTo });
+    if (filters.dateTo) {
+      qb.andWhere('review.createdAt <= :dateTo', { dateTo: filters.dateTo });
     }
-    if (criteria.subjectType) {
+    if (filters.subjectType) {
       qb.andWhere('review.subjectType = :subjectType', {
-        subjectType: criteria.subjectType,
+        subjectType: filters.subjectType,
       });
     }
-    if (criteria.subjectId !== undefined) {
+    if (filters.subjectId !== undefined) {
       qb.andWhere('review.subjectId = :subjectId', {
-        subjectId: criteria.subjectId,
+        subjectId: filters.subjectId,
       });
     }
 
     qb.orderBy(
-      SORT_FIELD_COLUMN[criteria.sortBy],
-      criteria.sortOrder === SortOrder.ASC ? 'ASC' : 'DESC',
+      SORT_FIELD_COLUMN[filters.sortBy],
+      filters.sortOrder === SortOrder.ASC ? 'ASC' : 'DESC',
     );
-    qb.skip((criteria.page - 1) * criteria.pageSize);
-    qb.take(criteria.pageSize);
+    qb.skip((page - 1) * pageSize);
+    qb.take(pageSize);
 
     const [entities, total] = await qb.getManyAndCount();
     return {
-      items: entities.map((e) => this.toModel(e)),
+      items: entities.map(ReviewRepository.toModel),
       total,
-      page: criteria.page,
-      pageSize: criteria.pageSize,
+      page,
+      pageSize,
     };
   }
 
-  private toModel(entity: ReviewEntity): ReviewModel {
-    return ReviewModel.reconstitute({
+  private static toModel(this: void, entity: ReviewEntity): ReviewModel {
+    return {
       id: entity.id,
-      subjectRef: new SubjectReference(entity.subjectType, entity.subjectId),
+      subject: buildSubject(entity.subjectType, entity.subjectId),
       content: entity.content,
       rating: entity.rating,
       createdAt: entity.createdAt,
       author: entity.author,
       updatedAt: entity.updatedAt,
-    });
-  }
-
-  private toEntity(model: ReviewModel): ReviewEntity {
-    const entity = new ReviewEntity();
-    if (model.id !== undefined) {
-      entity.id = model.id;
-    }
-    entity.content = model.content;
-    entity.rating = model.rating;
-    entity.subjectType = model.subjectRef.type;
-    entity.subjectId = model.subjectRef.id;
-    entity.author = { id: model.author.id } as UserEntity;
-    if (model.createdAt !== undefined) {
-      entity.createdAt = model.createdAt;
-    }
-    entity.updatedAt = model.updatedAt;
-    return entity;
+    };
   }
 }

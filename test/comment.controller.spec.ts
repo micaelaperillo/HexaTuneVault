@@ -13,8 +13,7 @@ import {
 import { CommentModel } from '../src/model/comment.model';
 import { CommentResponseDto } from '../src/dto/comment-response.dto';
 import { CreateCommentDto } from '../src/dto/create-comment.dto';
-import { SubjectReference } from '../src/model/subject-reference';
-import { ReviewModel, UserModel } from '../src/model';
+import { UserModel } from '../src/model';
 import type { AuthenticatedUser } from '../src/model/authenticated-user';
 
 describe('CommentController', () => {
@@ -38,15 +37,15 @@ describe('CommentController', () => {
     content: 'Test comment',
     createdAt: new Date('2024-01-01'),
     createdBy: mockUser,
-    parentReview: ReviewModel.reconstitute({
+    parentReview: {
       id: 10,
       author: mockUser,
       content: 'idk',
       rating: 1,
-      subjectRef: new SubjectReference('artist', 'The Beatles'),
+      subject: { artist: 'The Beatles' },
       createdAt: new Date(),
       updatedAt: null,
-    }),
+    },
     parentCommentId: null,
     likes: 0,
   };

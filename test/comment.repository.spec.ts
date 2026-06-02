@@ -7,7 +7,6 @@ import { CommentDBException } from '../src/error/comment/comment-db.exception';
 import { ReviewModel, UserModel } from '../src/model';
 import { UserEntity } from '../src/entity';
 import { ReviewEntity } from '../src/entity/review.entity';
-import { SubjectReference } from '../src/model/subject-reference';
 
 describe('CommentRepository', () => {
   let repository: CommentRepository;
@@ -21,7 +20,7 @@ describe('CommentRepository', () => {
     rating: 1,
     createdAt: new Date('2024-01-01'),
     updatedAt: null,
-    subjectRef: new SubjectReference('artist', 'The Beatles'),
+    subject: { artist: 'The Beatles' },
   } as ReviewModel;
 
   const mockComment = {
