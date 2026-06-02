@@ -30,6 +30,7 @@ import {
 import { ReviewSearchCriteria } from '../model/review-search-criteria';
 import { ReviewModel, UserModel } from '../model';
 import { plainToInstance } from 'class-transformer';
+import { PageDto } from '../dto/page.dto';
 
 @Controller('api/reviews')
 export class ReviewController {
@@ -68,11 +69,11 @@ export class ReviewController {
   async search(
     @Query() dto: SearchReviewQueryDto,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<ReviewResponse[]> {
+  ): Promise<PageDto<ReviewResponse>> {
     const criteria = ReviewSearchCriteriaMapper.fromDto(dto);
-    const { data, total } = await this.searchReview.execute(criteria);
+    const { items, total, ...page } = await this.searchReview.execute(criteria);
     res.header('X-Total-Count', total.toString());
-    return data.map(ReviewController.toResponse);
+    return PageDto.of(items.map(ReviewController.toResponse), page, total);
   }
 
   @Get(':id')

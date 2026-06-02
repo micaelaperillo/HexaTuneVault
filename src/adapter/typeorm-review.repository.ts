@@ -4,7 +4,7 @@ import { Repository, MoreThan } from 'typeorm';
 import { ReviewEntity } from '../entity/review.entity';
 import { ReviewModel } from '../model/review.model';
 import { SubjectReference } from '../model/subject-reference';
-import type { PaginatedResult } from '../common/paginated-result';
+import type { Page } from '../model';
 import type { ReviewSearchCriteria } from '../model/review-search-criteria';
 import { SortField, SortOrder } from '../model/review-search-criteria';
 import type { IReviewRepository } from '../repository/review-repository.port';
@@ -54,9 +54,7 @@ export class TypeOrmReviewRepository implements IReviewRepository {
     await this.repo.delete(id);
   }
 
-  async search(
-    criteria: ReviewSearchCriteria,
-  ): Promise<PaginatedResult<ReviewModel>> {
+  async search(criteria: ReviewSearchCriteria): Promise<Page<ReviewModel>> {
     const qb = this.repo
       .createQueryBuilder('review')
       .innerJoinAndSelect('review.author', 'user');
@@ -109,7 +107,12 @@ export class TypeOrmReviewRepository implements IReviewRepository {
     qb.take(criteria.pageSize);
 
     const [entities, total] = await qb.getManyAndCount();
-    return { data: entities.map((e) => this.toModel(e)), total };
+    return {
+      items: entities.map((e) => this.toModel(e)),
+      total,
+      page: criteria.page,
+      pageSize: criteria.pageSize,
+    };
   }
 
   private toModel(entity: ReviewEntity): ReviewModel {
