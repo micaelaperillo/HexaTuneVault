@@ -50,12 +50,6 @@
         {% else %}
         <h1 class='TrendingTittle'></h1>
         {% endif %}
-        <div class="btn-group">
-            <button onclick="showContent('podcasts')" id="artistsBtn" class = "btn-left activeButton">Podcasts</button>
-            <button onclick="showContent('episodes')" id="albumsBtn" class = "btn-right">Episodes</button>
-        </div>
-
-
         <div id="artistsContent" class="content">
             {% if result.0.vaults %}
             <div class='gallery'>
@@ -77,55 +71,11 @@
             {% endif %}
         </div>
 
-        <div id="albumsContent" class="content" style="display: none;">
-            {% if result.1.vaults %}
-            <div class='gallery'>
-                {% for episode in result.1.vaults %}
-                    {% with episode_id=episode.id %}
-                        <div class='gallery-item'>
-                            {% with episode_description="/vault/episode/"|add:episode_id %}
-                                {% include 'previewVault.html' with vtype='Episode' spotifyimg=episode.image description=episode_description likes=episode.likes  title=episode.episode %}
-                            {% endwith %}
-                        </div>
-                    {% endwith %}
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="no-results">
-                <i class="material-icons noResultsIcon">search_off</i>
-                <p>No results found in Episodes</p>
-            </div>
-            {% endif %}
-        </div>
-
     </div>
     </div>
 </div>
 
 <script>
-    function showContent(contentType) {
-        var artistsBtn = document.getElementById('artistsBtn');
-        var albumsBtn = document.getElementById('albumsBtn');
-
-        var artistsContent = document.getElementById('artistsContent');
-        var albumsContent = document.getElementById('albumsContent');
-
-        if (contentType === 'podcasts') {
-            artistsBtn.classList.add('activeButton');
-            albumsBtn.classList.remove('activeButton');
-
-            artistsContent.style.display = 'block';
-            albumsContent.style.display = 'none';
-
-        } else if (contentType === 'episodes') {
-            artistsBtn.classList.remove('activeButton');
-            albumsBtn.classList.add('activeButton');
-
-            artistsContent.style.display = 'none';
-            albumsContent.style.display = 'block';
-        }
-    }
-
     document.getElementById('contentSelect').addEventListener('change', function() {
             var selectedContent = this.value;
             document.getElementById('contentSelectInput').value = selectedContent;  

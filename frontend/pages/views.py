@@ -7,11 +7,15 @@ from django.shortcuts import redirect, render
 
 from .clients import api_client
 from .clients import artist_client
+from .clients import podcast_client
+from .clients import album_client
 from .clients import comment_client
+from .clients import user_client
+from .clients import image_client
+from .clients import review_client
 
 
 def login_required_api(view):
-    """Redirect anonymous users to the login page (replaces @login_required)."""
 
     @wraps(view)
     def wrapper(request, *args, **kwargs):
@@ -38,19 +42,20 @@ def _set_token_cookie(response, token):
 def home(request):
     timeline = []
     if request.user.is_authenticated:
-        timeline = api_client.get_json('/api/feed/timeline', request=request, default=[])
+        following = user_client.following(request.user.id, request=request)
+        timeline = review_client.feed(following['users'], request=request)
     return render(request, 'home.html', {'timeline': timeline})
 
 
 
 def signin(request):
     if request.method == 'POST':
-        response = api_client.post('/api/auth/login', json={
-            'username': request.POST.get('username'),
-            'password': request.POST.get('password'),
-        })
+        response = user_client.authenticate(
+            request.POST.get('username'),
+            request.POST.get('password'),
+        )
         if response is not None and response.ok:
-            token = response.json().get('token')
+            token = response.json().get('access_token')
             return _set_token_cookie(redirect('home'), token)
         messages.info(request, 'Invalid username or password')
         return redirect('login')
@@ -63,20 +68,20 @@ def signup(request):
             messages.info(request, 'Password not matching')
             return redirect('create_account')
 
-        is_artist = request.POST.get('isArtist') == 'on'
-        payload = {
-            'username': request.POST.get('username'),
-            'email': request.POST.get('email'),
-            'password': request.POST.get('password'),
-            'isArtist': is_artist,
-            'link': request.POST.get('link', ''),
-        }
-        response = api_client.post('/api/auth/register', json=payload)
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        response = user_client.create(
+            username=username,
+            password=password,
+            email=request.POST.get('email'),
+        )
         if response is not None and response.ok:
-            token = response.json().get('token')
-            return _set_token_cookie(redirect('profile'), token)
+            auth = user_client.authenticate(username, password)
+            if auth is not None and auth.ok:
+                token = auth.json().get('access_token')
+                return _set_token_cookie(redirect('profile'), token)
+            return redirect('login')
 
-        # Surface the API's validation message when available.
         detail = 'Could not create account'
         if response is not None:
             try:
@@ -102,30 +107,45 @@ def profile(request, user=None):
             return redirect('login')
         user = request.user.username
 
-    context = api_client.get_json(
-        f'/api/users/{user}/profile', request=request, default={}
-    ) or {}
-    context['isCurrentUser'] = (user == request.user.username)
+    user_profile = user_client.get_by_username(user, request=request) or {}
+    is_current_user = (user == request.user.username)
+    user_id = user_profile.get('id')
+    user_posts = []
+    followers = {'count': 0, 'users': []}
+    following = {'count': 0, 'users': []}
+    if user_id is not None:
+        user_posts = review_client.list_by_author(user_id, request=request)
+        followers = user_client.followers(user_id, request=request)
+        following = user_client.following(user_id, request=request)
+    context = {
+        'user_profile': user_profile,
+        'isCurrentUser': is_current_user,
+        'button_text': 'Follow',
+        'user_followers_count': followers['count'],
+        'user_following_count': following['count'],
+        'user_followers': {'followers': followers['users']},
+        'user_following': {'following': following['users']},
+        'user_post_length': len(user_posts),
+        'user_posts': user_posts,
+    }
     return render(request, 'profile.html', context)
 
 
 @login_required_api
 def settings_profile(request):
+    user_id = request.user.id
     if request.method == 'POST':
-        data = {
-            'bio': request.POST.get('bio', ''),
-            'location': request.POST.get('location', ''),
-        }
-        files = {}
-        if request.FILES.get('image'):
-            image = request.FILES['image']
-            files['image'] = (image.name, image.read(), image.content_type)
-        api_client.post('/api/users/me/settings', request=request, data=data, files=files or None)
+        fields = {'biography': request.POST.get('bio', ''),'location':request.POST.get('location','')}
+        image_url = image_client.upload(request.FILES.get('image'), request=request)
+        if image_url:
+            fields['profile_picture_url'] = image_url
+        user_client.edit(user_id, request=request, **fields)
         return redirect('settings')
 
-    context = api_client.get_json('/api/users/me/settings', request=request, default={}) or {}
-    return render(request, 'settingsProfile.html', context)
+    user_profile = user_client.get(user_id, request=request) or {}
+    return render(request, 'settingsProfile.html', {'user_profile': user_profile})
 
+TRENDING_QUERY = 'the'
 
 
 def music(request):
@@ -135,8 +155,9 @@ def music(request):
         if genre and query:
             query += '/?genre=' + genre
         return redirect('/music/' + query)
-    context = api_client.get_json('/api/music/trending', request=request, default={}) or {}
-    return render(request, 'music.html', context)
+    artists = artist_client.search(TRENDING_QUERY, request=request)
+    top = {a['id']: a for a in artists}
+    return render(request, 'music.html', {'top': top})
 
 
 def music_search(request, query):
@@ -148,10 +169,11 @@ def music_search(request, query):
         return redirect('/music/' + query)
     genre = request.GET.get('genre', '')
     artists = artist_client.search(query, genre, request=request)
+    albums = album_client.search(query, request=request)
     context = {
         'result': [
-            {'query': query, 'vaults': artists},  
-            {'query': query, 'vaults': []},       #Albums tab (TODO: album API)
+            {'query': query, 'vaults': artists},
+            {'query': query, 'vaults': albums},  
         ],
     }
     return render(request, 'searchMusic.html', context)
@@ -168,8 +190,10 @@ def podcasts(request):
         if media_type and query:
             query += ('&media_type=' if content else '/?media_type=') + media_type
         return redirect('/podcasts/' + query)
-    context = api_client.get_json('/api/podcasts/trending', request=request, default={}) or {}
-    return render(request, 'podcasts.html', context)
+    results = podcast_client.search(TRENDING_QUERY, request=request)
+    top = {p['id']: {'artist': p['show'], 'image': p['image']}
+           for p in results}
+    return render(request, 'podcasts.html', {'top': top})
 
 
 def podcasts_search(request, query):
@@ -182,13 +206,17 @@ def podcasts_search(request, query):
         if media_type and query:
             query += ('&media_type=' if content else '/?media_type=') + media_type
         return redirect('/podcasts/' + query)
-    params = {
-        'q': query,
-        'explicit': request.GET.get('explicit'),
-        'media_type': request.GET.get('media_type'),
-        'market': request.GET.get('market'),
+    explicit = request.GET.get('explicit', '')
+    media_type = request.GET.get('media_type', '')
+    market = request.GET.get('market', '')
+    podcasts = podcast_client.search(
+        query, explicit, media_type, market, request=request
+    )
+    context = {
+        'result': [
+            {'query': query, 'vaults': podcasts},
+        ],
     }
-    context = api_client.get_json('/api/podcasts/search', request=request, params=params, default={}) or {}
     return render(request, 'searchPodcasts.html', context)
 
 
@@ -196,16 +224,19 @@ def podcasts_search(request, query):
 def members(request):
     if request.method == 'POST':
         return redirect('/members/' + request.POST.get('query', ''))
-    context = api_client.get_json('/api/members/recommended', request=request, default={}) or {}
-    return render(request, 'members.html', context)
+    members_list = user_client.search(request=request)
+    return render(request, 'members.html', {'membersList': members_list})
 
 
 def members_search(request, query):
     if request.method == 'POST':
         return redirect('/members/' + request.POST.get('query', ''))
-    context = api_client.get_json(
-        '/api/members/search', request=request, params={'q': query}, default={}
-    ) or {}
+    accounts = user_client.search(query, request=request)
+    context = {
+        'result': [
+            {'query': query, 'members': accounts},
+        ],
+    }
     return render(request, 'searchMembers.html', context)
 
 
@@ -213,17 +244,18 @@ def members_search(request, query):
 def all_search(request, query):
     if request.method == 'POST':
         return redirect('/search/' + request.POST.get('query', ''))
-    # Only the artist API is live; other sections await their APIs.
+
     artists = artist_client.search(query, request=request)
+    podcasts = podcast_client.search(query, request=request)
+    albums = album_client.search(query, request=request)
+    members = user_client.search(query,request=request)
     context = {
         'result': [
-            {'query': query, 'vaults': artists},  # 0 -> Artists
-            {'query': query, 'vaults': []},       # 1 -> Albums
-            {'query': query, 'vaults': []},       # 2 -> Podcasts
-            {'query': query, 'vaults': []},       # 3 -> Episodes
-            {'query': query, 'members': []},      # 4 -> Artist members
-            {'query': query, 'members': []},      # 5 -> Members
-        ],
+            {'query': query, 'vaults': artists},
+            {'query': query, 'vaults': albums},
+            {'query': query, 'vaults': podcasts},
+            {'query': query, 'members': members}, 
+        ]
     }
     return render(request, 'searchResult.html', context)
 
@@ -231,10 +263,13 @@ def all_search(request, query):
 
 def vault(request, vtype, id):
     if request.method == 'POST':
-        api_client.post(f'/api/vaults/{vtype}/{id}/posts', request=request, data={
-            'title': request.POST.get('title'),
-            'rating': request.POST.get('rating'),
-        })
+        review_client.create(
+            content=request.POST.get('title'),
+            rating=request.POST.get('rating'),
+            subject_type=vtype,
+            subject_id=id,
+            request=request,
+        )
         return redirect(request.path)
 
     if vtype == 'artist':
@@ -246,34 +281,82 @@ def vault(request, vtype, id):
                 'title': artist['artist'],
                 'spotifyimg': artist['image'],
                 'id': id,
+                'external_url': artist['external_url'],
                 'authors': [{'name': artist['artist'], 'image': artist['image']}],
+            }
+    elif vtype == 'podcast':
+        podcast = podcast_client.get(id, request=request)
+        context = {}
+        if podcast is not None:
+            context['vault'] = {
+                'type': 'podcast',
+                'title': podcast['show'],
+                'spotifyimg': podcast['image'],
+                'id': id,
+                'description': podcast['description'],
+                'total_tracks': podcast['total_episodes'], 
+                'external_url': podcast['external_url'],
+                'authors': [{'name': podcast['publisher'], 'image': podcast['image']}],
+            }
+    elif vtype == 'album':
+        album = album_client.get(id, request=request)
+        context = {}
+        if album is not None:
+            author = album['artists'][0] if album['artists'] else ''
+            author_image = ''
+            if author:
+                artist = artist_client.get(author, request=request)
+                if artist is not None:
+                    author_image = artist['image']
+            context['vault'] = {
+                'type': 'album',
+                'title': album['album'],
+                'spotifyimg': album['image'],
+                'id': id,
+                'date': album['date'],
+                'total_tracks': album['total_tracks'],
+                'external_url': album['external_url'],
+                'authors': [{'name': author, 'image': author_image}],
             }
     else:
         context = api_client.get_json(f'/api/vaults/{vtype}/{id}', request=request, default={}) or {}
+
+    posts = review_client.list_for(vtype, id, request=request)
+    counts = comment_client.counts_by_subject(request=request)
+    for post in posts:
+        post['comment_count'] = counts.get(str(post['post']['id']), 0)
+    ratings = [p['post']['rating'] for p in posts if isinstance(p['post']['rating'], int)]
+    current_id = str(request.user.id) if request.user.is_authenticated else None
+    already_reviewed = bool(current_id) and any(
+        p.get('author_id') == current_id for p in posts
+    )
 
     context.update({
         'vault_id': id,
         'is_post': True,
         'path': request.path,
+        'posts': posts,
+        'rating': round(sum(ratings) / len(ratings)) if ratings else 0,
+        'first_post': not already_reviewed,
     })
     return render(request, 'vault.html', context)
 
 
 def vault_post(request, vtype, id, post_id):
     if request.method == 'POST':
-        # NOTE: the comments API has no threading, so comment_answer_id (the
-        # reply target) is not forwarded yet.
-        created_by = request.user.username if request.user.is_authenticated else None
-        comment_client.create(
-            content=request.POST.get('content'),
-            associated_to=post_id,
-            created_by=created_by,
-            request=request,
-        )
+        if request.user.is_authenticated:
+            answer_id = request.POST.get('comment_answer_id')
+            parent_comment_id = answer_id if answer_id and answer_id != '0' else None
+            comment_client.create(
+                content=request.POST.get('content'),
+                review_id=post_id,
+                created_by=request.user.id,
+                parent_comment_id=parent_comment_id,
+                request=request,
+            )
         return redirect(request.path)
 
-    # The post (review) itself awaits the review/user APIs; for now we render the
-    # comments thread attached to this post.
+    review = review_client.get(post_id, request=request)
     comments = comment_client.list_for(post_id, request=request)
     context = {
         'comments': comments,
@@ -281,6 +364,10 @@ def vault_post(request, vtype, id, post_id):
         'is_post': False,
         'path': request.path,
     }
+    if review is not None:
+        context['post'] = review['post']
+        context['post_user'] = review['user']
+        context['is_liked'] = review['is_liked']
     return render(request, 'post.html', context)
 
 
@@ -288,20 +375,13 @@ def vault_post(request, vtype, id, post_id):
 @login_required_api
 def follow(request):
     if request.method == 'POST':
-        user = request.POST.get('user')
-        api_client.post(f'/api/users/{user}/follow', request=request)
-        return redirect('/profile/' + user)
-    return redirect('home')
-
-
-@login_required_api
-def fav_or_unfav_vault(request):
-    if request.method == 'POST':
-        vault_id = request.POST.get('vault_id')
-        vtype = request.POST.get('vtype')
-        vault_id_path = request.POST.get('vault_id_path')
-        api_client.post(f'/api/vaults/{vault_id}/favourite', request=request)
-        return redirect('/vault/' + vtype + '/' + vault_id_path)
+        username = request.POST.get('user')
+        target = user_client.get_by_username(username, request=request)
+        if target is not None and target.get('id') is not None:
+            user_client.toggle_follow(
+                target['id'], request.user.id, request=request
+            )
+        return redirect('/profile/' + username)
     return redirect('home')
 
 
@@ -310,7 +390,7 @@ def like_or_unlike_post(request):
     if request.method == 'POST':
         post_id = request.POST.get('post_id')
         path = request.POST.get('path', '/')
-        api_client.post(f'/api/posts/{post_id}/like', request=request)
+        review_client.toggle_like(post_id, request=request)
         return redirect(path)
     return redirect('home')
 
@@ -320,6 +400,6 @@ def like_or_unlike_comment(request):
     if request.method == 'POST':
         comment_id = request.POST.get('comment_id')
         path = request.POST.get('path', '/')
-        comment_client.toggle_like(comment_id, request=request)
+        comment_client.toggle_like(comment_id, request.user.id, request=request)
         return redirect(path)
     return redirect('home')

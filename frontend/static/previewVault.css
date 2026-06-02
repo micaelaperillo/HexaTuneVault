@@ -61,7 +61,9 @@
 
 .likesBox {
     border-radius: 8px;
-    background: #141414;
+    /* Box is empty now that the favourite heart/count is gone; keep its size so
+       the card's layout height is unchanged, but make it invisible. */
+    background: transparent;
     width: 123px;
     height: 60px;
     color: white;
