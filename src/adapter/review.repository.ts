@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, MoreThan } from 'typeorm';
+import { Repository, MoreThan, TypeORMError } from 'typeorm';
 import { ReviewEntity } from '../entity/review.entity';
 import type { ReviewModel } from '../model/review.model';
 import { splitSubject, buildSubject } from '../model/review-subject';
@@ -10,7 +10,7 @@ import type { ReviewFilters } from '../model/review.filter';
 import { SortField, SortOrder } from '../model/review.filter';
 import type { IReviewRepository } from '../repository/review-repository.port';
 import { MapErrors } from 'error-mapper-decorator';
-import { reviewPersistenceFailure } from './review-error-mappings';
+import { ReviewRepositoryException } from '../error/review/review-repository.exception';
 import type { UserModel } from '../model';
 import { UserEntity } from '../entity';
 import { escapeLike } from './like-escape';
@@ -21,13 +21,15 @@ const SORT_FIELD_COLUMN: Record<SortField, string> = {
 };
 
 @Injectable()
+@MapErrors({
+  from: TypeORMError,
+  to: (error) => new ReviewRepositoryException(error.message),
+})
 export class ReviewRepository implements IReviewRepository {
   constructor(
     @InjectRepository(ReviewEntity)
     private readonly repo: Repository<ReviewEntity>,
   ) {}
-
-  @MapErrors(reviewPersistenceFailure)
   async create(
     review: Omit<ReviewModel, 'id' | 'createdAt' | 'updatedAt' | 'author'> & {
       author: Pick<UserModel, 'id'>;
@@ -45,7 +47,6 @@ export class ReviewRepository implements IReviewRepository {
     return ReviewRepository.toModel(saved);
   }
 
-  @MapErrors(reviewPersistenceFailure)
   async findById(id: number): Promise<ReviewModel | null> {
     const entity = await this.repo.findOne({
       where: { id },
@@ -54,7 +55,6 @@ export class ReviewRepository implements IReviewRepository {
     return entity ? ReviewRepository.toModel(entity) : null;
   }
 
-  @MapErrors(reviewPersistenceFailure)
   async findRecentByAuthorAndSubject(
     author: Pick<UserModel, 'id'>,
     subject: ReviewSubject,
@@ -72,12 +72,10 @@ export class ReviewRepository implements IReviewRepository {
     return entity ? ReviewRepository.toModel(entity) : null;
   }
 
-  @MapErrors(reviewPersistenceFailure)
   async delete(id: number): Promise<void> {
     await this.repo.delete(id);
   }
 
-  @MapErrors(reviewPersistenceFailure)
   async search(filters: ReviewFilters): Promise<Page<ReviewModel>> {
     const page = filters.page && filters.page > 0 ? filters.page : 1;
     const pageSize =

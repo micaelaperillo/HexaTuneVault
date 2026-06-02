@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Repository, SelectQueryBuilder, TypeORMError } from 'typeorm';
 import { MapErrors } from 'error-mapper-decorator';
 import { CommentEntity } from '../entity/comment.entity';
 import { ICommentRepository } from '../repository/comment-repository.port';
@@ -10,16 +10,21 @@ import type { ReviewModel, UserModel } from '../model';
 import type { Page } from '../model';
 import { buildSubject } from '../model/review-subject';
 import { escapeLike } from './like-escape';
-import { commentPersistenceFailure } from './comment-error-mappings';
+import { CommentDBException } from '../error/comment/comment-db.exception';
 
 @Injectable()
+@MapErrors(
+  { exclude: ['toModel'] },
+  {
+    from: TypeORMError,
+    to: (error) => new CommentDBException(error.message),
+  },
+)
 export class CommentRepository implements ICommentRepository {
   constructor(
     @InjectRepository(CommentEntity)
     private readonly repo: Repository<CommentEntity>,
   ) {}
-
-  @MapErrors(commentPersistenceFailure)
   async create(
     comment: Omit<
       CommentModel,
@@ -46,7 +51,6 @@ export class CommentRepository implements ICommentRepository {
     return this.toModel(reloaded);
   }
 
-  @MapErrors(commentPersistenceFailure)
   async findById(id: number): Promise<CommentModel | null> {
     const entity = await this.baseQuery()
       .where('comment.id = :id', { id })
@@ -54,12 +58,10 @@ export class CommentRepository implements ICommentRepository {
     return entity ? this.toModel(entity) : null;
   }
 
-  @MapErrors(commentPersistenceFailure)
   async deleteById(id: number): Promise<void> {
     await this.repo.delete(id);
   }
 
-  @MapErrors(commentPersistenceFailure)
   async findReplies(parentCommentId: number): Promise<CommentModel[]> {
     const entities = await this.baseQuery()
       .where('comment.parentComment = :parentCommentId', { parentCommentId })
@@ -67,12 +69,10 @@ export class CommentRepository implements ICommentRepository {
     return entities.map((e) => this.toModel(e));
   }
 
-  @MapErrors(commentPersistenceFailure)
   async hasLike(commentId: number, userId: number): Promise<boolean> {
     return this.likeExists(commentId, userId);
   }
 
-  @MapErrors(commentPersistenceFailure)
   async addLike(commentId: number, userId: number): Promise<void> {
     if (!(await this.likeExists(commentId, userId))) {
       await this.repo
@@ -83,7 +83,6 @@ export class CommentRepository implements ICommentRepository {
     }
   }
 
-  @MapErrors(commentPersistenceFailure)
   async removeLike(commentId: number, userId: number): Promise<void> {
     await this.repo
       .createQueryBuilder()
@@ -92,7 +91,6 @@ export class CommentRepository implements ICommentRepository {
       .remove(userId);
   }
 
-  @MapErrors(commentPersistenceFailure)
   async search(filters: CommentFilters): Promise<Page<CommentModel>> {
     const page = filters.page && filters.page > 0 ? filters.page : 1;
     const pageSize =

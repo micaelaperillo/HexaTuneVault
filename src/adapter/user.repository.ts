@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, TypeORMError } from 'typeorm';
 import { MapErrors } from 'error-mapper-decorator';
 
 import { UserEntity } from '../entity/user.entity';
@@ -14,9 +14,13 @@ import {
   PASSWORD_HASHER,
 } from '../repository/password-hasher.port';
 import { containsInsensitive } from './like-escape';
-import { userPersistenceFailure } from './user-error-mappings';
+import { UserDBException } from '../error/user/user-db.exception';
 
 @Injectable()
+@MapErrors({
+  from: TypeORMError,
+  to: (error) => new UserDBException(error.message),
+})
 export class UserRepository implements IUserRepository {
   constructor(
     @InjectRepository(UserEntity)
@@ -24,20 +28,17 @@ export class UserRepository implements IUserRepository {
     @Inject(PASSWORD_HASHER) private readonly hasher: IPasswordHasher,
   ) {}
 
-  @MapErrors(userPersistenceFailure)
   async create(user: Omit<UserModel, 'id'>): Promise<UserModel> {
     const password = await this.hasher.hash(user.password);
     const saved = await this.repo.save({ ...user, password });
     return UserRepository.toModel(saved);
   }
 
-  @MapErrors(userPersistenceFailure)
   async findById(id: number): Promise<UserModel | null> {
     const entity = await this.repo.findOneBy({ id });
     return entity ? UserRepository.toModel(entity) : null;
   }
 
-  @MapErrors(userPersistenceFailure)
   async findByUsername(username: string): Promise<UserModel | null> {
     const entity = await this.repo.findOneBy({ username });
     return entity ? UserRepository.toModel(entity) : null;
@@ -51,7 +52,6 @@ export class UserRepository implements IUserRepository {
     return user;
   }
 
-  @MapErrors(userPersistenceFailure)
   async search(filters: UserFilters): Promise<Page<UserModel>> {
     const page = filters.page && filters.page > 0 ? filters.page : 1;
     const pageSize =
@@ -69,19 +69,16 @@ export class UserRepository implements IUserRepository {
     return { items: rows.map(UserRepository.toModel), page, pageSize, total };
   }
 
-  @MapErrors(userPersistenceFailure)
   async update(user: Partial<UserModel>): Promise<UserModel> {
     user.password &&= await this.hasher.hash(user.password);
     const saved = await this.repo.save(user);
     return UserRepository.toModel(saved);
   }
 
-  @MapErrors(userPersistenceFailure)
   async deleteById(id: number): Promise<void> {
     await this.repo.softDelete(id);
   }
 
-  @MapErrors(userPersistenceFailure)
   async follow(followerId: number, followingId: number): Promise<void> {
     if (await this.isFollowing(followerId, followingId)) return;
     await this.repo
@@ -91,7 +88,6 @@ export class UserRepository implements IUserRepository {
       .add(followingId);
   }
 
-  @MapErrors(userPersistenceFailure)
   async unfollow(followerId: number, followingId: number): Promise<void> {
     await this.repo
       .createQueryBuilder()
@@ -100,7 +96,6 @@ export class UserRepository implements IUserRepository {
       .remove(followingId);
   }
 
-  @MapErrors(userPersistenceFailure)
   async isFollowing(followerId: number, followingId: number): Promise<boolean> {
     const following = await this.repo
       .createQueryBuilder()
@@ -110,7 +105,6 @@ export class UserRepository implements IUserRepository {
     return following.some((user) => user.id === followingId);
   }
 
-  @MapErrors(userPersistenceFailure)
   async findFollowers(
     userId: number,
     { page, pageSize }: PageRequest,
@@ -125,7 +119,6 @@ export class UserRepository implements IUserRepository {
     return { items: rows.map(UserRepository.toModel), page, pageSize, total };
   }
 
-  @MapErrors(userPersistenceFailure)
   async findFollowing(
     userId: number,
     { page, pageSize }: PageRequest,
