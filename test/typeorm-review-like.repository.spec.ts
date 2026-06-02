@@ -1,13 +1,17 @@
 import { TypeOrmReviewLikeRepository } from '../src/adapter/typeorm-review-like.repository';
 import { ReviewLikeEntity } from '../src/entity/review-like.entity';
 import { ReviewNotFoundException } from '../src/error/review/review-not-found.exception';
+import { AlreadyLikedException } from '../src/error/review/already-liked.exception';
 import { ReviewRepositoryException } from '../src/error/review/review-repository.exception';
 import { QueryFailedError, type Repository } from 'typeorm';
 
 describe('TypeOrmReviewLikeRepository', () => {
   let repository: TypeOrmReviewLikeRepository;
   let mockRepo: jest.Mocked<
-    Pick<Repository<ReviewLikeEntity>, 'delete' | 'createQueryBuilder'>
+    Pick<
+      Repository<ReviewLikeEntity>,
+      'delete' | 'count' | 'createQueryBuilder'
+    >
   >;
   let mockInsertQb: Record<string, jest.Mock>;
 
@@ -15,12 +19,12 @@ describe('TypeOrmReviewLikeRepository', () => {
     mockInsertQb = {
       insert: jest.fn().mockReturnThis(),
       values: jest.fn().mockReturnThis(),
-      orIgnore: jest.fn().mockReturnThis(),
       execute: jest.fn().mockResolvedValue({}),
     };
 
     mockRepo = {
       delete: jest.fn(),
+      count: jest.fn(),
       createQueryBuilder: jest.fn().mockReturnValue(mockInsertQb),
     };
 
@@ -30,7 +34,7 @@ describe('TypeOrmReviewLikeRepository', () => {
   });
 
   describe('addLike', () => {
-    it('should insert idempotently via orIgnore', async () => {
+    it('should insert the like row', async () => {
       await repository.addLike(1, '42');
 
       expect(mockInsertQb.insert).toHaveBeenCalled();
@@ -38,8 +42,18 @@ describe('TypeOrmReviewLikeRepository', () => {
         reviewId: 1,
         userId: '42',
       });
-      expect(mockInsertQb.orIgnore).toHaveBeenCalled();
       expect(mockInsertQb.execute).toHaveBeenCalled();
+    });
+
+    it('should translate a unique violation into AlreadyLikedException', async () => {
+      const dupError = new QueryFailedError('insert', [], {
+        code: '23505',
+      } as unknown as Error);
+      mockInsertQb.execute.mockRejectedValue(dupError);
+
+      await expect(repository.addLike(1, '42')).rejects.toThrow(
+        AlreadyLikedException,
+      );
     });
 
     it('should translate a FK violation into ReviewNotFoundException', async () => {
@@ -99,6 +113,17 @@ describe('TypeOrmReviewLikeRepository', () => {
       const result = await repository.removeLike(1, '42');
 
       expect(result).toBe(false);
+    });
+  });
+
+  describe('countLikes', () => {
+    it('should return the row count for the review', async () => {
+      mockRepo.count.mockResolvedValue(7);
+
+      const result = await repository.countLikes(1);
+
+      expect(result).toBe(7);
+      expect(mockRepo.count).toHaveBeenCalledWith({ where: { reviewId: 1 } });
     });
   });
 });

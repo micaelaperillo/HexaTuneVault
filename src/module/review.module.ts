@@ -9,8 +9,7 @@ import { CreateReviewService } from '../use-case/create-review.service';
 import { DeleteReviewService } from '../use-case/delete-review.service';
 import { SearchReviewService } from '../use-case/search-review.service';
 import { GetReviewService } from '../use-case/get-review.service';
-import { LikeReviewService } from '../use-case/like-review.service';
-import { UnlikeReviewService } from '../use-case/unlike-review.service';
+import { ReviewLikeService } from '../use-case/review-like.service';
 import { ReviewController } from '../controller/review.controller';
 import {
   CREATE_REVIEW,
@@ -19,6 +18,7 @@ import {
   GET_REVIEW,
   LIKE_REVIEW,
   UNLIKE_REVIEW,
+  COUNT_REVIEW_LIKES,
   REVIEW_REPOSITORY,
   REVIEW_LIKE_REPOSITORY,
   REVIEW_CONFIG,
@@ -49,8 +49,9 @@ import {
     { provide: DELETE_REVIEW, useClass: DeleteReviewService },
     { provide: SEARCH_REVIEW, useClass: SearchReviewService },
     { provide: GET_REVIEW, useClass: GetReviewService },
-    { provide: LIKE_REVIEW, useClass: LikeReviewService },
-    { provide: UNLIKE_REVIEW, useClass: UnlikeReviewService },
+    { provide: LIKE_REVIEW, useClass: ReviewLikeService },
+    { provide: UNLIKE_REVIEW, useClass: ReviewLikeService },
+    { provide: COUNT_REVIEW_LIKES, useClass: ReviewLikeService },
   ],
 })
 export class ReviewModule {}

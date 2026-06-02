@@ -4,5 +4,6 @@ export function createMockReviewLikeRepository(): jest.Mocked<IReviewLikeReposit
   return {
     addLike: jest.fn(),
     removeLike: jest.fn(),
+    countLikes: jest.fn(),
   };
 }

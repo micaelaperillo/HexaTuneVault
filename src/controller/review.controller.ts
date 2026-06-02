@@ -21,9 +21,11 @@ import type { ISearchReview } from '../port/review/search-review.port';
 import type { IGetReview } from '../port/review/get-review.port';
 import type { ILikeReview } from '../port/review/like-review.port';
 import type { IUnlikeReview } from '../port/review/unlike-review.port';
+import type { ICountReviewLikes } from '../port/review/count-review-likes.port';
 import { CreateReviewRequest } from '../dto/create-review.request';
 import { SearchReviewQueryDto } from '../dto/search-review-query.dto';
 import { ReviewResponse } from '../dto/review-response.dto';
+import { ReviewLikeCountResponse } from '../dto/review-like-count-response.dto';
 import { ReviewSearchCriteriaMapper } from './review-search-criteria.mapper';
 import {
   CREATE_REVIEW,
@@ -32,6 +34,7 @@ import {
   GET_REVIEW,
   LIKE_REVIEW,
   UNLIKE_REVIEW,
+  COUNT_REVIEW_LIKES,
 } from '../port/review/tokens';
 
 @Controller('api/reviews')
@@ -43,6 +46,8 @@ export class ReviewController {
     @Inject(GET_REVIEW) private readonly getReview: IGetReview,
     @Inject(LIKE_REVIEW) private readonly likeReview: ILikeReview,
     @Inject(UNLIKE_REVIEW) private readonly unlikeReview: IUnlikeReview,
+    @Inject(COUNT_REVIEW_LIKES)
+    private readonly countReviewLikes: ICountReviewLikes,
   ) {}
 
   @Post()
@@ -100,7 +105,7 @@ export class ReviewController {
   async like(@Param('id', ParseIntPipe) id: number): Promise<void> {
     // TODO: replace hardcoded userId with @CurrentUser() from AuthGuard
     const userId = '1';
-    await this.likeReview.execute(id, userId);
+    await this.likeReview.like(id, userId);
   }
 
   @Delete(':id/likes')
@@ -108,6 +113,14 @@ export class ReviewController {
   async unlike(@Param('id', ParseIntPipe) id: number): Promise<void> {
     // TODO: replace hardcoded userId with @CurrentUser() from AuthGuard
     const userId = '1';
-    await this.unlikeReview.execute(id, userId);
+    await this.unlikeReview.unlike(id, userId);
+  }
+
+  @Get(':id/likes/count')
+  async likeCount(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ReviewLikeCountResponse> {
+    const count = await this.countReviewLikes.count(id);
+    return ReviewLikeCountResponse.fromCount(id, count);
   }
 }

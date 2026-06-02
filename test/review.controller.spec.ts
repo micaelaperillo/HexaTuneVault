@@ -6,6 +6,7 @@ import type { ISearchReview } from '../src/port/review/search-review.port';
 import type { IGetReview } from '../src/port/review/get-review.port';
 import type { ILikeReview } from '../src/port/review/like-review.port';
 import type { IUnlikeReview } from '../src/port/review/unlike-review.port';
+import type { ICountReviewLikes } from '../src/port/review/count-review-likes.port';
 import {
   CREATE_REVIEW,
   DELETE_REVIEW,
@@ -13,6 +14,7 @@ import {
   GET_REVIEW,
   LIKE_REVIEW,
   UNLIKE_REVIEW,
+  COUNT_REVIEW_LIKES,
 } from '../src/port/review/tokens';
 import { SubjectType, SubjectReference } from '../src/model/subject-reference';
 import { ReviewModel } from '../src/model/review.model';
@@ -27,6 +29,7 @@ describe('ReviewController', () => {
   let getReview: jest.Mocked<IGetReview>;
   let likeReview: jest.Mocked<ILikeReview>;
   let unlikeReview: jest.Mocked<IUnlikeReview>;
+  let countReviewLikes: jest.Mocked<ICountReviewLikes>;
 
   let mockResponse: { header: jest.Mock };
   let mockRequest: { protocol: string; get: jest.Mock };
@@ -36,8 +39,9 @@ describe('ReviewController', () => {
     deleteReview = { execute: jest.fn() };
     searchReview = { execute: jest.fn() };
     getReview = { execute: jest.fn() };
-    likeReview = { execute: jest.fn() };
-    unlikeReview = { execute: jest.fn() };
+    likeReview = { like: jest.fn() };
+    unlikeReview = { unlike: jest.fn() };
+    countReviewLikes = { count: jest.fn() };
 
     mockResponse = {
       header: jest.fn(),
@@ -56,6 +60,7 @@ describe('ReviewController', () => {
         { provide: GET_REVIEW, useValue: getReview },
         { provide: LIKE_REVIEW, useValue: likeReview },
         { provide: UNLIKE_REVIEW, useValue: unlikeReview },
+        { provide: COUNT_REVIEW_LIKES, useValue: countReviewLikes },
       ],
     }).compile();
 
@@ -185,7 +190,7 @@ describe('ReviewController', () => {
     it('should like a review on behalf of the current user', async () => {
       await controller.like(123);
 
-      expect(likeReview.execute).toHaveBeenCalledWith(123, '1');
+      expect(likeReview.like).toHaveBeenCalledWith(123, '1');
     });
   });
 
@@ -193,7 +198,19 @@ describe('ReviewController', () => {
     it('should unlike a review on behalf of the current user', async () => {
       await controller.unlike(123);
 
-      expect(unlikeReview.execute).toHaveBeenCalledWith(123, '1');
+      expect(unlikeReview.unlike).toHaveBeenCalledWith(123, '1');
+    });
+  });
+
+  describe('likeCount', () => {
+    it('should return the like count for a review', async () => {
+      countReviewLikes.count.mockResolvedValue(12);
+
+      const result = await controller.likeCount(123);
+
+      expect(countReviewLikes.count).toHaveBeenCalledWith(123);
+      expect(result.review_id).toBe(123);
+      expect(result.count).toBe(12);
     });
   });
 });

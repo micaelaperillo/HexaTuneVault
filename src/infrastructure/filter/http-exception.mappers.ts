@@ -27,6 +27,7 @@ import { ForbiddenDeletionException } from '../../error/review/forbidden-deletio
 import { InvalidReviewException } from '../../error/review/invalid-review.exception';
 import { ReviewCooldownException } from '../../error/review/review-cooldown.exception';
 import { NotLikedException } from '../../error/review/not-liked.exception';
+import { AlreadyLikedException } from '../../error/review/already-liked.exception';
 import { ReviewRepositoryException } from '../../error/review/review-repository.exception';
 
 // Single response envelope across the app: { statusCode, code, message }.
@@ -49,19 +50,19 @@ function send(
   });
 }
 
-@Catch(
-  CommentNotFoundException,
-  UserNotFoundException,
-  ReviewNotFoundException,
-  NotLikedException,
-)
+@Catch(CommentNotFoundException, UserNotFoundException, ReviewNotFoundException)
 export class NotFoundMapper implements ExceptionFilter {
   catch(exception: Error, host: ArgumentsHost): void {
     send(host, HttpStatus.NOT_FOUND, exception, 'NOT_FOUND');
   }
 }
 
-@Catch(AlreadyFollowingException, NotFollowingException)
+@Catch(
+  AlreadyFollowingException,
+  NotFollowingException,
+  AlreadyLikedException,
+  NotLikedException,
+)
 export class ConflictMapper implements ExceptionFilter {
   catch(exception: Error, host: ArgumentsHost): void {
     send(host, HttpStatus.CONFLICT, exception, 'CONFLICT');
