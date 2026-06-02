@@ -5,6 +5,7 @@ import {
   Inject,
   Get,
   Post,
+  Put,
   Delete,
   Patch,
   Param,
@@ -14,6 +15,9 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
+import { CurrentUser } from '../infrastructure/auth/current-user.decorator';
+import type { AuthenticatedUser } from '../model/authenticated-user';
+import { ForbiddenUserActionException } from '../error/user/';
 
 import {
   AUTHENTICATE_USER,
@@ -81,14 +85,24 @@ export class UserController {
   async edit(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: EditUserDto,
+    @CurrentUser() current: AuthenticatedUser,
   ): Promise<UserResponseDto> {
+    if (id !== current.id) {
+      throw new ForbiddenUserActionException();
+    }
     const user = await this.editUser.edit({ ...dto, id });
     return UserController.toResponse(user);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  async delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  async delete(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() current: AuthenticatedUser,
+  ): Promise<void> {
+    if (id !== current.id) {
+      throw new ForbiddenUserActionException();
+    }
     await this.deleteUser.deleteById(id);
   }
 
@@ -120,20 +134,22 @@ export class UserController {
     );
   }
 
-  @Patch(':id/follow')
+  @Put(':id/followers')
+  @HttpCode(204)
   async follow(
     @Param('id', ParseIntPipe) id: number,
-    @Body('follower_id', ParseIntPipe) followerId: number,
+    @CurrentUser() current: AuthenticatedUser,
   ): Promise<void> {
-    await this.followUser.follow(followerId, id);
+    await this.followUser.follow(current.id, id);
   }
 
-  @Patch(':id/unfollow')
+  @Delete(':id/followers')
+  @HttpCode(204)
   async unfollow(
     @Param('id', ParseIntPipe) id: number,
-    @Body('follower_id', ParseIntPipe) followerId: number,
+    @CurrentUser() current: AuthenticatedUser,
   ): Promise<void> {
-    await this.followUser.unfollow(followerId, id);
+    await this.followUser.unfollow(current.id, id);
   }
 
   private static toResponse(this: void, user: UserModel) {

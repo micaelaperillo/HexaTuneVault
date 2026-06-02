@@ -7,9 +7,10 @@ export interface IDeleteComment {
    * Deletes the comment with the given id. Replies are removed via the
    * `ON DELETE CASCADE` on the self-referential parent relation.
    *
-   * Idempotent: deleting a non-existent id is a no-op and does not throw.
+   * Only the comment's author may delete it.
    *
    * @param commentId - Id of the comment to delete.
+   * @param requesterId - Id of the authenticated user requesting deletion.
    */
-  deleteById(commentId: number): Promise<void>;
+  deleteById(commentId: number, requesterId: number): Promise<void>;
 }

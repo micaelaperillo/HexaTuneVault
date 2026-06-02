@@ -19,7 +19,10 @@ import {
   type ICommentRepository,
 } from '../repository/i-comment.repository';
 
-import { CommentNotFoundException } from '../error/comment';
+import {
+  CommentNotFoundException,
+  CommentDeletionForbiddenException,
+} from '../error/comment';
 
 import { Inject, Injectable } from '@nestjs/common';
 
@@ -53,7 +56,14 @@ export class CommentService
     return this.repo.create(comment);
   }
 
-  async deleteById(commentId: number): Promise<void> {
+  async deleteById(commentId: number, requesterId: number): Promise<void> {
+    const comment = await this.repo.findById(commentId);
+    if (!comment) {
+      throw new CommentNotFoundException(commentId);
+    }
+    if (comment.createdBy.id !== requesterId) {
+      throw new CommentDeletionForbiddenException();
+    }
     await this.repo.deleteById(commentId);
   }
 

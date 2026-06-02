@@ -8,10 +8,6 @@ export class CreateCommentDto {
 
   @IsInt()
   @Type(() => Number)
-  createdById!: number;
-
-  @IsInt()
-  @Type(() => Number)
   parentReviewId!: number;
 
   @IsOptional()

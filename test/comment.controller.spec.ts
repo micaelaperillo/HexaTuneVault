@@ -13,9 +13,9 @@ import {
 import { CommentModel } from '../src/model/comment.model';
 import { CommentResponseDto } from '../src/dto/comment-response.dto';
 import { CreateCommentDto } from '../src/dto/create-comment.dto';
-import { SetCommentLikeDto } from '../src/dto/set-comment-like.dto';
 import { SubjectReference } from '../src/model/subject-reference';
 import { ReviewModel, UserModel } from '../src/model';
+import type { AuthenticatedUser } from '../src/model/authenticated-user';
 
 describe('CommentController', () => {
   let controller: CommentController;
@@ -30,6 +30,8 @@ describe('CommentController', () => {
     biography: 'abc',
     profilePictureUrl: 'a.b',
   };
+
+  const currentUser: AuthenticatedUser = { id: 1 };
 
   const mockComment: CommentModel = {
     id: 1,
@@ -77,15 +79,14 @@ describe('CommentController', () => {
   });
 
   describe('create', () => {
-    it('calls create port and returns a CommentResponseDto with correct links', async () => {
+    it('uses the authenticated user as author and returns a CommentResponseDto', async () => {
       mockCreate.create.mockResolvedValue(mockComment);
       const dto: CreateCommentDto = {
         content: 'Test comment',
-        createdById: 1,
         parentReviewId: 10,
       };
 
-      const result = await controller.create(dto);
+      const result = await controller.create(dto, currentUser);
 
       expect(mockCreate.create).toHaveBeenCalledWith({
         content: 'Test comment',
@@ -105,12 +106,11 @@ describe('CommentController', () => {
       });
       const dto: CreateCommentDto = {
         content: 'A reply',
-        createdById: 1,
         parentReviewId: 10,
         parentCommentId: 5,
       };
 
-      const result = await controller.create(dto);
+      const result = await controller.create(dto, currentUser);
 
       expect(mockCreate.create).toHaveBeenCalledWith({
         content: 'A reply',
@@ -153,6 +153,17 @@ describe('CommentController', () => {
     });
   });
 
+  describe('likeCount', () => {
+    it('returns the like count for the comment', async () => {
+      mockGet.get.mockResolvedValue({ ...mockComment, likes: 7 });
+      const result = await controller.likeCount(1);
+
+      expect(mockGet.get).toHaveBeenCalledWith(1);
+      expect(result.comment_id).toBe(1);
+      expect(result.count).toBe(7);
+    });
+  });
+
   describe('getReplies', () => {
     it('calls getReplies port and returns an array of CommentResponseDto', async () => {
       const reply = { ...mockComment, id: 2, parentCommentId: 1 };
@@ -168,44 +179,42 @@ describe('CommentController', () => {
   });
 
   describe('hasLiked', () => {
-    it('resolves (204) when the user has liked the comment', async () => {
+    it('resolves (204) when the current user has liked the comment', async () => {
       mockHasLiked.hasLiked.mockResolvedValue(true);
 
-      await expect(
-        controller.hasLiked(1, { user_id: 2 }),
-      ).resolves.toBeUndefined();
+      await expect(controller.hasLiked(1, { id: 2 })).resolves.toBeUndefined();
       expect(mockHasLiked.hasLiked).toHaveBeenCalledWith(1, 2);
     });
 
-    it('throws NotFoundException (404) when the user has not liked the comment', async () => {
+    it('throws NotFoundException (404) when the current user has not liked the comment', async () => {
       mockHasLiked.hasLiked.mockResolvedValue(false);
 
-      await expect(controller.hasLiked(1, { user_id: 2 })).rejects.toThrow(
+      await expect(controller.hasLiked(1, { id: 2 })).rejects.toThrow(
         NotFoundException,
       );
     });
   });
 
   describe('delete', () => {
-    it('calls deleteById port', async () => {
+    it('passes the comment id and requesting user to the delete port', async () => {
       mockDelete.deleteById.mockResolvedValue(undefined);
-      await controller.delete(1);
-      expect(mockDelete.deleteById).toHaveBeenCalledWith(1);
+      await controller.delete(1, currentUser);
+      expect(mockDelete.deleteById).toHaveBeenCalledWith(1, 1);
     });
   });
 
-  describe('setLike', () => {
-    it('calls setLike port with comment id, user id and liked flag', async () => {
+  describe('like', () => {
+    it('likes the comment on behalf of the current user', async () => {
       mockLike.setLike.mockResolvedValue(undefined);
-      const dto: SetCommentLikeDto = { user_id: 2, liked: true };
-      await controller.setLike(1, dto);
+      await controller.like(1, { id: 2 });
       expect(mockLike.setLike).toHaveBeenCalledWith(1, 2, true);
     });
+  });
 
-    it('passes liked=false to unlike', async () => {
+  describe('unlike', () => {
+    it('unlikes the comment on behalf of the current user', async () => {
       mockLike.setLike.mockResolvedValue(undefined);
-      const dto: SetCommentLikeDto = { user_id: 2, liked: false };
-      await controller.setLike(1, dto);
+      await controller.unlike(1, { id: 2 });
       expect(mockLike.setLike).toHaveBeenCalledWith(1, 2, false);
     });
   });

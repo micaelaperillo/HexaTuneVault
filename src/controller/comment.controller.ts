@@ -5,8 +5,8 @@ import {
   Inject,
   Get,
   Post,
+  Put,
   Delete,
-  Patch,
   Param,
   Body,
   Query,
@@ -35,9 +35,10 @@ import {
 import { CreateCommentDto } from '../dto/create-comment.dto';
 import { CommentFiltersDto } from '../dto/comment-filters.dto';
 import { CommentResponseDto } from '../dto/comment-response.dto';
-import { CommentLikeQueryDto } from '../dto/comment-like-query.dto';
-import { SetCommentLikeDto } from '../dto/set-comment-like.dto';
+import { CommentLikeCountResponse } from '../dto/comment-like-count-response.dto';
 import { Public } from '../infrastructure/auth/public.decorator';
+import { CurrentUser } from '../infrastructure/auth/current-user.decorator';
+import type { AuthenticatedUser } from '../model/authenticated-user';
 
 import { plainToInstance } from 'class-transformer';
 
@@ -56,11 +57,13 @@ export class CommentController {
   ) {}
 
   @Post()
-  async create(@Body() dto: CreateCommentDto): Promise<CommentResponseDto> {
-    // TODO: Use AuthGuard for current user
+  async create(
+    @Body() dto: CreateCommentDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<CommentResponseDto> {
     const comment = await this.createComment.create({
       content: dto.content,
-      createdBy: { id: dto.createdById },
+      createdBy: { id: user.id },
       parentReview: { id: dto.parentReviewId },
       parentCommentId: dto.parentCommentId ?? null,
     });
@@ -104,26 +107,48 @@ export class CommentController {
   @HttpCode(204)
   async hasLiked(
     @Param('id', ParseIntPipe) id: number,
-    @Query() query: CommentLikeQueryDto,
+    @CurrentUser() user: AuthenticatedUser,
   ): Promise<void> {
-    const liked = await this.commentHasLiked.hasLiked(id, query.user_id);
+    const liked = await this.commentHasLiked.hasLiked(id, user.id);
     if (!liked) {
       throw new NotFoundException();
     }
   }
 
-  @Delete(':id')
-  @HttpCode(204)
-  async delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    await this.deleteComment.deleteById(id);
+  @Public()
+  @Get(':id/likes/count')
+  async likeCount(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<CommentLikeCountResponse> {
+    const comment = await this.getComment.get(id);
+    return CommentLikeCountResponse.fromCount(id, comment.likes);
   }
 
-  @Patch(':id/like')
-  async setLike(
+  @Put(':id/likes')
+  @HttpCode(204)
+  async like(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: SetCommentLikeDto,
+    @CurrentUser() user: AuthenticatedUser,
   ): Promise<void> {
-    await this.likeComment.setLike(id, dto.user_id, dto.liked);
+    await this.likeComment.setLike(id, user.id, true);
+  }
+
+  @Delete(':id/likes')
+  @HttpCode(204)
+  async unlike(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<void> {
+    await this.likeComment.setLike(id, user.id, false);
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  async delete(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<void> {
+    await this.deleteComment.deleteById(id, user.id);
   }
 
   private static toResponse(this: void, comment: CommentModel) {

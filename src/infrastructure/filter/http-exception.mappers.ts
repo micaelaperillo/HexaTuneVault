@@ -11,6 +11,7 @@ import { DomainException } from '../../error/domain.exception';
 import {
   CommentDBException,
   CommentNotFoundException,
+  CommentDeletionForbiddenException,
 } from '../../error/comment/';
 import { AlbumProviderError } from '../../error/album/';
 import { ArtistProviderError } from '../../error/artist/';
@@ -22,6 +23,7 @@ import {
   AlreadyFollowingException,
   NotFollowingException,
   SelfFollowException,
+  ForbiddenUserActionException,
 } from '../../error/user/';
 import { ReviewNotFoundException } from '../../error/review/review-not-found.exception';
 import { ForbiddenDeletionException } from '../../error/review/forbidden-deletion.exception';
@@ -77,7 +79,11 @@ export class UnauthorizedMapper implements ExceptionFilter {
   }
 }
 
-@Catch(ForbiddenDeletionException)
+@Catch(
+  ForbiddenDeletionException,
+  CommentDeletionForbiddenException,
+  ForbiddenUserActionException,
+)
 export class ForbiddenMapper implements ExceptionFilter {
   catch(exception: Error, host: ArgumentsHost): void {
     send(host, HttpStatus.FORBIDDEN, exception, 'FORBIDDEN');

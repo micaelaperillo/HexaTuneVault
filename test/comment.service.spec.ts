@@ -3,6 +3,7 @@ import { CommentService } from '../src/use-case/comment.service';
 import { COMMENT_REPOSITORY } from '../src/repository/i-comment.repository';
 import { CommentModel } from '../src/model/comment.model';
 import { CommentNotFoundException } from '../src/error/comment/comment-not-found.exception';
+import { CommentDeletionForbiddenException } from '../src/error/comment/comment-deletion-forbidden.exception';
 import { ReviewModel, UserModel } from '../src/model';
 import { SubjectReference } from '../src/model/subject-reference';
 
@@ -113,10 +114,27 @@ describe('CommentService', () => {
   });
 
   describe('deleteById', () => {
-    it('delegates to repo', async () => {
+    it('deletes when the requester is the author', async () => {
+      mockRepo.findById.mockResolvedValue(mockComment);
       mockRepo.deleteById.mockResolvedValue(undefined);
-      await service.deleteById(1);
+      await service.deleteById(1, 1);
       expect(mockRepo.deleteById).toHaveBeenCalledWith(1);
+    });
+
+    it('throws CommentNotFoundException when the comment does not exist', async () => {
+      mockRepo.findById.mockResolvedValue(null);
+      await expect(service.deleteById(1, 1)).rejects.toThrow(
+        CommentNotFoundException,
+      );
+      expect(mockRepo.deleteById).not.toHaveBeenCalled();
+    });
+
+    it('throws CommentDeletionForbiddenException when requester is not the author', async () => {
+      mockRepo.findById.mockResolvedValue(mockComment);
+      await expect(service.deleteById(1, 999)).rejects.toThrow(
+        CommentDeletionForbiddenException,
+      );
+      expect(mockRepo.deleteById).not.toHaveBeenCalled();
     });
   });
 
