@@ -34,7 +34,7 @@
     "argon2": "^0.44.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
-    "error-mapper-decorator": "^0.2.0",
+    "error-mapper-decorator": "^0.2.1",
     "multer": "^2.1.1",
     "pg": "^8.21.0",
     "reflect-metadata": "^0.2.2",
@@ -89,7 +89,11 @@
         "ts-jest",
         {
           "tsconfig": "tsconfig.spec.json",
-          "diagnostics": { "ignoreCodes": [151002] }
+          "diagnostics": {
+            "ignoreCodes": [
+              151002
+            ]
+          }
         }
       ]
     },
