@@ -1,7 +1,7 @@
 import { QueryFailedError, type Repository } from 'typeorm';
 import { UserRepository } from '../../../src/adapter/persistence/user.repository';
 import { UserEntity } from '../../../src/entity/user.entity';
-import { UserDBException } from '../../../src/error/user/user-db.exception';
+import { UserDBException } from '../../../src/adapter/persistence/user-db.exception';
 import { InvalidCredentialsException } from '../../../src/error/user/invalid-credentials.exception';
 import type { IPasswordHasher } from '../../../src/port/out/password-hasher.port';
 

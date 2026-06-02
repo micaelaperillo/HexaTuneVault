@@ -10,7 +10,7 @@ import type { IPodcastProvider } from '../../port/out';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
 import { SPOTIFY_API } from './spotify.provider';
-import { PodcastProviderError } from '../../error/podcast';
+import { PodcastProviderError } from './podcast-provider.error';
 import { resolveSpotifyPage } from './spotify-pagination';
 import { MapErrors } from 'error-mapper-decorator';
 

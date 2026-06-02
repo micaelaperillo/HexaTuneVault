@@ -14,7 +14,7 @@ import {
   PASSWORD_HASHER,
 } from '../../port/out/password-hasher.port';
 import { containsInsensitive } from './like-escape';
-import { UserDBException } from '../../error/user/user-db.exception';
+import { UserDBException } from './user-db.exception';
 
 @Injectable()
 @MapErrors({

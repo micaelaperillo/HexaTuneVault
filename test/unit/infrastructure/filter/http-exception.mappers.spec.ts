@@ -18,8 +18,8 @@ import { ForbiddenUserActionException } from '../../../../src/error/user/forbidd
 import { ForbiddenDeletionException } from '../../../../src/error/review/forbidden-deletion.exception';
 import { SelfFollowException } from '../../../../src/error/user/self-follow.exception';
 import { ReviewCooldownException } from '../../../../src/error/review/review-cooldown.exception';
-import { UserDBException } from '../../../../src/error/user/user-db.exception';
-import { AlbumProviderError } from '../../../../src/error/album/provider.error';
+import { UserDBException } from '../../../../src/adapter/persistence/user-db.exception';
+import { AlbumProviderError } from '../../../../src/adapter/catalog/album-provider.error';
 
 describe('http-exception mappers', () => {
   let json: jest.Mock;

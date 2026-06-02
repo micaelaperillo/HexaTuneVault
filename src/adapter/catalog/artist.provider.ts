@@ -6,7 +6,7 @@ import type { IArtistProvider } from '../../port/out';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
 import { SPOTIFY_API } from './spotify.provider';
-import { ArtistProviderError } from '../../error/artist';
+import { ArtistProviderError } from './artist-provider.error';
 import { resolveSpotifyPage } from './spotify-pagination';
 import { escapeSpotifyTerm } from './spotify-query';
 import { MapErrors } from 'error-mapper-decorator';

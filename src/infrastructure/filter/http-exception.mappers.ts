@@ -9,15 +9,10 @@ import {
 import { DomainException } from '../../error/domain.exception';
 
 import {
-  CommentDBException,
   CommentNotFoundException,
   CommentDeletionForbiddenException,
 } from '../../error/comment/';
-import { AlbumProviderError } from '../../error/album/';
-import { ArtistProviderError } from '../../error/artist/';
-import { PodcastProviderError } from '../../error/podcast/';
 import {
-  UserDBException,
   UserNotFoundException,
   InvalidCredentialsException,
   AlreadyFollowingException,
@@ -28,7 +23,12 @@ import {
 import { ReviewNotFoundException } from '../../error/review/review-not-found.exception';
 import { ForbiddenDeletionException } from '../../error/review/forbidden-deletion.exception';
 import { ReviewCooldownException } from '../../error/review/review-cooldown.exception';
-import { ReviewRepositoryException } from '../../error/review/review-repository.exception';
+import { AlbumProviderError } from '../../adapter/catalog/album-provider.error';
+import { ArtistProviderError } from '../../adapter/catalog/artist-provider.error';
+import { PodcastProviderError } from '../../adapter/catalog/podcast-provider.error';
+import { CommentDBException } from '../../adapter/persistence/comment-db.exception';
+import { UserDBException } from '../../adapter/persistence/user-db.exception';
+import { ReviewRepositoryException } from '../../adapter/persistence/review-repository.exception';
 
 // Single response envelope across the app: { statusCode, code, message }.
 // Domain exceptions carry a stable machine-readable `code`; for plain

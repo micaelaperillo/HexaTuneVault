@@ -1,7 +1,7 @@
 import { ReviewLikeRepository } from '../../../src/adapter/persistence/review-like.repository';
 import { ReviewLikeEntity } from '../../../src/entity/review-like.entity';
 import { ReviewNotFoundException } from '../../../src/error/review/review-not-found.exception';
-import { ReviewRepositoryException } from '../../../src/error/review/review-repository.exception';
+import { ReviewRepositoryException } from '../../../src/adapter/persistence/review-repository.exception';
 import { QueryFailedError, type Repository } from 'typeorm';
 
 describe('ReviewLikeRepository', () => {

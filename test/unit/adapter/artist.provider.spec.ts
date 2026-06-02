@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { SPOTIFY_API } from '../../../src/adapter/catalog/spotify.provider';
 import { SpotifyArtistProvider } from '../../../src/adapter';
-import { ArtistProviderError } from '../../../src/error';
+import { ArtistProviderError } from '../../../src/adapter/catalog/artist-provider.error';
 
 import type { ArtistModel } from '../../../src/model';
 
