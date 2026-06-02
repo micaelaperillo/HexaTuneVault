@@ -23,8 +23,5 @@ export class PodcastResponseDto {
   readonly self!: `/${string}`;
 
   @Expose()
-  readonly episodes!: `/${string}`;
-
-  @Expose()
   readonly reviews!: `/${string}`;
 }
