@@ -45,8 +45,8 @@ importers:
         specifier: ^0.15.1
         version: 0.15.1
       error-mapper-decorator:
-        specifier: ^0.1.0
-        version: 0.1.0
+        specifier: ^0.2.0
+        version: 0.2.0
       multer:
         specifier: ^2.1.1
         version: 2.1.1
@@ -1708,8 +1708,8 @@ packages:
   error-ex@1.3.4:
     resolution: {integrity: sha512-sqQamAnR14VgCr1A618A3sGrygcpK+HEbenA/HiEAkkUwcZIIB/tgWqHFxWgOyDh4nB4JCRimh79dR5Ywc9MDQ==}
 
-  error-mapper-decorator@0.1.0:
-    resolution: {integrity: sha512-RllFEfHH/gqNMM0gTMJjOgcbf6b6DTuDfx5QwtnaO+YvTYpjW//rBTPdr+fzf8RCS6OuPZFbcUPZdjAqBcAvfA==}
+  error-mapper-decorator@0.2.0:
+    resolution: {integrity: sha512-SkAYnFZfrIDZnl42M6RQKEYELJmr7YFkMa6gI4ZioGJCr/Doz6LLmHIWmRna/LTbEFeg9LawamjZyqYq4NgCPw==}
     engines: {node: '>=18'}
 
   es-define-property@1.0.1:
@@ -5121,7 +5121,7 @@ snapshots:
     dependencies:
       is-arrayish: 0.2.1
 
-  error-mapper-decorator@0.1.0: {}
+  error-mapper-decorator@0.2.0: {}
 
   es-define-property@1.0.1: {}
 

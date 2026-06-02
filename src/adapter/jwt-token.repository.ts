@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { MapErrors } from 'error-mapper-decorator';
 import { ITokenVerifier } from '../repository/token-verifier.port';
 import { ITokenIssuer } from '../repository/token-issuer.port';
 import { InvalidTokenException } from '../error/auth/invalid-token.exception';
@@ -17,15 +18,11 @@ export class JwtTokenRepository implements ITokenVerifier, ITokenIssuer {
     return { accessToken };
   }
 
+  @MapErrors({ from: Error, to: () => new InvalidTokenException() })
   async verify(token: string): Promise<Pick<UserModel, 'id'>> {
-    let payload: Claims;
-    try {
-      payload = await this.jwt.verifyAsync<Claims>(token, {
-        algorithms: ['HS256'],
-      });
-    } catch {
-      throw new InvalidTokenException();
-    }
+    const payload = await this.jwt.verifyAsync<Claims>(token, {
+      algorithms: ['HS256'],
+    });
 
     const id = Number(payload.sub);
     if (!Number.isInteger(id) || id <= 0) {

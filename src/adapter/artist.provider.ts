@@ -8,6 +8,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { SPOTIFY_API } from '../infrastructure/api/provider';
 import { ArtistProviderError } from '../error/artist';
 import { resolveSpotifyPage } from './spotify-pagination';
+import { MapErrors } from 'error-mapper-decorator';
 
 export { ARTIST_PROVIDER } from '../repository';
 
@@ -20,30 +21,26 @@ export class SpotifyArtistProvider implements IArtistProvider {
   /**
    * @override
    */
+  @MapErrors({ from: Error, to: (e) => new ArtistProviderError(e) })
   async search(filters: ArtistFilters): Promise<Page<ArtistModel>> {
-    try {
-      const query = SpotifyArtistProvider.toQuery(filters);
-      const { page, pageSize, limit, offset } = resolveSpotifyPage(filters);
-      this.logger.debug(query);
+    const query = SpotifyArtistProvider.toQuery(filters);
+    const { page, pageSize, limit, offset } = resolveSpotifyPage(filters);
+    this.logger.debug(query);
 
-      const { artists } = await this.spotify.search(
-        query,
-        ['artist'],
-        undefined,
-        limit,
-        offset,
-      );
-      this.logger.debug(artists.items);
+    const { artists } = await this.spotify.search(
+      query,
+      ['artist'],
+      undefined,
+      limit,
+      offset,
+    );
+    this.logger.debug(artists.items);
 
-      const items = artists.items
-        .filter((a) => a.images.length)
-        .map(SpotifyArtistProvider.toModel);
+    const items = artists.items
+      .filter((a) => a.images.length)
+      .map(SpotifyArtistProvider.toModel);
 
-      return { items, total: artists.total, page, pageSize };
-    } catch (e) {
-      if (!(e instanceof Error)) throw e;
-      throw new ArtistProviderError(e);
-    }
+    return { items, total: artists.total, page, pageSize };
   }
 
   /**
