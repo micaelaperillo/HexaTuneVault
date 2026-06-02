@@ -113,9 +113,12 @@ describe('SpotifyArtistProvider', () => {
 
       const result = await provider.search(filters);
 
-      expect(mockInfrastructure.search).toHaveBeenCalledWith('The Beatles', [
-        'artist',
-      ]);
+      expect(mockInfrastructure.search).toHaveBeenCalledWith(
+        'The Beatles',
+        ['artist'],
+        undefined,
+        10,
+      );
       expect(result).toStrictEqual(mockMappedApiResponse);
     });
 
@@ -128,6 +131,8 @@ describe('SpotifyArtistProvider', () => {
       expect(mockInfrastructure.search).toHaveBeenCalledWith(
         'The Beatles genre:Rock genre:Roll',
         ['artist'],
+        undefined,
+        10,
       );
       expect(result).toStrictEqual(mockMappedApiResponse);
     });
@@ -169,9 +174,12 @@ describe('SpotifyArtistProvider', () => {
 
       const result = await provider.get(filters);
 
-      expect(mockInfrastructure.search).toHaveBeenCalledWith('The Beatles', [
-        'artist',
-      ]);
+      expect(mockInfrastructure.search).toHaveBeenCalledWith(
+        'The Beatles',
+        ['artist'],
+        undefined,
+        10,
+      );
       expect(result).toStrictEqual(mockMappedApiResponse[0]);
     });
 

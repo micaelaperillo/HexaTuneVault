@@ -136,8 +136,10 @@ describe('ReviewController', () => {
       });
 
       searchReview.execute.mockResolvedValue({
-        data: [reviewModel],
-        total: 10,
+        items: [reviewModel],
+        total: 1,
+        page: 1,
+        pageSize: 10,
       });
 
       const result = await controller.search(
@@ -153,9 +155,9 @@ describe('ReviewController', () => {
       expect(searchReview.execute).toHaveBeenCalledWith(
         expect.objectContaining({ page: 1, pageSize: 10 }),
       );
-      expect(mockResponse.header).toHaveBeenCalledWith('X-Total-Count', '10');
-      expect(result).toHaveLength(1);
-      expect(result[0].id).toBe(123);
+      expect(mockResponse.header).toHaveBeenCalledWith('X-Total-Count', '1');
+      expect(result.items).toHaveLength(1);
+      expect(result.items[0].id).toBe(123);
     });
   });
 

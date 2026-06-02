@@ -37,6 +37,7 @@ describe('TypeOrmReviewRepository', () => {
       orderBy: jest.fn().mockReturnThis(),
       skip: jest.fn().mockReturnThis(),
       take: jest.fn().mockReturnThis(),
+      innerJoinAndSelect: jest.fn().mockReturnThis(),
       getManyAndCount: jest.fn().mockResolvedValue([[], 0]),
     };
 
@@ -292,8 +293,8 @@ describe('TypeOrmReviewRepository', () => {
       const result = await repository.search(baseCriteria);
 
       expect(result.total).toBe(1);
-      expect(result.data).toHaveLength(1);
-      expect(result.data[0].id).toBe(1);
+      expect(result.items).toHaveLength(1);
+      expect(result.items[0].id).toBe(1);
     });
   });
 });

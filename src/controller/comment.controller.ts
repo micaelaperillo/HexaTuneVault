@@ -129,7 +129,6 @@ export class CommentController {
         ...comment,
         self: `/api/comments/${comment.id}`,
         like: `/api/comments/${comment.id}/like`,
-        likes: `/api/comments/${comment.id}/likes`,
         replies: `/api/comments/${comment.id}/replies`,
         collection: `/api/comments`,
         author: `/api/users/${comment.createdBy.id}`,

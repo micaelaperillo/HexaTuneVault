@@ -20,6 +20,7 @@ describe('CommentRepository', () => {
     content: 'idk',
     rating: 1,
     createdAt: new Date('2024-01-01'),
+    updatedAt: null,
     subjectRef: new SubjectReference('artist', 'The Beatles'),
   } as ReviewModel;
 
@@ -30,7 +31,7 @@ describe('CommentRepository', () => {
     createdBy: mockUser,
     parentReview: mockReview,
     parentCommentId: null,
-    likedByIds: [5, 6],
+    likes: 0,
   };
 
   const mockUserEntity = { id: 1 } as unknown as UserEntity;
@@ -41,6 +42,7 @@ describe('CommentRepository', () => {
     content: 'idk',
     rating: 1,
     createdAt: new Date('2024-01-01'),
+    updatedAt: null,
     subjectType: 'artist',
     subjectId: 'The Beatles',
   } as ReviewEntity;
@@ -168,7 +170,7 @@ describe('CommentRepository', () => {
   describe('findById', () => {
     it('returns the mapped model when found', async () => {
       qbMock.getOne.mockResolvedValue(mockEntity);
-      const result = await repository.findById(1);
+      const result = await repository.findById(100);
       expect(qbMock.where).toHaveBeenCalledWith('comment.id = :id', {
         id: 100,
       });
@@ -206,14 +208,14 @@ describe('CommentRepository', () => {
   describe('findReplies', () => {
     it('returns child comments of the given parent', async () => {
       qbMock.getMany.mockResolvedValue([
-        { ...mockEntity, id: 2, parentCommentId: 1 },
+        { ...mockEntity, id: 2, parentComment: mockEntity },
       ]);
-      const result = await repository.findReplies(1);
+      const result = await repository.findReplies(100);
       expect(qbMock.where).toHaveBeenCalledWith(
         'comment.parentComment = :parentCommentId',
-        { parentCommentId: 1 },
+        { parentCommentId: 100 },
       );
-      expect(result).toEqual([{ ...mockComment, id: 2, parentCommentId: 1 }]);
+      expect(result).toEqual([{ ...mockComment, id: 2, parentCommentId: 100 }]);
     });
   });
 
