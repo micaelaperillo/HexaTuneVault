@@ -1,10 +1,10 @@
 import { DataSource } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-import { UserEntity } from '../../src/entity/user.entity';
-import { ReviewEntity } from '../../src/entity/review.entity';
-import { ReviewLikeEntity } from '../../src/entity/review-like.entity';
-import { CommentEntity } from '../../src/entity/comment.entity';
-import { CommentLikeEntity } from '../../src/entity/comment-like.entity';
+import { UserEntity } from '../../src/adapter/out/persistence/entity/user.entity';
+import { ReviewEntity } from '../../src/adapter/out/persistence/entity/review.entity';
+import { ReviewLikeEntity } from '../../src/adapter/out/persistence/entity/review-like.entity';
+import { CommentEntity } from '../../src/adapter/out/persistence/entity/comment.entity';
+import { CommentLikeEntity } from '../../src/adapter/out/persistence/entity/comment-like.entity';
 
 // A DataSource pointed at the Testcontainers Postgres (env set in global-setup),
 // with `synchronize` so the schema is derived from the entities — mirroring dev.

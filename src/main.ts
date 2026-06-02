@@ -3,8 +3,8 @@ import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import type { ValidationError } from 'class-validator';
 import { AppModule } from './app.module';
-import { AllExceptionsFilter } from './infrastructure/filter/all-exceptions.filter';
-import { filters } from './infrastructure/filter/http-exception.mappers';
+import { AllExceptionsFilter } from './adapter/in/http/filter/all-exceptions.filter';
+import { filters } from './adapter/in/http/filter/http-exception.mappers';
 
 function flattenValidationErrors(errors: ValidationError[]): string[] {
   return errors.flatMap((error) => {

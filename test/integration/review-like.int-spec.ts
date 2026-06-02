@@ -1,9 +1,9 @@
 import { DataSource, Repository } from 'typeorm';
 import { createTestDataSource } from './datasource';
-import { ReviewLikeRepository } from '../../src/adapter/persistence/review-like.repository';
-import { ReviewLikeEntity } from '../../src/entity/review-like.entity';
-import { UserEntity } from '../../src/entity/user.entity';
-import { ReviewEntity } from '../../src/entity/review.entity';
+import { ReviewLikeRepository } from '../../src/adapter/out/persistence/review-like.repository';
+import { ReviewLikeEntity } from '../../src/adapter/out/persistence/entity/review-like.entity';
+import { UserEntity } from '../../src/adapter/out/persistence/entity/user.entity';
+import { ReviewEntity } from '../../src/adapter/out/persistence/entity/review.entity';
 import { ReviewNotFoundException } from '../../src/error/review/review-not-found.exception';
 
 describe('ReviewLikeRepository (integration)', () => {

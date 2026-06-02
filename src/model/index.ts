@@ -11,6 +11,5 @@ export * from './user-filter.model';
 export * from './review.model';
 export * from './review-subject';
 export * from './review-filter.model';
-export * from './jwt.model';
-export * from './authenticated-user';
+export * from './auth-token.model';
 export * from './page.model';

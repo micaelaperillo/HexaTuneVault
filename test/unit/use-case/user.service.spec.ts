@@ -3,7 +3,7 @@ import { InvalidCredentialsException } from '../../../src/error/user/invalid-cre
 import type { IUserRepository } from '../../../src/port/out/user-repository.port';
 import type { ITokenIssuer } from '../../../src/port/out/token-issuer.port';
 import type { UserModel } from '../../../src/model/user.model';
-import type { JwtModel } from '../../../src/model/jwt.model';
+import type { AuthToken } from '../../../src/model/auth-token.model';
 import { UserNotFoundException } from '../../../src/error/user/user-not-found.exception';
 import { SelfFollowException } from '../../../src/error/user/self-follow.exception';
 import { AlreadyFollowingException } from '../../../src/error/user/already-following.exception';
@@ -231,7 +231,7 @@ describe('UserService.search', () => {
 
 describe('UserService.authenticate', () => {
   it('issues a token when the repository validates the credentials', async () => {
-    const token: JwtModel = { accessToken: 'token-123' };
+    const token: AuthToken = { accessToken: 'token-123' };
     let issuedFor: UserModel | undefined;
     const service = makeService(
       { authenticate: () => Promise.resolve(storedUser) },

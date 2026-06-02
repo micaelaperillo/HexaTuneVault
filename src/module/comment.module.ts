@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { CommentEntity } from '../entity/comment.entity';
-import { CommentLikeEntity } from '../entity/comment-like.entity';
+import { CommentEntity } from '../adapter/out/persistence/entity/comment.entity';
+import { CommentLikeEntity } from '../adapter/out/persistence/entity/comment-like.entity';
 import { COMMENT_REPOSITORY } from '../port/out/comment-repository.port';
-import { CommentRepository } from '../adapter/persistence/comment.repository';
+import { CommentRepository } from '../adapter/out/persistence/comment.repository';
 
 import { CommentService } from '../use-case/comment.service';
 import {
@@ -17,7 +17,7 @@ import {
   SEARCH_COMMENT,
 } from '../port/in/comment/';
 
-import { CommentController } from '../controller/comment.controller';
+import { CommentController } from '../adapter/in/http/comment.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([CommentEntity, CommentLikeEntity])],

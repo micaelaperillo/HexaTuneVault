@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 
-import { ArtistController } from '../controller/artist.controller';
+import { ArtistController } from '../adapter/in/http/artist.controller';
 import { ExternalApiModule } from '../infrastructure/api/api.module';
 
-import { SpotifyArtistProvider, ARTIST_PROVIDER } from '../adapter';
+import { SpotifyArtistProvider, ARTIST_PROVIDER } from '../adapter/out';
 
 import {
   ArtistService,

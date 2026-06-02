@@ -1,10 +1,10 @@
 import { DataSource, Repository } from 'typeorm';
 import { createTestDataSource } from './datasource';
-import { CommentRepository } from '../../src/adapter/persistence/comment.repository';
-import { CommentEntity } from '../../src/entity/comment.entity';
-import { CommentLikeEntity } from '../../src/entity/comment-like.entity';
-import { UserEntity } from '../../src/entity/user.entity';
-import { ReviewEntity } from '../../src/entity/review.entity';
+import { CommentRepository } from '../../src/adapter/out/persistence/comment.repository';
+import { CommentEntity } from '../../src/adapter/out/persistence/entity/comment.entity';
+import { CommentLikeEntity } from '../../src/adapter/out/persistence/entity/comment-like.entity';
+import { UserEntity } from '../../src/adapter/out/persistence/entity/user.entity';
+import { ReviewEntity } from '../../src/adapter/out/persistence/entity/review.entity';
 
 describe('CommentRepository (integration)', () => {
   let ds: DataSource;

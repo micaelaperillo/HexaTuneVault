@@ -4,8 +4,8 @@ import { ConfigService } from '@nestjs/config';
 import { JwtModule, type JwtModuleOptions } from '@nestjs/jwt';
 
 import { TOKEN_VERIFIER } from '../port/out/token-verifier.port';
-import { JwtTokenRepository } from '../adapter/auth/jwt-token.repository';
-import { JwtAuthGuard } from '../infrastructure/auth/jwt-auth.guard';
+import { JwtTokenRepository } from '../adapter/out/auth/jwt-token.repository';
+import { JwtAuthGuard } from '../adapter/in/http/guard/jwt-auth.guard';
 
 @Global()
 @Module({

@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ReviewEntity } from '../entity/review.entity';
-import { ReviewLikeEntity } from '../entity/review-like.entity';
-import { ReviewRepository } from '../adapter/persistence/review.repository';
-import { ReviewLikeRepository } from '../adapter/persistence/review-like.repository';
+import { ReviewEntity } from '../adapter/out/persistence/entity/review.entity';
+import { ReviewLikeEntity } from '../adapter/out/persistence/entity/review-like.entity';
+import { ReviewRepository } from '../adapter/out/persistence/review.repository';
+import { ReviewLikeRepository } from '../adapter/out/persistence/review-like.repository';
 import { ReviewService } from '../use-case/review.service';
-import { ReviewController } from '../controller/review.controller';
+import { ReviewController } from '../adapter/in/http/review.controller';
 import { CREATE_REVIEW } from '../port/in/review/create-review.port';
 import { DELETE_REVIEW } from '../port/in/review/delete-review.port';
 import { SEARCH_REVIEW } from '../port/in/review/search-review.port';

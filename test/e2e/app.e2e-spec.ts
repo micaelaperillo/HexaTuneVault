@@ -8,10 +8,13 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 
 import { AppModule } from './../../src/app.module';
-import { SPOTIFY_API } from '../../src/adapter/catalog/spotify.provider';
-import { AllExceptionsFilter } from '../../src/infrastructure/filter/all-exceptions.filter';
-import { filters } from '../../src/infrastructure/filter/http-exception.mappers';
-import { ArtistResponseDto, PodcastResponseDto } from '../../src/dto';
+import { SPOTIFY_API } from '../../src/adapter/out/catalog/spotify.provider';
+import { AllExceptionsFilter } from '../../src/adapter/in/http/filter/all-exceptions.filter';
+import { filters } from '../../src/adapter/in/http/filter/http-exception.mappers';
+import {
+  ArtistResponseDto,
+  PodcastResponseDto,
+} from '../../src/adapter/in/http/dto';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication<App>;

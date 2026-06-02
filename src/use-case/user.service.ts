@@ -24,7 +24,7 @@ export {
   LIST_FOLLOWS,
 } from '../port/in/user';
 import { UserModel } from '../model/user.model';
-import { JwtModel } from '../model/jwt.model';
+import { AuthToken } from '../model/auth-token.model';
 import { UserFilters } from '../model/user-filter.model';
 import { Page, PageRequest } from '../model/page.model';
 import { UserNotFoundException } from '../error/user/user-not-found.exception';
@@ -53,7 +53,7 @@ export class UserService
 
   async authenticate(
     credentials: Pick<UserModel, 'username' | 'password'>,
-  ): Promise<JwtModel> {
+  ): Promise<AuthToken> {
     const user = await this.repo.authenticate(
       credentials.username,
       credentials.password,

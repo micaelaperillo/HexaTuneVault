@@ -1,6 +1,6 @@
-import * as albumProvider from '../../src/adapter/catalog/album.provider';
-import * as artistProvider from '../../src/adapter/catalog/artist.provider';
-import * as podcastProvider from '../../src/adapter/catalog/podcast.provider';
+import * as albumProvider from '../../src/adapter/out/catalog/album.provider';
+import * as artistProvider from '../../src/adapter/out/catalog/artist.provider';
+import * as podcastProvider from '../../src/adapter/out/catalog/podcast.provider';
 import * as artistService from '../../src/use-case/artist.service';
 import * as podcastService from '../../src/use-case/podcast.service';
 import * as commentService from '../../src/use-case/comment.service';

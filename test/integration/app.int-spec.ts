@@ -7,9 +7,9 @@ import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import type { App } from 'supertest/types';
 import { AppModule } from '../../src/app.module';
-import { SPOTIFY_API } from '../../src/adapter/catalog/spotify.provider';
-import { AllExceptionsFilter } from '../../src/infrastructure/filter/all-exceptions.filter';
-import { filters } from '../../src/infrastructure/filter/http-exception.mappers';
+import { SPOTIFY_API } from '../../src/adapter/out/catalog/spotify.provider';
+import { AllExceptionsFilter } from '../../src/adapter/in/http/filter/all-exceptions.filter';
+import { filters } from '../../src/adapter/in/http/filter/http-exception.mappers';
 
 describe('Review likes (HTTP integration)', () => {
   let app: INestApplication<App>;
