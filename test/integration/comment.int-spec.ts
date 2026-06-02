@@ -1,6 +1,6 @@
 import { DataSource, Repository } from 'typeorm';
 import { createTestDataSource } from './datasource';
-import { CommentRepository } from '../../src/adapter/comment.repository';
+import { CommentRepository } from '../../src/adapter/persistence/comment.repository';
 import { CommentEntity } from '../../src/entity/comment.entity';
 import { CommentLikeEntity } from '../../src/entity/comment-like.entity';
 import { UserEntity } from '../../src/entity/user.entity';

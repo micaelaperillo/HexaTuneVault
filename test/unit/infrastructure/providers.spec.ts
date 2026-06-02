@@ -1,10 +1,10 @@
 import type { ConfigService } from '@nestjs/config';
 import { SpotifyApi } from '@spotify/web-api-ts-sdk';
-import { postgresConfig } from '../../../src/infrastructure/database/provider/postgres.provider';
+import { postgresConfig } from '../../../src/adapter/persistence/postgres.provider';
 import {
   spotify,
   SPOTIFY_API,
-} from '../../../src/infrastructure/api/provider/spotify.provider';
+} from '../../../src/adapter/catalog/spotify.provider';
 
 function fakeConfig(map: Record<string, string>): ConfigService {
   return {

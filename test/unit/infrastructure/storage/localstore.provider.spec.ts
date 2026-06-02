@@ -2,7 +2,7 @@ import type { Request } from 'express';
 import {
   localstore,
   uploadFilename,
-} from '../../../../src/infrastructure/storage/provider/localstore.provider';
+} from '../../../../src/adapter/storage/localstore.provider';
 
 describe('localstore provider', () => {
   it('registers the multer and static-serving modules', () => {

@@ -1,4 +1,4 @@
-import { ReviewLikeRepository } from '../../../src/adapter/review-like.repository';
+import { ReviewLikeRepository } from '../../../src/adapter/persistence/review-like.repository';
 import { ReviewLikeEntity } from '../../../src/entity/review-like.entity';
 import { ReviewNotFoundException } from '../../../src/error/review/review-not-found.exception';
 import { ReviewRepositoryException } from '../../../src/error/review/review-repository.exception';

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { SPOTIFY_API } from '../../../src/infrastructure/api/provider';
+import { SPOTIFY_API } from '../../../src/adapter/catalog/spotify.provider';
 import { SpotifyArtistProvider } from '../../../src/adapter';
 import { ArtistProviderError } from '../../../src/error';
 

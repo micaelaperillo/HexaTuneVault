@@ -1,17 +1,17 @@
 import type { SpotifyApi, Artist } from '@spotify/web-api-ts-sdk';
 
-import type { ArtistModel, ArtistFilters, Page } from '../model';
-import type { IArtistProvider } from '../port/out';
+import type { ArtistModel, ArtistFilters, Page } from '../../model';
+import type { IArtistProvider } from '../../port/out';
 
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
-import { SPOTIFY_API } from '../infrastructure/api/provider';
-import { ArtistProviderError } from '../error/artist';
+import { SPOTIFY_API } from './spotify.provider';
+import { ArtistProviderError } from '../../error/artist';
 import { resolveSpotifyPage } from './spotify-pagination';
 import { escapeSpotifyTerm } from './spotify-query';
 import { MapErrors } from 'error-mapper-decorator';
 
-export { ARTIST_PROVIDER } from '../port/out';
+export { ARTIST_PROVIDER } from '../../port/out';
 
 @Injectable()
 export class SpotifyArtistProvider implements IArtistProvider {

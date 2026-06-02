@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { postgresConfig } from './provider';
+import { postgresConfig } from '../../adapter/persistence/postgres.provider';
 
 @Module({
   imports: [

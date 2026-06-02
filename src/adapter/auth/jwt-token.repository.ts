@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { MapErrors } from 'error-mapper-decorator';
-import { ITokenVerifier } from '../port/out/token-verifier.port';
-import { ITokenIssuer } from '../port/out/token-issuer.port';
-import { InvalidTokenException } from '../error/auth/invalid-token.exception';
-import { JwtModel, UserModel } from '../model';
+import { ITokenVerifier } from '../../port/out/token-verifier.port';
+import { ITokenIssuer } from '../../port/out/token-issuer.port';
+import { InvalidTokenException } from '../../error/auth/invalid-token.exception';
+import { JwtModel, UserModel } from '../../model';
 
 type Claims = { sub: UserModel['id'] };
 

@@ -2,16 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder, TypeORMError } from 'typeorm';
 import { MapErrors } from 'error-mapper-decorator';
-import { CommentEntity } from '../entity/comment.entity';
-import { CommentLikeEntity } from '../entity/comment-like.entity';
-import { ICommentRepository } from '../port/out/comment-repository.port';
-import type { CommentModel } from '../model/comment.model';
-import type { CommentFilters } from '../model/comment.filter';
-import type { ReviewModel, UserModel } from '../model';
-import type { Page } from '../model';
-import { buildSubject } from '../model/review-subject';
+import { CommentEntity } from '../../entity/comment.entity';
+import { CommentLikeEntity } from '../../entity/comment-like.entity';
+import { ICommentRepository } from '../../port/out/comment-repository.port';
+import type { CommentModel } from '../../model/comment.model';
+import type { CommentFilters } from '../../model/comment.filter';
+import type { ReviewModel, UserModel } from '../../model';
+import type { Page } from '../../model';
+import { buildSubject } from '../../model/review-subject';
 import { escapeLike } from './like-escape';
-import { CommentDBException } from '../error/comment/comment-db.exception';
+import { CommentDBException } from '../../error/comment/comment-db.exception';
 
 @Injectable()
 @MapErrors(

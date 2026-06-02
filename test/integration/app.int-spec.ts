@@ -7,7 +7,7 @@ import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import type { App } from 'supertest/types';
 import { AppModule } from '../../src/app.module';
-import { SPOTIFY_API } from '../../src/infrastructure/api/provider';
+import { SPOTIFY_API } from '../../src/adapter/catalog/spotify.provider';
 import { AllExceptionsFilter } from '../../src/infrastructure/filter/all-exceptions.filter';
 import { filters } from '../../src/infrastructure/filter/http-exception.mappers';
 

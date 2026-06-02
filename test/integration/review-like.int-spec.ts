@@ -1,6 +1,6 @@
 import { DataSource, Repository } from 'typeorm';
 import { createTestDataSource } from './datasource';
-import { ReviewLikeRepository } from '../../src/adapter/review-like.repository';
+import { ReviewLikeRepository } from '../../src/adapter/persistence/review-like.repository';
 import { ReviewLikeEntity } from '../../src/entity/review-like.entity';
 import { UserEntity } from '../../src/entity/user.entity';
 import { ReviewEntity } from '../../src/entity/review.entity';

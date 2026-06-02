@@ -1,4 +1,4 @@
-import { ReviewRepository } from '../../../src/adapter/review.repository';
+import { ReviewRepository } from '../../../src/adapter/persistence/review.repository';
 import { ReviewEntity } from '../../../src/entity/review.entity';
 import { ReviewRepositoryException } from '../../../src/error/review/review-repository.exception';
 import { QueryFailedError } from 'typeorm';

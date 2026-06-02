@@ -1,11 +1,11 @@
 import type { ConfigService } from '@nestjs/config';
 import type { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-import { ReviewEntity } from '../../../entity/review.entity';
-import { ReviewLikeEntity } from '../../../entity/review-like.entity';
-import { CommentEntity } from '../../../entity/comment.entity';
-import { CommentLikeEntity } from '../../../entity/comment-like.entity';
-import { UserEntity } from '../../../entity/user.entity';
+import { ReviewEntity } from '../../entity/review.entity';
+import { ReviewLikeEntity } from '../../entity/review-like.entity';
+import { CommentEntity } from '../../entity/comment.entity';
+import { CommentLikeEntity } from '../../entity/comment-like.entity';
+import { UserEntity } from '../../entity/user.entity';
 
 export function postgresConfig(config: ConfigService): TypeOrmModuleOptions {
   return {

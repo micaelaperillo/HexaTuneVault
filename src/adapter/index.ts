@@ -1,3 +1,3 @@
-export * from './artist.provider';
-export * from './podcast.provider';
-export * from './album.provider';
+export * from './catalog/artist.provider';
+export * from './catalog/podcast.provider';
+export * from './catalog/album.provider';

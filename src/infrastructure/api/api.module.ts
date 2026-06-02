@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { spotify } from './provider';
+import { spotify } from '../../adapter/catalog/spotify.provider';
 
 @Module({
   providers: [spotify],

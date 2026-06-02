@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommentEntity } from '../entity/comment.entity';
 import { CommentLikeEntity } from '../entity/comment-like.entity';
 import { COMMENT_REPOSITORY } from '../port/out/comment-repository.port';
-import { CommentRepository } from '../adapter/comment.repository';
+import { CommentRepository } from '../adapter/persistence/comment.repository';
 
 import { CommentService } from '../use-case/comment.service';
 import {

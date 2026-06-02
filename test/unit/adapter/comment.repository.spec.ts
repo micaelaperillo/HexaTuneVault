@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { QueryFailedError } from 'typeorm';
-import { CommentRepository } from '../../../src/adapter/comment.repository';
+import { CommentRepository } from '../../../src/adapter/persistence/comment.repository';
 import { CommentEntity } from '../../../src/entity/comment.entity';
 import { CommentLikeEntity } from '../../../src/entity/comment-like.entity';
 import { CommentDBException } from '../../../src/error/comment/comment-db.exception';
