@@ -16,7 +16,7 @@ import {
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { CurrentUser } from './decorator/current-user.decorator';
-import type { AuthenticatedUser } from './authenticated-user';
+import type { AuthenticatedUser } from './auth/authenticated-user';
 import { ForbiddenUserActionException } from '../../../error/user/';
 
 import {

@@ -14,7 +14,7 @@ import {
   TOKEN_VERIFIER,
   type ITokenVerifier,
 } from '../../../../port/out/token-verifier.port';
-import type { AuthenticatedRequest } from '../authenticated-request';
+import type { AuthenticatedRequest } from '../auth/authenticated-request';
 import { InvalidTokenException } from '../../../../error/auth/invalid-token.exception';
 
 @Injectable()

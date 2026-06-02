@@ -42,7 +42,7 @@ import { LikedResponseDto } from './dto/liked-response.dto';
 import { PageDto } from './dto/page.dto';
 import { Public } from './decorator/public.decorator';
 import { CurrentUser } from './decorator/current-user.decorator';
-import type { AuthenticatedUser } from './authenticated-user';
+import type { AuthenticatedUser } from './auth/authenticated-user';
 
 import { plainToInstance } from 'class-transformer';
 

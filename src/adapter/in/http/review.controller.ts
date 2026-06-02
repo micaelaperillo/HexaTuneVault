@@ -44,7 +44,7 @@ import { splitSubject } from '../../../model/review-subject';
 import { plainToInstance } from 'class-transformer';
 import { Public } from './decorator/public.decorator';
 import { CurrentUser } from './decorator/current-user.decorator';
-import type { AuthenticatedUser } from './authenticated-user';
+import type { AuthenticatedUser } from './auth/authenticated-user';
 import { PageDto } from './dto/page.dto';
 
 @Controller('api/reviews')
