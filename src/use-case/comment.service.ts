@@ -1,18 +1,29 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { ICreateComment } from '../port/comment/i-create-comment.port';
-import { IDeleteComment } from '../port/comment/i-delete-comment.port';
-import { ISearchComment } from '../port/comment/i-search-comment.port';
-import { IGetComment } from '../port/comment/i-get-comment.port';
-import { IGetCommentReplies } from '../port/comment/i-get-comment-replies.port';
-import { IHasLikedComment } from '../port/comment/i-has-liked-comment.port';
-import { ILikeComment } from '../port/comment/i-like-comment-port';
+import type {
+  CommentModel,
+  CommentFilters,
+  ReviewModel,
+  UserModel,
+} from '../model';
+
+import type {
+  ICreateComment,
+  IDeleteComment,
+  ISearchComment,
+  IGetComment,
+  IGetCommentReplies,
+  ILikeComment,
+  IHasLikedComment,
+} from '../port/comment';
 import {
   COMMENT_REPOSITORY,
   type ICommentRepository,
 } from '../repository/i-comment.repository';
-import { CommentModel } from '../model/comment.model';
-import { CommentFilters } from '../model/comment.filter';
-import { CommentNotFoundException } from '../error/comment/comment-not-found.exception';
+
+import { CommentNotFoundException } from '../error/comment';
+
+import { Inject, Injectable } from '@nestjs/common';
+
+export { COMMENT_REPOSITORY } from '../repository/i-comment.repository';
 
 @Injectable()
 export class CommentService
@@ -31,7 +42,13 @@ export class CommentService
   ) {}
 
   async create(
-    comment: Omit<CommentModel, 'id' | 'createdAt' | 'likes'>,
+    comment: Omit<
+      CommentModel,
+      'id' | 'createdAt' | 'likes' | 'createdBy' | 'parentReview'
+    > & {
+      createdBy: Pick<UserModel, 'id'>;
+      parentReview: Pick<ReviewModel, 'id'>;
+    },
   ): Promise<CommentModel> {
     return this.repo.create(comment);
   }
@@ -54,9 +71,11 @@ export class CommentService
 
   async getReplies(commentId: number): Promise<CommentModel[]> {
     const comment = await this.repo.findById(commentId);
+
     if (!comment) {
       throw new CommentNotFoundException(commentId);
     }
+
     return this.repo.findReplies(commentId);
   }
 

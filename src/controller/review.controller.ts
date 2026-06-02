@@ -21,13 +21,16 @@ import type { IGetReview } from '../port/review/get-review.port';
 import { CreateReviewRequest } from '../dto/create-review.request';
 import { SearchReviewQueryDto } from '../dto/search-review-query.dto';
 import { ReviewResponse } from '../dto/review-response.dto';
-import { ReviewSearchCriteriaMapper } from './review-search-criteria.mapper';
 import {
   CREATE_REVIEW,
   DELETE_REVIEW,
   SEARCH_REVIEW,
   GET_REVIEW,
 } from '../port/review/tokens';
+import { ReviewSearchCriteria } from '../model/review-search-criteria';
+import { ReviewModel, UserModel } from '../model';
+import { plainToInstance } from 'class-transformer';
+import { PageDto } from '../dto/page.dto';
 
 @Controller('api/reviews')
 export class ReviewController {
@@ -44,32 +47,33 @@ export class ReviewController {
     @Res({ passthrough: true }) res: Response,
     @Req() req: Request,
   ): Promise<ReviewResponse> {
-    // TODO: replace hardcoded userId with @CurrentUser() from AuthGuard
-    const userId = '1';
+    // TODO: replace hardcoded user with @CurrentUser() from AuthGuard
+    const user = { id: 1 } as UserModel;
     const review = await this.createReview.execute({
       content: dto.content,
       rating: dto.rating,
       subjectType: dto.subject_type,
       subjectId: dto.subject_id,
-      authorId: userId,
+      author: user,
     });
-    const response = ReviewResponse.fromDomain(review);
+
     res.header(
       'Location',
-      `${req.protocol}://${req.get('host')}/api/reviews/${response.id}`,
+      `${req.protocol}://${req.get('host')}/api/reviews/${review.id}`,
     );
-    return response;
+
+    return ReviewController.toResponse(review);
   }
 
   @Get()
   async search(
     @Query() dto: SearchReviewQueryDto,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<ReviewResponse[]> {
+  ): Promise<PageDto<ReviewResponse>> {
     const criteria = ReviewSearchCriteriaMapper.fromDto(dto);
-    const { data, total } = await this.searchReview.execute(criteria);
+    const { items, total, ...page } = await this.searchReview.execute(criteria);
     res.header('X-Total-Count', total.toString());
-    return data.map((review) => ReviewResponse.fromDomain(review));
+    return PageDto.of(items.map(ReviewController.toResponse), page, total);
   }
 
   @Get(':id')
@@ -77,14 +81,60 @@ export class ReviewController {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<ReviewResponse> {
     const review = await this.getReview.execute(id);
-    return ReviewResponse.fromDomain(review);
+    return ReviewController.toResponse(review);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     // TODO: replace hardcoded userId with @CurrentUser() from AuthGuard
-    const userId = '1';
-    await this.deleteReview.execute({ reviewId: id, requesterId: userId });
+    const user = { id: 1 } as UserModel;
+    await this.deleteReview.execute({ reviewId: id, requesterId: user });
+  }
+
+  private static toResponse(this: void, review: ReviewModel) {
+    if (review.id === undefined || review.createdAt === undefined) {
+      throw new Error('Cannot create response from unsaved review');
+    }
+
+    return plainToInstance(
+      ReviewResponse,
+      {
+        ...review,
+        created_at: review.createdAt,
+        updated_at: review.updatedAt,
+        self: `/api/reviews/${review.id}`,
+        collection: `/api/reviews`,
+        subject: `/api/${review.subjectRef.type}s/${review.subjectRef.id}`,
+        author: `/api/users/${review.author.id}`,
+      },
+      { excludeExtraneousValues: true },
+    );
+  }
+}
+
+class ReviewSearchCriteriaMapper {
+  static fromDto(dto: SearchReviewQueryDto): ReviewSearchCriteria {
+    const base = {
+      page: dto.page,
+      pageSize: dto.page_size,
+      content: dto.content_contains,
+      authorId: dto.author_id,
+      minRating: dto.min_rating,
+      maxRating: dto.max_rating,
+      dateFrom: dto.date_from,
+      dateTo: dto.date_to,
+      sortBy: dto.sort_by,
+      sortOrder: dto.sort_order,
+    };
+
+    if (dto.subject_type !== undefined) {
+      return {
+        ...base,
+        subjectType: dto.subject_type,
+        subjectId: dto.subject_id,
+      };
+    }
+    return { ...base, subjectType: undefined, subjectId: undefined };
   }
 }

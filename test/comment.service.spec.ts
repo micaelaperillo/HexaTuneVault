@@ -3,16 +3,29 @@ import { CommentService } from '../src/use-case/comment.service';
 import { COMMENT_REPOSITORY } from '../src/repository/i-comment.repository';
 import { CommentModel } from '../src/model/comment.model';
 import { CommentNotFoundException } from '../src/error/comment/comment-not-found.exception';
+import { ReviewModel, UserModel } from '../src/model';
+import { SubjectReference } from '../src/model/subject-reference';
 
 describe('CommentService', () => {
   let service: CommentService;
+
+  const mockUser = { id: 1 } as unknown as UserModel;
+
+  const mockReview = {
+    id: 10,
+    author: mockUser,
+    content: 'idk',
+    rating: 1,
+    createdAt: new Date('2024-01-01'),
+    subjectRef: new SubjectReference('artist', 'The Beatles'),
+  } as ReviewModel;
 
   const mockComment: CommentModel = {
     id: 1,
     content: 'Test comment',
     createdAt: new Date('2024-01-01'),
-    createdById: 1,
-    parentReviewId: 10,
+    createdBy: mockUser,
+    parentReview: mockReview,
     parentCommentId: null,
     likes: 0,
   };
@@ -46,8 +59,8 @@ describe('CommentService', () => {
       mockRepo.create.mockResolvedValue(mockComment);
       const input = {
         content: 'Test comment',
-        createdById: 1,
-        parentReviewId: 10,
+        createdBy: { id: 1 },
+        parentReview: { id: 10 },
         parentCommentId: null,
       };
       const result = await service.create(input);

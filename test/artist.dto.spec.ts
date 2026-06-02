@@ -3,7 +3,7 @@ import { plainToInstance } from 'class-transformer';
 
 import { ArtistFilterDto, ArtistGetDto } from '../src/dto';
 
-describe('ArtistController', () => {
+describe('ArtistValidations', () => {
   describe('search', () => {
     function transform(data: Record<string, unknown>): ArtistFilterDto {
       return plainToInstance(ArtistFilterDto, data);

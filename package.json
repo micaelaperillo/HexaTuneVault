@@ -80,9 +80,18 @@
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
-    "setupFiles": ["reflect-metadata"],
+    "setupFiles": [
+      "reflect-metadata"
+    ],
     "collectCoverageFrom": [
-      "src/**/*.(t|j)s"
+      "src/**/*.(t|j)s",
+      "!node_modules",
+      "!jestGlobalMocks.ts",
+      "!src/**/index.ts",
+      "!src/**/*.module.ts",
+      "!src/**/*.entity.ts",
+      "!src/**/*.dto.ts",
+      "!src/main.ts"
     ],
     "coverageDirectory": "./coverage",
     "testEnvironment": "node"

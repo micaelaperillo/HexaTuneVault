@@ -6,11 +6,14 @@ import { SubjectType, SubjectReference } from '../src/model/subject-reference';
 import { ReviewCooldownException } from '../src/error/review/review-cooldown.exception';
 import { InvalidReviewException } from '../src/error/review/invalid-review.exception';
 import { ReviewModel } from '../src/model/review.model';
+import { UserModel } from '../src/model';
 
 describe('CreateReviewService', () => {
   let service: CreateReviewService;
   let reviewRepo: jest.Mocked<IReviewRepository>;
   let mockConfig: IReviewConfig;
+
+  const mockUser = { id: 1 } as unknown as UserModel;
 
   beforeEach(() => {
     reviewRepo = createMockReviewRepository();
@@ -28,7 +31,7 @@ describe('CreateReviewService', () => {
       content: 'Great stuff',
       rating: 5,
       createdAt: new Date(),
-      authorId: '1',
+      author: mockUser,
       updatedAt: null,
     });
     reviewRepo.save.mockResolvedValue(mockCreatedReview);
@@ -38,11 +41,11 @@ describe('CreateReviewService', () => {
       subjectId: '1',
       content: 'Great stuff',
       rating: 5,
-      authorId: '1',
+      author: mockUser,
     });
 
     expect(reviewRepo.findRecentByAuthorAndSubject).toHaveBeenCalledWith(
-      '1',
+      mockUser,
       expect.objectContaining({ type: SubjectType.ALBUM, id: '1' }),
       expect.any(Date),
     );
@@ -50,7 +53,7 @@ describe('CreateReviewService', () => {
       expect.objectContaining({
         content: 'Great stuff',
         rating: 5,
-        authorId: '1',
+        author: mockUser,
       }),
     );
     expect(result).toEqual(mockCreatedReview);
@@ -61,7 +64,7 @@ describe('CreateReviewService', () => {
       subjectRef: new SubjectReference(SubjectType.ALBUM, '1'),
       content: 'Old',
       rating: 4,
-      authorId: '1',
+      author: mockUser,
     });
     reviewRepo.findRecentByAuthorAndSubject.mockResolvedValue(existingReview);
 
@@ -71,7 +74,7 @@ describe('CreateReviewService', () => {
         subjectId: '1',
         content: 'New content',
         rating: 3,
-        authorId: '1',
+        author: mockUser,
       }),
     ).rejects.toThrow(ReviewCooldownException);
 
@@ -86,7 +89,7 @@ describe('CreateReviewService', () => {
         subjectId: '1',
         content: 'Great stuff',
         rating: 0,
-        authorId: '1',
+        author: mockUser,
       }),
     ).rejects.toThrow(InvalidReviewException);
 

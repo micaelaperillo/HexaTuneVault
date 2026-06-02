@@ -1,3 +1,4 @@
+import type { UserModel } from '.';
 import { SubjectReference } from './subject-reference';
 import { InvalidReviewException } from '../error/review/invalid-review.exception';
 import {
@@ -14,7 +15,7 @@ export class ReviewModel {
     public readonly content: string,
     public readonly rating: number,
     public readonly createdAt: Date | undefined,
-    public readonly authorId: string,
+    public readonly author: UserModel,
     public readonly updatedAt: Date | null,
   ) {}
 
@@ -22,7 +23,7 @@ export class ReviewModel {
     subjectRef: SubjectReference;
     content: string;
     rating: number;
-    authorId: string;
+    author: UserModel;
   }): ReviewModel {
     if (
       !Number.isInteger(params.rating) ||
@@ -48,7 +49,7 @@ export class ReviewModel {
       trimmedContent,
       params.rating,
       undefined,
-      params.authorId,
+      params.author,
       null,
     );
   }
@@ -59,7 +60,7 @@ export class ReviewModel {
     content: string;
     rating: number;
     createdAt: Date;
-    authorId: string;
+    author: UserModel;
     updatedAt: Date | null;
   }): ReviewModel {
     if (!Number.isInteger(params.id) || params.id < 1) {
@@ -78,12 +79,12 @@ export class ReviewModel {
       params.content,
       params.rating,
       params.createdAt,
-      params.authorId,
+      params.author,
       params.updatedAt,
     );
   }
 
-  isOwnedBy(userId: string): boolean {
-    return this.authorId === userId;
+  isOwnedBy(user: Pick<UserModel, 'id'>): boolean {
+    return this.author.id === user.id;
   }
 }
