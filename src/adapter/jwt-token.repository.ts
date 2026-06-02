@@ -17,11 +17,16 @@ export class JwtTokenRepository implements ITokenVerifier, ITokenIssuer {
   async verify(token: string): Promise<Pick<UserModel, 'id'>> {
     let payload: Record<string, unknown>;
     try {
-      payload = await this.jwt.verifyAsync(token);
+      payload = await this.jwt.verifyAsync(token, { algorithms: ['HS256'] });
     } catch {
       throw new InvalidTokenException();
     }
 
-    return { id: payload.sub as UserModel['id'] };
+    const id = Number(payload.sub);
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new InvalidTokenException();
+    }
+
+    return { id };
   }
 }
