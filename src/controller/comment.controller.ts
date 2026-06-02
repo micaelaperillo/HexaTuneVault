@@ -55,6 +55,7 @@ export class CommentController {
 
   @Post()
   async create(@Body() dto: CreateCommentDto): Promise<CommentResponseDto> {
+    // TODO: Use AuthGuard for current user
     const comment = await this.createComment.create({
       content: dto.content,
       createdBy: { id: dto.createdById },
