@@ -26,6 +26,8 @@ import { ReviewNotFoundException } from '../../error/review/review-not-found.exc
 import { ForbiddenDeletionException } from '../../error/review/forbidden-deletion.exception';
 import { InvalidReviewException } from '../../error/review/invalid-review.exception';
 import { ReviewCooldownException } from '../../error/review/review-cooldown.exception';
+import { NotLikedException } from '../../error/review/not-liked.exception';
+import { ReviewRepositoryException } from '../../error/review/review-repository.exception';
 
 // Single response envelope across the app: { statusCode, code, message }.
 // Domain exceptions carry a stable machine-readable `code`; for plain
@@ -47,7 +49,12 @@ function send(
   });
 }
 
-@Catch(CommentNotFoundException, UserNotFoundException, ReviewNotFoundException)
+@Catch(
+  CommentNotFoundException,
+  UserNotFoundException,
+  ReviewNotFoundException,
+  NotLikedException,
+)
 export class NotFoundMapper implements ExceptionFilter {
   catch(exception: Error, host: ArgumentsHost): void {
     send(host, HttpStatus.NOT_FOUND, exception, 'NOT_FOUND');
@@ -106,6 +113,7 @@ export class TooManyRequestsMapper implements ExceptionFilter {
   UserDBException,
   ArtistProviderError,
   PodcastProviderError,
+  ReviewRepositoryException,
 )
 export class InternalServerErrorMapper implements ExceptionFilter {
   catch(exception: Error, host: ArgumentsHost): void {

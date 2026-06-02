@@ -2,6 +2,7 @@ import {
   Controller,
   Post,
   Get,
+  Put,
   Delete,
   Body,
   Param,
@@ -18,6 +19,8 @@ import type { ICreateReview } from '../port/review/create-review.port';
 import type { IDeleteReview } from '../port/review/delete-review.port';
 import type { ISearchReview } from '../port/review/search-review.port';
 import type { IGetReview } from '../port/review/get-review.port';
+import type { ILikeReview } from '../port/review/like-review.port';
+import type { IUnlikeReview } from '../port/review/unlike-review.port';
 import { CreateReviewRequest } from '../dto/create-review.request';
 import { SearchReviewQueryDto } from '../dto/search-review-query.dto';
 import { ReviewResponse } from '../dto/review-response.dto';
@@ -27,6 +30,8 @@ import {
   DELETE_REVIEW,
   SEARCH_REVIEW,
   GET_REVIEW,
+  LIKE_REVIEW,
+  UNLIKE_REVIEW,
 } from '../port/review/tokens';
 
 @Controller('api/reviews')
@@ -36,6 +41,8 @@ export class ReviewController {
     @Inject(DELETE_REVIEW) private readonly deleteReview: IDeleteReview,
     @Inject(SEARCH_REVIEW) private readonly searchReview: ISearchReview,
     @Inject(GET_REVIEW) private readonly getReview: IGetReview,
+    @Inject(LIKE_REVIEW) private readonly likeReview: ILikeReview,
+    @Inject(UNLIKE_REVIEW) private readonly unlikeReview: IUnlikeReview,
   ) {}
 
   @Post()
@@ -86,5 +93,21 @@ export class ReviewController {
     // TODO: replace hardcoded userId with @CurrentUser() from AuthGuard
     const userId = '1';
     await this.deleteReview.execute({ reviewId: id, requesterId: userId });
+  }
+
+  @Put(':id/likes')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async like(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    // TODO: replace hardcoded userId with @CurrentUser() from AuthGuard
+    const userId = '1';
+    await this.likeReview.execute(id, userId);
+  }
+
+  @Delete(':id/likes')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async unlike(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    // TODO: replace hardcoded userId with @CurrentUser() from AuthGuard
+    const userId = '1';
+    await this.unlikeReview.execute(id, userId);
   }
 }

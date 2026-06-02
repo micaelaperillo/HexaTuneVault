@@ -4,11 +4,15 @@ import type { ICreateReview } from '../src/port/review/create-review.port';
 import type { IDeleteReview } from '../src/port/review/delete-review.port';
 import type { ISearchReview } from '../src/port/review/search-review.port';
 import type { IGetReview } from '../src/port/review/get-review.port';
+import type { ILikeReview } from '../src/port/review/like-review.port';
+import type { IUnlikeReview } from '../src/port/review/unlike-review.port';
 import {
   CREATE_REVIEW,
   DELETE_REVIEW,
   SEARCH_REVIEW,
   GET_REVIEW,
+  LIKE_REVIEW,
+  UNLIKE_REVIEW,
 } from '../src/port/review/tokens';
 import { SubjectType, SubjectReference } from '../src/model/subject-reference';
 import { ReviewModel } from '../src/model/review.model';
@@ -21,6 +25,8 @@ describe('ReviewController', () => {
   let deleteReview: jest.Mocked<IDeleteReview>;
   let searchReview: jest.Mocked<ISearchReview>;
   let getReview: jest.Mocked<IGetReview>;
+  let likeReview: jest.Mocked<ILikeReview>;
+  let unlikeReview: jest.Mocked<IUnlikeReview>;
 
   let mockResponse: { header: jest.Mock };
   let mockRequest: { protocol: string; get: jest.Mock };
@@ -30,6 +36,8 @@ describe('ReviewController', () => {
     deleteReview = { execute: jest.fn() };
     searchReview = { execute: jest.fn() };
     getReview = { execute: jest.fn() };
+    likeReview = { execute: jest.fn() };
+    unlikeReview = { execute: jest.fn() };
 
     mockResponse = {
       header: jest.fn(),
@@ -46,6 +54,8 @@ describe('ReviewController', () => {
         { provide: DELETE_REVIEW, useValue: deleteReview },
         { provide: SEARCH_REVIEW, useValue: searchReview },
         { provide: GET_REVIEW, useValue: getReview },
+        { provide: LIKE_REVIEW, useValue: likeReview },
+        { provide: UNLIKE_REVIEW, useValue: unlikeReview },
       ],
     }).compile();
 
@@ -168,6 +178,22 @@ describe('ReviewController', () => {
         reviewId: 123,
         requesterId: '1',
       });
+    });
+  });
+
+  describe('like', () => {
+    it('should like a review on behalf of the current user', async () => {
+      await controller.like(123);
+
+      expect(likeReview.execute).toHaveBeenCalledWith(123, '1');
+    });
+  });
+
+  describe('unlike', () => {
+    it('should unlike a review on behalf of the current user', async () => {
+      await controller.unlike(123);
+
+      expect(unlikeReview.execute).toHaveBeenCalledWith(123, '1');
     });
   });
 });
