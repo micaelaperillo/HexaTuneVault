@@ -25,7 +25,7 @@ export class AlbumFilterDto {
 
   @IsOptional()
   @IsNumber()
-  @Transform(Number)
+  @Transform(({ value }) => Number(value))
   @Min(0)
   readonly year?: number;
 
