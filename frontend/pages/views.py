@@ -235,7 +235,6 @@ def members_search(request, query):
     context = {
         'result': [
             {'query': query, 'members': accounts},
-            {'query': query, 'members': []},
         ],
     }
     return render(request, 'searchMembers.html', context)
