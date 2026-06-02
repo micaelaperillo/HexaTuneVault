@@ -16,7 +16,7 @@ def decode_token(token: str) -> dict | None:
 
 
 def authenticate(username, password):
-    return api_client.post('/api/users/authenticate', json={
+    return api_client.post('/api/sessions', json={
         'username': username,
         'password': password,
     })

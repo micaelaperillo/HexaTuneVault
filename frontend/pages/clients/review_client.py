@@ -1,3 +1,5 @@
+from urllib.parse import unquote
+
 from . import api_client
 from . import user_client
 from . import artist_client
@@ -8,16 +10,41 @@ from .image_client import DEFAULT_PROFILE_IMAGE
 BASE = '/api/reviews'
 
 
+def _items(data) -> list:
+    """Review search now returns a paginated page ({items, page, total})."""
+    if isinstance(data, list):
+        return data
+    if isinstance(data, dict) and isinstance(data.get('items'), list):
+        return data['items']
+    return []
+
+
+def _id_from(link: str, default: str = '') -> str:
+    if not link:
+        return default
+    return unquote(link.rstrip('/').rsplit('/', 1)[-1])
+
+
+def _subject_ref(link: str) -> tuple[str, str]:
+    """'/api/albums/Abbey Road' -> ('album', 'Abbey Road')."""
+    if not link:
+        return '', ''
+    parts = link.strip('/').split('/', 2)
+    if len(parts) < 3:
+        return '', ''
+    plural = parts[1]
+    subject_type = plural[:-1] if plural.endswith('s') else plural
+    return subject_type, unquote(parts[2])
+
+
 def list_for(subject_type, subject_id, request=None) -> list[dict]:
     data = api_client.get_json(
         BASE, request=request,
         params={'subject_type': subject_type, 'subject_id': str(subject_id)},
         default=[],
     )
-    if not isinstance(data, list):
-        return []
     author_cache: dict[str, tuple[str, dict]] = {}
-    return [_to_post(r, request, author_cache) for r in data]
+    return [_to_post(r, request, author_cache) for r in _items(data)]
 
 
 def get(review_id, request=None) -> dict | None:
@@ -40,10 +67,8 @@ def list_by_author(author_id, request=None) -> list[dict]:
     data = api_client.get_json(
         BASE, request=request, params={'author_id': str(author_id)}, default=[],
     )
-    if not isinstance(data, list):
-        return []
     subject_cache: dict[tuple[str, str], tuple[str, str]] = {}
-    return [_to_profile_post(r, request, subject_cache) for r in data]
+    return [_to_profile_post(r, request, subject_cache) for r in _items(data)]
 
 
 def feed(authors, request=None, limit=20) -> list[dict]:
@@ -53,9 +78,7 @@ def feed(authors, request=None, limit=20) -> list[dict]:
         data = api_client.get_json(
             BASE, request=request,
             params={'author_id': str(author['id'])}, default=[],)
-        if not isinstance(data, list):
-            continue
-        for r in data:
+        for r in _items(data):
             item = _to_profile_post(r, request, subject_cache)
             item['user'] = author.get('username', '')
             items.append(item)
@@ -83,8 +106,7 @@ def _subject(subject_type, subject_id, request, cache) -> tuple[str, str]:
 
 
 def _to_profile_post(r: dict, request, cache) -> dict:
-    subject_type = r.get('subject_type', '')
-    subject_id = r.get('subject_id', '')
+    subject_type, subject_id = _subject_ref(r.get('subject'))
     name, image = _subject(subject_type, subject_id, request, cache)
     return {
         'post_id': r.get('id'),
@@ -122,7 +144,8 @@ def _author(author_id, request, cache) -> tuple[str, dict]:
 
 
 def _to_post(r: dict, request, cache) -> dict:
-    author_id = str(r.get('author_id') or '')
+    author_id = _id_from(r.get('author'))
+    _subject_type, subject_id = _subject_ref(r.get('subject'))
     username, user_info = _author(author_id, request, cache)
     return {
         'author_id': author_id,
@@ -132,7 +155,7 @@ def _to_post(r: dict, request, cache) -> dict:
             'title': r.get('content', ''),
             'date': r.get('created_at', ''),
             'rating': r.get('rating', 0),
-            'vault_id': r.get('subject_id', ''),
+            'vault_id': subject_id,
         },
         'user': user_info,
         'likes': 0,
