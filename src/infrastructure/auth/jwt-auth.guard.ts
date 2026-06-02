@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { IS_PUBLIC_KEY } from './public.decorator';
+import { Public } from './public.decorator';
 import {
   TOKEN_VERIFIER,
   type ITokenVerifier,
@@ -22,11 +22,7 @@ export class JwtAuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-    if (isPublic) {
+    if (this.isPublic(context)) {
       return true;
     }
 
@@ -51,6 +47,15 @@ export class JwtAuthGuard implements CanActivate {
       }
       throw error;
     }
+  }
+
+  private isPublic(context: ExecutionContext): boolean {
+    return (
+      this.reflector.getAllAndOverride(Public, [
+        context.getHandler(),
+        context.getClass(),
+      ]) ?? false
+    );
   }
 
   private extractToken(request: AuthenticatedRequest): string | undefined {

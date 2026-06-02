@@ -1,5 +1,8 @@
-import { SetMetadata, type CustomDecorator } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 
-export const IS_PUBLIC_KEY = 'isPublic';
-
-export const Public = (): CustomDecorator => SetMetadata(IS_PUBLIC_KEY, true);
+// The decorator reference itself is the metadata key (no magic string/symbol).
+// `transform` lets call sites stay `@Public()` with no argument while the
+// stored value is `true`.
+export const Public = Reflector.createDecorator<void, boolean>({
+  transform: () => true,
+});
