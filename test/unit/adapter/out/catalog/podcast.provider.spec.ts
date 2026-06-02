@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { SPOTIFY_API } from '../../../../src/adapter/out/catalog/spotify.provider';
-import { SpotifyPodcastProvider } from '../../../../src/adapter/out';
-import { PodcastProviderError } from '../../../../src/adapter/out/catalog/podcast-provider.error';
+import { SPOTIFY_API } from '../../../../../src/adapter/out/catalog/spotify.provider';
+import { SpotifyPodcastProvider } from '../../../../../src/adapter/out';
+import { PodcastProviderError } from '../../../../../src/adapter/out/catalog/podcast-provider.error';
 
-import type { PodcastModel } from '../../../../src/model';
+import type { PodcastModel } from '../../../../../src/model';
 
 describe('SpotifyPodcastProvider', () => {
   let provider: SpotifyPodcastProvider;

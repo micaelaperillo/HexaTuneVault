@@ -1,4 +1,4 @@
-import { resolveSpotifyPage } from '../../../../src/adapter/out/catalog/spotify-pagination';
+import { resolveSpotifyPage } from '../../../../../src/adapter/out/catalog/spotify-pagination';
 
 describe('resolveSpotifyPage', () => {
   it('uses the provided page and pageSize when valid', () => {

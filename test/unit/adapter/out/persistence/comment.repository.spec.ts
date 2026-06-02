@@ -1,13 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { QueryFailedError } from 'typeorm';
-import { CommentRepository } from '../../../../src/adapter/out/persistence/comment.repository';
-import { CommentEntity } from '../../../../src/adapter/out/persistence/entity/comment.entity';
-import { CommentLikeEntity } from '../../../../src/adapter/out/persistence/entity/comment-like.entity';
-import { CommentDBException } from '../../../../src/adapter/out/persistence/comment-db.exception';
-import { ReviewModel, UserModel } from '../../../../src/model';
-import { UserEntity } from '../../../../src/adapter/out/persistence/entity';
-import { ReviewEntity } from '../../../../src/adapter/out/persistence/entity/review.entity';
+import { CommentRepository } from '../../../../../src/adapter/out/persistence/comment.repository';
+import { CommentEntity } from '../../../../../src/adapter/out/persistence/entity/comment.entity';
+import { CommentLikeEntity } from '../../../../../src/adapter/out/persistence/entity/comment-like.entity';
+import { CommentDBException } from '../../../../../src/adapter/out/persistence/comment-db.exception';
+import { ReviewModel, UserModel } from '../../../../../src/model';
+import { UserEntity } from '../../../../../src/adapter/out/persistence/entity';
+import { ReviewEntity } from '../../../../../src/adapter/out/persistence/entity/review.entity';
 
 describe('CommentRepository', () => {
   let repository: CommentRepository;

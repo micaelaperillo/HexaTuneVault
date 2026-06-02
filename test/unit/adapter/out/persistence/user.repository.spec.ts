@@ -1,9 +1,9 @@
 import { QueryFailedError, type Repository } from 'typeorm';
-import { UserRepository } from '../../../../src/adapter/out/persistence/user.repository';
-import { UserEntity } from '../../../../src/adapter/out/persistence/entity/user.entity';
-import { UserDBException } from '../../../../src/adapter/out/persistence/user-db.exception';
-import { InvalidCredentialsException } from '../../../../src/error/user/invalid-credentials.exception';
-import type { IPasswordHasher } from '../../../../src/port/out/password-hasher.port';
+import { UserRepository } from '../../../../../src/adapter/out/persistence/user.repository';
+import { UserEntity } from '../../../../../src/adapter/out/persistence/entity/user.entity';
+import { UserDBException } from '../../../../../src/adapter/out/persistence/user-db.exception';
+import { InvalidCredentialsException } from '../../../../../src/error/user/invalid-credentials.exception';
+import type { IPasswordHasher } from '../../../../../src/port/out/password-hasher.port';
 
 describe('UserRepository', () => {
   let repository: UserRepository;
