@@ -49,10 +49,11 @@ export class SpotifyArtistProvider implements IArtistProvider {
   }
 
   private static toQuery(filters: ArtistFilters) {
+    const token = ' genre:';
     // TODO: Fix injection vulnerability
     return (
       filters.name +
-      (filters.genre?.length ? `,tag:${filters.genre?.join(',tag:')}` : '')
+      (filters.genre?.length ? `${token}${filters.genre?.join(token)}` : '')
     );
   }
 
