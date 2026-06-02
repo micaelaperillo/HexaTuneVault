@@ -1,3 +1,5 @@
+from urllib.parse import quote
+
 from . import api_client
 
 
@@ -21,7 +23,7 @@ def search(query: str, genre: str = '', request=None) -> list[dict]:
 
 
 def get(name: str, request=None) -> dict | None:
-    data = api_client.get_json(f'/api/artists/{name}', request=request, default=None)
+    data = api_client.get_json(f'/api/artists/{quote(name, safe="")}', request=request, default=None)
     return _to_vault(data) if isinstance(data, dict) else None
 
 
