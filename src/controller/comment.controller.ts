@@ -37,6 +37,7 @@ import { CommentFiltersDto } from '../dto/comment-filters.dto';
 import { CommentResponseDto } from '../dto/comment-response.dto';
 import { CommentLikeQueryDto } from '../dto/comment-like-query.dto';
 import { SetCommentLikeDto } from '../dto/set-comment-like.dto';
+import { Public } from '../infrastructure/auth/public.decorator';
 
 import { plainToInstance } from 'class-transformer';
 
@@ -67,6 +68,7 @@ export class CommentController {
     return CommentController.toResponse(comment);
   }
 
+  @Public()
   @Get()
   async search(
     @Query() filters: CommentFiltersDto,
@@ -80,6 +82,7 @@ export class CommentController {
     return comments.map(CommentController.toResponse);
   }
 
+  @Public()
   @Get(':id')
   async get(
     @Param('id', ParseIntPipe) id: number,
@@ -88,6 +91,7 @@ export class CommentController {
     return CommentController.toResponse(comment);
   }
 
+  @Public()
   @Get(':id/replies')
   async getReplies(
     @Param('id', ParseIntPipe) id: number,

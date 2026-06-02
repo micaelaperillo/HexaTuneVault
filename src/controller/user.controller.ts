@@ -37,11 +37,10 @@ import {
 import { CreateUserDto } from '../dto/create-user.dto';
 import { EditUserDto } from '../dto/edit-user.dto';
 import { UserFiltersDto } from '../dto/user-filters.dto';
-import { LoginUserDto } from '../dto/login-user.dto';
 import { UserResponseDto } from '../dto/user-response.dto';
-import { AuthResponseDto } from '../dto/auth-response.dto';
 import { PageDto } from '../dto/page.dto';
 import { PageQueryDto } from '../dto/page-query.dto';
+import { Public } from '../infrastructure/auth/public.decorator';
 
 @Controller('api/users')
 export class UserController {
@@ -57,26 +56,21 @@ export class UserController {
     @Inject(LIST_FOLLOWS) private readonly listFollows: IListFollows,
   ) {}
 
+  @Public()
   @Post()
   async create(@Body() dto: CreateUserDto): Promise<UserResponseDto> {
     const user = await this.createUser.create(dto);
     return UserController.toResponse(user);
   }
 
-  @Post('authenticate')
-  async authenticate(@Body() dto: LoginUserDto): Promise<AuthResponseDto> {
-    const token = await this.authenticateUser.authenticate(dto);
-    return plainToInstance(AuthResponseDto, token, {
-      excludeExtraneousValues: true,
-    });
-  }
-
+  @Public()
   @Get()
   async search(@Query() filters: UserFiltersDto): Promise<UserResponseDto[]> {
     const users = await this.searchUser.search(filters);
     return users.map(UserController.toResponse);
   }
 
+  @Public()
   @Get(':id')
   async get(@Param('id', ParseIntPipe) id: number): Promise<UserResponseDto> {
     const user = await this.getUser.get(id);
@@ -98,6 +92,7 @@ export class UserController {
     await this.deleteUser.deleteById(id);
   }
 
+  @Public()
   @Get(':id/followers')
   async followers(
     @Param('id', ParseIntPipe) id: number,
@@ -111,6 +106,7 @@ export class UserController {
     );
   }
 
+  @Public()
   @Get(':id/following')
   async following(
     @Param('id', ParseIntPipe) id: number,

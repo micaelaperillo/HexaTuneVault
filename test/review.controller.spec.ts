@@ -90,6 +90,7 @@ describe('ReviewController', () => {
 
       const result = await controller.create(
         dto,
+        mockUser,
         mockResponse as unknown as Response,
         mockRequest as unknown as Request,
       );
@@ -176,7 +177,7 @@ describe('ReviewController', () => {
 
   describe('remove', () => {
     it('should delete a review', async () => {
-      await controller.remove(123);
+      await controller.remove(123, mockUser);
 
       expect(deleteReview.delete).toHaveBeenCalledWith({
         reviewId: 123,
@@ -187,7 +188,7 @@ describe('ReviewController', () => {
 
   describe('like', () => {
     it('should like a review on behalf of the current user', async () => {
-      await controller.like(123);
+      await controller.like(123, mockUser);
 
       expect(likeReview.like).toHaveBeenCalledWith(123, '1');
     });
@@ -195,7 +196,7 @@ describe('ReviewController', () => {
 
   describe('unlike', () => {
     it('should unlike a review on behalf of the current user', async () => {
-      await controller.unlike(123);
+      await controller.unlike(123, mockUser);
 
       expect(unlikeReview.unlike).toHaveBeenCalledWith(123, '1');
     });

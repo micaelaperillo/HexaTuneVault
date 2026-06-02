@@ -42,8 +42,11 @@ import { SearchReviewQueryDto } from '../dto/search-review-query.dto';
 import { ReviewResponse } from '../dto/review-response.dto';
 import { ReviewLikeCountResponse } from '../dto/review-like-count-response.dto';
 import { ReviewSearchCriteria } from '../model/review-search-criteria';
-import { ReviewModel, UserModel } from '../model';
+import { ReviewModel } from '../model';
 import { plainToInstance } from 'class-transformer';
+import { Public } from '../infrastructure/auth/public.decorator';
+import { CurrentUser } from '../infrastructure/auth/current-user.decorator';
+import type { AuthenticatedUser } from '../model/authenticated-user';
 import { PageDto } from '../dto/page.dto';
 
 @Controller('api/reviews')
@@ -62,11 +65,10 @@ export class ReviewController {
   @Post()
   async create(
     @Body() dto: CreateReviewRequest,
+    @CurrentUser() user: AuthenticatedUser,
     @Res({ passthrough: true }) res: Response,
     @Req() req: Request,
   ): Promise<ReviewResponse> {
-    // TODO: replace hardcoded user with @CurrentUser() from AuthGuard
-    const user = { id: 1 } as UserModel;
     const review = await this.createReview.create({
       content: dto.content,
       rating: dto.rating,
@@ -83,6 +85,7 @@ export class ReviewController {
     return ReviewController.toResponse(review);
   }
 
+  @Public()
   @Get()
   async search(
     @Query() dto: SearchReviewQueryDto,
@@ -94,6 +97,7 @@ export class ReviewController {
     return PageDto.of(items.map(ReviewController.toResponse), page, total);
   }
 
+  @Public()
   @Get(':id')
   async getById(
     @Param('id', ParseIntPipe) id: number,
@@ -104,28 +108,32 @@ export class ReviewController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    // TODO: replace hardcoded user with @CurrentUser() from AuthGuard
-    const user = { id: 1 } as UserModel;
+  async remove(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<void> {
     await this.deleteReview.delete({ reviewId: id, requesterId: user });
   }
 
   @Put(':id/likes')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async like(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    // TODO: replace hardcoded userId with @CurrentUser() from AuthGuard
-    const userId = '1';
-    await this.likeReview.like(id, userId);
+  async like(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<void> {
+    await this.likeReview.like(id, String(user.id));
   }
 
   @Delete(':id/likes')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async unlike(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    // TODO: replace hardcoded userId with @CurrentUser() from AuthGuard
-    const userId = '1';
-    await this.unlikeReview.unlike(id, userId);
+  async unlike(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<void> {
+    await this.unlikeReview.unlike(id, String(user.id));
   }
 
+  @Public()
   @Get(':id/likes/count')
   async likeCount(
     @Param('id', ParseIntPipe) id: number,
