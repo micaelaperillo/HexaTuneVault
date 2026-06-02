@@ -14,8 +14,6 @@ import { PodcastProviderError } from '../../../port/out/catalog.error';
 import { resolveSpotifyPage } from './spotify-pagination';
 import { MapErrors } from 'error-mapper-decorator';
 
-export { PODCAST_PROVIDER } from '../../../port/out';
-
 // Spotify only returns shows scoped to a market; default when the caller
 // does not specify one so searches return results out of the box.
 const DEFAULT_MARKET: Market = 'US';

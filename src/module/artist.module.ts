@@ -3,7 +3,8 @@ import { Module } from '@nestjs/common';
 import { ArtistController } from '../adapter/in/http/artist.controller';
 import { ExternalApiModule } from '../infrastructure/api/api.module';
 
-import { SpotifyArtistProvider, ARTIST_PROVIDER } from '../adapter/out';
+import { SpotifyArtistProvider } from '../adapter/out';
+import { ARTIST_PROVIDER } from '../port/out';
 
 import {
   ArtistService,

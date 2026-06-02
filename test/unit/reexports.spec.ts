@@ -1,21 +1,12 @@
-import * as albumProvider from '../../src/adapter/out/catalog/album.provider';
-import * as artistProvider from '../../src/adapter/out/catalog/artist.provider';
-import * as podcastProvider from '../../src/adapter/out/catalog/podcast.provider';
 import * as artistService from '../../src/use-case/artist.service';
 import * as podcastService from '../../src/use-case/podcast.service';
 import * as commentService from '../../src/use-case/comment.service';
 import * as userService from '../../src/use-case/user.service';
 
-// These modules re-export their DI tokens (`export { TOKEN } from '...'`) as a
+// These services re-export their DI tokens (`export { TOKEN } from '...'`) as a
 // convenience for the wiring modules. Accessing each token exercises the
 // re-export bindings.
 describe('module re-exports', () => {
-  it('re-exports the catalog provider tokens', () => {
-    expect(albumProvider.ALBUM_PROVIDER).toBeDefined();
-    expect(artistProvider.ARTIST_PROVIDER).toBeDefined();
-    expect(podcastProvider.PODCAST_PROVIDER).toBeDefined();
-  });
-
   it('re-exports the catalog/comment service tokens', () => {
     expect(artistService.GET_ARTIST).toBeDefined();
     expect(artistService.SEARCH_ARTIST).toBeDefined();

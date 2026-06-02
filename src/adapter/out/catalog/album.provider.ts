@@ -11,8 +11,6 @@ import { resolveSpotifyPage } from './spotify-pagination';
 import { escapeSpotifyTerm } from './spotify-query';
 import { MapErrors } from 'error-mapper-decorator';
 
-export { ALBUM_PROVIDER } from '../../../port/out';
-
 @Injectable()
 export class SpotifyAlbumProvider implements IAlbumProvider {
   private readonly logger = new Logger(SpotifyAlbumProvider.name);
