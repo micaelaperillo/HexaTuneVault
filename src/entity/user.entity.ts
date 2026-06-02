@@ -9,7 +9,9 @@ import {
   ManyToMany,
   JoinTable,
   VirtualColumn,
+  OneToMany,
 } from 'typeorm';
+import { ReviewEntity } from './review.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -51,6 +53,9 @@ export class UserEntity {
 
   @VersionColumn()
   version!: number;
+
+  @OneToMany(() => ReviewEntity, (review) => review.author)
+  reviews!: ReviewEntity[];
 
   @ManyToMany(() => UserEntity, (user) => user.followers)
   @JoinTable({

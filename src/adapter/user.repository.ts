@@ -108,7 +108,7 @@ export class UserRepository implements IUserRepository {
   async findFollowers(
     userId: number,
     { page, pageSize }: PageRequest,
-  ): Promise<Page<number>> {
+  ): Promise<Page<UserModel>> {
     const [rows, total] = await this.run(() =>
       this.repo
         .createQueryBuilder('u')
@@ -117,13 +117,14 @@ export class UserRepository implements IUserRepository {
         .take(pageSize)
         .getManyAndCount(),
     );
-    return { items: rows.map((u) => u.id), page, pageSize, total };
+
+    return { items: rows, page, pageSize, total };
   }
 
   async findFollowing(
     userId: number,
     { page, pageSize }: PageRequest,
-  ): Promise<Page<number>> {
+  ): Promise<Page<UserModel>> {
     const [rows, total] = await this.run(() =>
       this.repo
         .createQueryBuilder('u')
@@ -132,7 +133,8 @@ export class UserRepository implements IUserRepository {
         .take(pageSize)
         .getManyAndCount(),
     );
-    return { items: rows.map((u) => u.id), page, pageSize, total };
+
+    return { items: rows, page, pageSize, total };
   }
 
   private async run<T>(fn: () => Promise<T>): Promise<T> {

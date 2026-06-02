@@ -12,6 +12,7 @@ import {
   CommentDBException,
   CommentNotFoundException,
 } from '../../error/comment/';
+import { AlbumProviderError } from '../../error/album/';
 import { ArtistProviderError } from '../../error/artist/';
 import { PodcastProviderError } from '../../error/podcast/';
 import {
@@ -113,6 +114,7 @@ export class TooManyRequestsMapper implements ExceptionFilter {
   CommentDBException,
   UserDBException,
   ArtistProviderError,
+  AlbumProviderError,
   PodcastProviderError,
   ReviewRepositoryException,
 )

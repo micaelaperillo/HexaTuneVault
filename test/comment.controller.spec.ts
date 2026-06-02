@@ -14,16 +14,37 @@ import { CommentModel } from '../src/model/comment.model';
 import { CommentResponseDto } from '../src/dto/comment-response.dto';
 import { CreateCommentDto } from '../src/dto/create-comment.dto';
 import { SetCommentLikeDto } from '../src/dto/set-comment-like.dto';
+import { SubjectReference } from '../src/model/subject-reference';
+import { ReviewModel, UserModel } from '../src/model';
 
 describe('CommentController', () => {
   let controller: CommentController;
+
+  const mockUser: UserModel = {
+    id: 1,
+    username: 'a',
+    password: 'b',
+    firstName: 'A',
+    lastName: 'B',
+    email: 'a@b.c',
+    biography: 'abc',
+    profilePictureUrl: 'a.b',
+  };
 
   const mockComment: CommentModel = {
     id: 1,
     content: 'Test comment',
     createdAt: new Date('2024-01-01'),
-    createdById: 1,
-    parentReviewId: 10,
+    createdBy: mockUser,
+    parentReview: ReviewModel.reconstitute({
+      id: 10,
+      author: mockUser,
+      content: 'idk',
+      rating: 1,
+      subjectRef: new SubjectReference('artist', 'The Beatles'),
+      createdAt: new Date(),
+      updatedAt: null,
+    }),
     parentCommentId: null,
     likes: 0,
   };
@@ -68,8 +89,8 @@ describe('CommentController', () => {
 
       expect(mockCreate.create).toHaveBeenCalledWith({
         content: 'Test comment',
-        createdById: 1,
-        parentReviewId: 10,
+        createdBy: { id: 1 },
+        parentReview: { id: 10 },
         parentCommentId: null,
       });
       expect(result).toBeInstanceOf(CommentResponseDto);
@@ -93,8 +114,8 @@ describe('CommentController', () => {
 
       expect(mockCreate.create).toHaveBeenCalledWith({
         content: 'A reply',
-        createdById: 1,
-        parentReviewId: 10,
+        createdBy: { id: 1 },
+        parentReview: { id: 10 },
         parentCommentId: 5,
       });
       expect(result.parent).toBe('/api/comments/5');

@@ -52,11 +52,15 @@ export class SpotifyAlbumProvider implements IAlbumProvider {
     const params: string[] = [];
 
     if (filters.name) {
-      params.push(`album:${filters.name}`);
+      params.push(filters.name);
     }
 
     if (filters.artist) {
-      params.push(`artist:${filters.artist}`);
+      params.push(filters.artist);
+    }
+
+    if (filters.year) {
+      params.push(`year:${filters.year}`);
     }
 
     return params.join(' ');
@@ -76,7 +80,7 @@ export class SpotifyAlbumProvider implements IAlbumProvider {
     return {
       name,
       cover: images[0].url,
-      releaseDate: release_date,
+      releaseDate: new Date(release_date),
       totalTracks: total_tracks,
       artists: artists.map((a) => a.name),
       external_urls: { ...external_urls },

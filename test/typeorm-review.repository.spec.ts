@@ -7,6 +7,7 @@ import { SubjectReference, SubjectType } from '../src/model/subject-reference';
 import type { ReviewSearchCriteria } from '../src/model/review-search-criteria';
 import { SortField, SortOrder } from '../src/model/review-search-criteria';
 import type { Repository } from 'typeorm';
+import { UserEntity } from '../src/entity';
 
 describe('TypeOrmReviewRepository', () => {
   let repository: TypeOrmReviewRepository;
@@ -17,6 +18,7 @@ describe('TypeOrmReviewRepository', () => {
     >
   >;
   let mockQb: Record<string, jest.Mock>;
+  const mockUser = { id: 1 } as unknown as UserEntity;
 
   function makeEntity(overrides?: Partial<ReviewEntity>): ReviewEntity {
     const entity = new ReviewEntity();
@@ -25,7 +27,7 @@ describe('TypeOrmReviewRepository', () => {
     entity.rating = 5;
     entity.subjectType = 'album';
     entity.subjectId = '10';
-    entity.authorId = '42';
+    entity.author = mockUser;
     entity.createdAt = new Date();
     entity.updatedAt = null;
     return Object.assign(entity, overrides);
@@ -37,6 +39,7 @@ describe('TypeOrmReviewRepository', () => {
       orderBy: jest.fn().mockReturnThis(),
       skip: jest.fn().mockReturnThis(),
       take: jest.fn().mockReturnThis(),
+      innerJoinAndSelect: jest.fn().mockReturnThis(),
       getManyAndCount: jest.fn().mockResolvedValue([[], 0]),
     };
 
@@ -58,7 +61,7 @@ describe('TypeOrmReviewRepository', () => {
         subjectRef: new SubjectReference(SubjectType.ALBUM, '10'),
         content: 'Great album',
         rating: 5,
-        authorId: '42',
+        author: mockUser,
       });
 
     it('should save and return domain model', async () => {
@@ -100,7 +103,10 @@ describe('TypeOrmReviewRepository', () => {
 
       expect(result).not.toBeNull();
       expect(result!.id).toBe(1);
-      expect(mockRepo.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(mockRepo.findOne).toHaveBeenCalledWith({
+        where: { id: 1 },
+        relations: { author: true },
+      });
     });
 
     it('should return null when not found', async () => {
@@ -119,7 +125,7 @@ describe('TypeOrmReviewRepository', () => {
 
       const ref = new SubjectReference(SubjectType.ALBUM, '10');
       const result = await repository.findRecentByAuthorAndSubject(
-        '42',
+        mockUser,
         ref,
         since,
       );
@@ -129,7 +135,7 @@ describe('TypeOrmReviewRepository', () => {
       expect(mockRepo.findOne).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            authorId: '42',
+            author: mockUser,
             subjectType: 'album',
             subjectId: '10',
           }),
@@ -143,7 +149,7 @@ describe('TypeOrmReviewRepository', () => {
 
       const ref = new SubjectReference(SubjectType.TRACK, '1');
       const result = await repository.findRecentByAuthorAndSubject(
-        '1',
+        mockUser,
         ref,
         since,
       );
@@ -203,7 +209,7 @@ describe('TypeOrmReviewRepository', () => {
       await repository.search({ ...baseCriteria, authorId: '42' });
 
       expect(mockQb.andWhere).toHaveBeenCalledWith(
-        'review.authorId = :authorId',
+        'review.author.id = :authorId',
         { authorId: '42' },
       );
     });
@@ -304,8 +310,8 @@ describe('TypeOrmReviewRepository', () => {
       const result = await repository.search(baseCriteria);
 
       expect(result.total).toBe(1);
-      expect(result.data).toHaveLength(1);
-      expect(result.data[0].id).toBe(1);
+      expect(result.items).toHaveLength(1);
+      expect(result.items[0].id).toBe(1);
     });
   });
 });

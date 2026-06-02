@@ -1,3 +1,5 @@
+import type { CommentModel } from '../model';
+
 import {
   Controller,
   Inject,
@@ -36,6 +38,8 @@ import { CommentResponseDto } from '../dto/comment-response.dto';
 import { CommentLikeQueryDto } from '../dto/comment-like-query.dto';
 import { SetCommentLikeDto } from '../dto/set-comment-like.dto';
 
+import { plainToInstance } from 'class-transformer';
+
 @Controller('api/comments')
 export class CommentController {
   constructor(
@@ -52,13 +56,15 @@ export class CommentController {
 
   @Post()
   async create(@Body() dto: CreateCommentDto): Promise<CommentResponseDto> {
+    // TODO: Use AuthGuard for current user
     const comment = await this.createComment.create({
       content: dto.content,
-      createdById: dto.createdById,
-      parentReviewId: dto.parentReviewId,
+      createdBy: { id: dto.createdById },
+      parentReview: { id: dto.parentReviewId },
       parentCommentId: dto.parentCommentId ?? null,
     });
-    return CommentResponseDto.from(comment);
+
+    return CommentController.toResponse(comment);
   }
 
   @Get()
@@ -70,7 +76,8 @@ export class CommentController {
       content: filters.content,
       parentReviewId: filters.reviewId,
     });
-    return CommentResponseDto.fromMany(comments);
+
+    return comments.map(CommentController.toResponse);
   }
 
   @Get(':id')
@@ -78,7 +85,7 @@ export class CommentController {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<CommentResponseDto> {
     const comment = await this.getComment.get(id);
-    return CommentResponseDto.from(comment);
+    return CommentController.toResponse(comment);
   }
 
   @Get(':id/replies')
@@ -86,7 +93,7 @@ export class CommentController {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<CommentResponseDto[]> {
     const replies = await this.getCommentReplies.getReplies(id);
-    return CommentResponseDto.fromMany(replies);
+    return replies.map(CommentController.toResponse);
   }
 
   @Get(':id/like')
@@ -113,5 +120,24 @@ export class CommentController {
     @Body() dto: SetCommentLikeDto,
   ): Promise<void> {
     await this.likeComment.setLike(id, dto.user_id, dto.liked);
+  }
+
+  private static toResponse(this: void, comment: CommentModel) {
+    return plainToInstance(
+      CommentResponseDto,
+      {
+        ...comment,
+        self: `/api/comments/${comment.id}`,
+        like: `/api/comments/${comment.id}/like`,
+        replies: `/api/comments/${comment.id}/replies`,
+        collection: `/api/comments`,
+        author: `/api/users/${comment.createdBy.id}`,
+        review: `/api/reviews/${comment.parentReview.id}`,
+        parent: comment.parentCommentId
+          ? `/api/comments/${comment.parentCommentId}`
+          : undefined,
+      },
+      { excludeExtraneousValues: true },
+    );
   }
 }

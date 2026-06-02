@@ -1,6 +1,8 @@
+import { UserModel } from '../../model';
+
 export interface DeleteReviewCommand {
   reviewId: number;
-  requesterId: string;
+  requesterId: Pick<UserModel, 'id'>;
 }
 
 export const DELETE_REVIEW = Symbol('IDeleteReview');

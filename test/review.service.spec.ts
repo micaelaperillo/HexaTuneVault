@@ -8,6 +8,7 @@ import type { ReviewSearchCriteria } from '../src/model/review-search-criteria';
 import { SortField, SortOrder } from '../src/model/review-search-criteria';
 import { SubjectReference, SubjectType } from '../src/model/subject-reference';
 import { ReviewModel } from '../src/model/review.model';
+import type { UserModel } from '../src/model';
 import { ReviewCooldownException } from '../src/error/review/review-cooldown.exception';
 import { InvalidReviewException } from '../src/error/review/invalid-review.exception';
 import { ReviewNotFoundException } from '../src/error/review/review-not-found.exception';
@@ -19,15 +20,17 @@ describe('ReviewService', () => {
   let reviewRepo: jest.Mocked<IReviewRepository>;
   let likeRepo: jest.Mocked<IReviewLikeRepository>;
   const config: IReviewConfig = { cooldownSeconds: 60 };
+  const mockUser = { id: 1 } as unknown as UserModel;
+  const mockUser2 = { id: 2 } as unknown as UserModel;
 
-  const reviewBy = (authorId: string) =>
+  const reviewBy = (author: UserModel) =>
     ReviewModel.reconstitute({
       id: 1,
       subjectRef: new SubjectReference(SubjectType.ALBUM, '1'),
       content: 'Okay',
       rating: 3,
       createdAt: new Date(),
-      authorId,
+      author,
       updatedAt: null,
     });
 
@@ -43,18 +46,18 @@ describe('ReviewService', () => {
       subjectId: '1',
       content: 'Great stuff',
       rating: 5,
-      authorId: '1',
+      author: mockUser,
     };
 
     it('creates and saves a review', async () => {
       reviewRepo.findRecentByAuthorAndSubject.mockResolvedValue(null);
-      const saved = reviewBy('1');
+      const saved = reviewBy(mockUser);
       reviewRepo.save.mockResolvedValue(saved);
 
       const result = await service.create(cmd);
 
       expect(reviewRepo.findRecentByAuthorAndSubject).toHaveBeenCalledWith(
-        '1',
+        mockUser,
         expect.objectContaining({ type: SubjectType.ALBUM, id: '1' }),
         expect.any(Date),
       );
@@ -65,7 +68,9 @@ describe('ReviewService', () => {
     });
 
     it('throws ReviewCooldownException when reviewed recently', async () => {
-      reviewRepo.findRecentByAuthorAndSubject.mockResolvedValue(reviewBy('1'));
+      reviewRepo.findRecentByAuthorAndSubject.mockResolvedValue(
+        reviewBy(mockUser),
+      );
 
       await expect(service.create(cmd)).rejects.toThrow(
         ReviewCooldownException,
@@ -87,22 +92,22 @@ describe('ReviewService', () => {
       reviewRepo.findById.mockResolvedValue(null);
 
       await expect(
-        service.delete({ reviewId: 1, requesterId: '1' }),
+        service.delete({ reviewId: 1, requesterId: mockUser }),
       ).rejects.toThrow(ReviewNotFoundException);
     });
 
     it('throws ForbiddenDeletionException when requester is not the author', async () => {
-      reviewRepo.findById.mockResolvedValue(reviewBy('2'));
+      reviewRepo.findById.mockResolvedValue(reviewBy(mockUser2));
 
       await expect(
-        service.delete({ reviewId: 1, requesterId: '1' }),
+        service.delete({ reviewId: 1, requesterId: mockUser }),
       ).rejects.toThrow(ForbiddenDeletionException);
     });
 
     it('deletes when requester is the owner', async () => {
-      reviewRepo.findById.mockResolvedValue(reviewBy('1'));
+      reviewRepo.findById.mockResolvedValue(reviewBy(mockUser));
 
-      await service.delete({ reviewId: 1, requesterId: '1' });
+      await service.delete({ reviewId: 1, requesterId: mockUser });
 
       expect(reviewRepo.delete).toHaveBeenCalledWith(1);
     });
@@ -116,7 +121,7 @@ describe('ReviewService', () => {
     });
 
     it('returns the review when found', async () => {
-      const review = reviewBy('1');
+      const review = reviewBy(mockUser);
       reviewRepo.findById.mockResolvedValue(review);
 
       const result = await service.get(1);
@@ -135,14 +140,19 @@ describe('ReviewService', () => {
     };
 
     it('returns results from the repository', async () => {
-      const review = reviewBy('1');
-      reviewRepo.search.mockResolvedValue({ data: [review], total: 1 });
+      const review = reviewBy(mockUser);
+      reviewRepo.search.mockResolvedValue({
+        items: [review],
+        total: 1,
+        page: 1,
+        pageSize: 10,
+      });
 
       const result = await service.search(criteria);
 
       expect(reviewRepo.search).toHaveBeenCalledWith(criteria);
       expect(result.total).toBe(1);
-      expect(result.data[0]).toEqual(review);
+      expect(result.items[0]).toEqual(review);
     });
 
     it('passes criteria filters through unchanged', async () => {
@@ -152,7 +162,12 @@ describe('ReviewService', () => {
         authorId: '5',
         minRating: 3,
       };
-      reviewRepo.search.mockResolvedValue({ data: [], total: 0 });
+      reviewRepo.search.mockResolvedValue({
+        items: [],
+        total: 0,
+        page: 1,
+        pageSize: 10,
+      });
 
       await service.search(filtered);
 
@@ -162,7 +177,7 @@ describe('ReviewService', () => {
 
   describe('like', () => {
     it('adds a like when the review exists', async () => {
-      reviewRepo.findById.mockResolvedValue(reviewBy('1'));
+      reviewRepo.findById.mockResolvedValue(reviewBy(mockUser));
 
       await service.like(1, '7');
 
@@ -181,7 +196,7 @@ describe('ReviewService', () => {
 
   describe('unlike', () => {
     it('removes the like when one exists', async () => {
-      reviewRepo.findById.mockResolvedValue(reviewBy('1'));
+      reviewRepo.findById.mockResolvedValue(reviewBy(mockUser));
       likeRepo.removeLike.mockResolvedValue(true);
 
       await service.unlike(1, '7');
@@ -190,7 +205,7 @@ describe('ReviewService', () => {
     });
 
     it('throws NotLikedException when there is no like to remove', async () => {
-      reviewRepo.findById.mockResolvedValue(reviewBy('1'));
+      reviewRepo.findById.mockResolvedValue(reviewBy(mockUser));
       likeRepo.removeLike.mockResolvedValue(false);
 
       await expect(service.unlike(1, '7')).rejects.toThrow(NotLikedException);
@@ -208,7 +223,7 @@ describe('ReviewService', () => {
 
   describe('count', () => {
     it('returns the like count when the review exists', async () => {
-      reviewRepo.findById.mockResolvedValue(reviewBy('1'));
+      reviewRepo.findById.mockResolvedValue(reviewBy(mockUser));
       likeRepo.countLikes.mockResolvedValue(12);
 
       const result = await service.count(1);

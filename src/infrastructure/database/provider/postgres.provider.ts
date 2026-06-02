@@ -15,5 +15,6 @@ export function postgresConfig(config: ConfigService): TypeOrmModuleOptions {
     database: config.get<string>('DB_NAME', 'hexatunevault'),
     entities: [ReviewEntity, ReviewLikeEntity, CommentEntity, UserEntity],
     synchronize: config.get<string>('NODE_ENV') !== 'production',
+    logging: config.get<string>('NODE_ENV') !== 'production',
   };
 }

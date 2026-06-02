@@ -24,7 +24,7 @@ import {
   REVIEW_CONFIG,
   type IReviewConfig,
 } from '../port/review/review-config.port';
-import type { PaginatedResult } from '../common/paginated-result';
+import type { Page, UserModel } from '../model';
 import type { ReviewSearchCriteria } from '../model/review-search-criteria';
 import { ReviewModel } from '../model/review.model';
 import { SubjectReference } from '../model/subject-reference';
@@ -62,12 +62,12 @@ export class ReviewService
       subjectRef,
       content: cmd.content,
       rating: cmd.rating,
-      authorId: cmd.authorId,
+      author: cmd.author as UserModel,
     });
 
     const since = new Date(Date.now() - this.cooldownSeconds * 1000);
     const recent = await this.reviews.findRecentByAuthorAndSubject(
-      cmd.authorId,
+      cmd.author,
       subjectRef,
       since,
     );
@@ -99,9 +99,7 @@ export class ReviewService
     return review;
   }
 
-  async search(
-    criteria: ReviewSearchCriteria,
-  ): Promise<PaginatedResult<ReviewModel>> {
+  async search(criteria: ReviewSearchCriteria): Promise<Page<ReviewModel>> {
     return this.reviews.search(criteria);
   }
 
