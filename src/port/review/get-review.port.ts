@@ -1,5 +1,7 @@
 import type { ReviewModel } from '../../model/review.model';
 
+export const GET_REVIEW = Symbol('IGetReview');
+
 export interface IGetReview {
-  execute(id: number): Promise<ReviewModel>;
+  get(id: number): Promise<ReviewModel>;
 }

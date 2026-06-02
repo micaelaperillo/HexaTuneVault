@@ -1,9 +1,9 @@
-import { Transform } from 'class-transformer';
+import { TrimString } from './transforms';
 import { IsNotEmpty, IsString } from 'class-validator';
 
 export class ArtistGetDto {
   @IsString()
-  @Transform(({ value }) => (value as string).trim())
+  @TrimString()
   @IsNotEmpty()
   readonly name!: string;
 }

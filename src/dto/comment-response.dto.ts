@@ -5,7 +5,7 @@ export class CommentResponseDto {
   content!: string;
 
   @Expose()
-  createdAt!: Date;
+  created_at!: Date;
 
   @Expose()
   self!: `/${string}`;

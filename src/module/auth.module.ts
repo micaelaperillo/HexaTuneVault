@@ -2,7 +2,7 @@ import { Global, Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule, type JwtModuleOptions } from '@nestjs/jwt';
 
-import { TOKEN_VERIFIER } from '../repository/i-token-verifier';
+import { TOKEN_VERIFIER } from '../repository/token-verifier.port';
 import { JwtTokenRepository } from '../adapter/jwt-token.repository';
 import { JwtAuthGuard } from '../infrastructure/auth/jwt-auth.guard';
 

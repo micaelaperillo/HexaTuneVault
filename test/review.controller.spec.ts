@@ -4,17 +4,19 @@ import type { ICreateReview } from '../src/port/review/create-review.port';
 import type { IDeleteReview } from '../src/port/review/delete-review.port';
 import type { ISearchReview } from '../src/port/review/search-review.port';
 import type { IGetReview } from '../src/port/review/get-review.port';
-import {
-  CREATE_REVIEW,
-  DELETE_REVIEW,
-  SEARCH_REVIEW,
-  GET_REVIEW,
-} from '../src/port/review/tokens';
-import { SubjectType, SubjectReference } from '../src/model/subject-reference';
-import { ReviewModel } from '../src/model/review.model';
-import { SortField, SortOrder } from '../src/model/review-search-criteria';
+import type { ILikeReview } from '../src/port/review/like-review.port';
+import type { IUnlikeReview } from '../src/port/review/unlike-review.port';
+import type { ICountReviewLikes } from '../src/port/review/count-review-likes.port';
+import { CREATE_REVIEW } from '../src/port/review/create-review.port';
+import { DELETE_REVIEW } from '../src/port/review/delete-review.port';
+import { SEARCH_REVIEW } from '../src/port/review/search-review.port';
+import { GET_REVIEW } from '../src/port/review/get-review.port';
+import { LIKE_REVIEW } from '../src/port/review/like-review.port';
+import { UNLIKE_REVIEW } from '../src/port/review/unlike-review.port';
+import { COUNT_REVIEW_LIKES } from '../src/port/review/count-review-likes.port';
+import { SortField, SortOrder } from '../src/model/review.filter';
+import type { ReviewModel, UserModel } from '../src/model';
 import type { Response, Request } from 'express';
-import { UserModel } from '../src/model';
 
 describe('ReviewController', () => {
   let controller: ReviewController;
@@ -22,16 +24,33 @@ describe('ReviewController', () => {
   let deleteReview: jest.Mocked<IDeleteReview>;
   let searchReview: jest.Mocked<ISearchReview>;
   let getReview: jest.Mocked<IGetReview>;
+  let likeReview: jest.Mocked<ILikeReview>;
+  let unlikeReview: jest.Mocked<IUnlikeReview>;
+  let countReviewLikes: jest.Mocked<ICountReviewLikes>;
 
   let mockResponse: { header: jest.Mock };
   let mockRequest: { protocol: string; get: jest.Mock };
   const mockUser = { id: 1 } as unknown as UserModel;
 
+  const reviewModel = (overrides: Partial<ReviewModel> = {}): ReviewModel => ({
+    id: 123,
+    subject: { album: '1' },
+    content: 'Great stuff',
+    rating: 5,
+    createdAt: new Date('2023-01-01T00:00:00Z'),
+    author: mockUser,
+    updatedAt: null,
+    ...overrides,
+  });
+
   beforeEach(async () => {
-    createReview = { execute: jest.fn() };
-    deleteReview = { execute: jest.fn() };
-    searchReview = { execute: jest.fn() };
-    getReview = { execute: jest.fn() };
+    createReview = { create: jest.fn() };
+    deleteReview = { delete: jest.fn() };
+    searchReview = { search: jest.fn() };
+    getReview = { get: jest.fn() };
+    likeReview = { like: jest.fn() };
+    unlikeReview = { unlike: jest.fn() };
+    countReviewLikes = { count: jest.fn() };
 
     mockResponse = {
       header: jest.fn(),
@@ -48,6 +67,9 @@ describe('ReviewController', () => {
         { provide: DELETE_REVIEW, useValue: deleteReview },
         { provide: SEARCH_REVIEW, useValue: searchReview },
         { provide: GET_REVIEW, useValue: getReview },
+        { provide: LIKE_REVIEW, useValue: likeReview },
+        { provide: UNLIKE_REVIEW, useValue: unlikeReview },
+        { provide: COUNT_REVIEW_LIKES, useValue: countReviewLikes },
       ],
     }).compile();
 
@@ -59,33 +81,22 @@ describe('ReviewController', () => {
       const dto = {
         content: 'Great stuff',
         rating: 5,
-        subject_type: SubjectType.ALBUM,
-        subject_id: '1',
+        subject: { album: '1' },
       };
 
-      const createdModel = ReviewModel.reconstitute({
-        id: 123,
-        subjectRef: new SubjectReference(SubjectType.ALBUM, '1'),
-        content: 'Great stuff',
-        rating: 5,
-        createdAt: new Date('2023-01-01T00:00:00Z'),
-        author: mockUser,
-        updatedAt: null,
-      });
-
-      createReview.execute.mockResolvedValue(createdModel);
+      createReview.create.mockResolvedValue(reviewModel());
 
       const result = await controller.create(
         dto,
+        mockUser,
         mockResponse as unknown as Response,
         mockRequest as unknown as Request,
       );
 
-      expect(createReview.execute).toHaveBeenCalledWith({
+      expect(createReview.create).toHaveBeenCalledWith({
         content: dto.content,
         rating: dto.rating,
-        subjectType: dto.subject_type,
-        subjectId: dto.subject_id,
+        subject: dto.subject,
         author: mockUser,
       });
       expect(mockResponse.header).toHaveBeenCalledWith(
@@ -95,6 +106,7 @@ describe('ReviewController', () => {
       expect(result.id).toBe(123);
       expect(result.content).toBe('Great stuff');
       expect(result.rating).toBe(5);
+      expect(result.subject).toBe('/api/albums/1');
       expect(result.created_at).toEqual(new Date('2023-01-01T00:00:00Z'));
       expect(result.updated_at).toBeNull();
     });
@@ -102,21 +114,11 @@ describe('ReviewController', () => {
 
   describe('getById', () => {
     it('should return a specific review', async () => {
-      const reviewModel = ReviewModel.reconstitute({
-        id: 123,
-        subjectRef: new SubjectReference(SubjectType.ALBUM, '1'),
-        content: 'Great stuff',
-        rating: 5,
-        createdAt: new Date('2023-01-01T00:00:00Z'),
-        author: mockUser,
-        updatedAt: null,
-      });
-
-      getReview.execute.mockResolvedValue(reviewModel);
+      getReview.get.mockResolvedValue(reviewModel());
 
       const result = await controller.getById(123);
 
-      expect(getReview.execute).toHaveBeenCalledWith(123);
+      expect(getReview.get).toHaveBeenCalledWith(123);
       expect(result.id).toBe(123);
       expect(result.content).toBe('Great stuff');
       expect(result.rating).toBe(5);
@@ -125,18 +127,8 @@ describe('ReviewController', () => {
 
   describe('search', () => {
     it('should return search results and set X-Total-Count header', async () => {
-      const reviewModel = ReviewModel.reconstitute({
-        id: 123,
-        subjectRef: new SubjectReference(SubjectType.ALBUM, '1'),
-        content: 'Search match',
-        rating: 4,
-        createdAt: new Date('2023-01-01T00:00:00Z'),
-        author: mockUser,
-        updatedAt: null,
-      });
-
-      searchReview.execute.mockResolvedValue({
-        items: [reviewModel],
+      searchReview.search.mockResolvedValue({
+        items: [reviewModel({ content: 'Search match', rating: 4 })],
         total: 1,
         page: 1,
         pageSize: 10,
@@ -152,7 +144,7 @@ describe('ReviewController', () => {
         mockResponse as unknown as Response,
       );
 
-      expect(searchReview.execute).toHaveBeenCalledWith(
+      expect(searchReview.search).toHaveBeenCalledWith(
         expect.objectContaining({ page: 1, pageSize: 10 }),
       );
       expect(mockResponse.header).toHaveBeenCalledWith('X-Total-Count', '1');
@@ -163,12 +155,40 @@ describe('ReviewController', () => {
 
   describe('remove', () => {
     it('should delete a review', async () => {
-      await controller.remove(123);
+      await controller.remove(123, mockUser);
 
-      expect(deleteReview.execute).toHaveBeenCalledWith({
+      expect(deleteReview.delete).toHaveBeenCalledWith({
         reviewId: 123,
         requesterId: mockUser,
       });
+    });
+  });
+
+  describe('like', () => {
+    it('should like a review on behalf of the current user', async () => {
+      await controller.like(123, mockUser);
+
+      expect(likeReview.like).toHaveBeenCalledWith(123, 1);
+    });
+  });
+
+  describe('unlike', () => {
+    it('should unlike a review on behalf of the current user', async () => {
+      await controller.unlike(123, mockUser);
+
+      expect(unlikeReview.unlike).toHaveBeenCalledWith(123, 1);
+    });
+  });
+
+  describe('likeCount', () => {
+    it('should return the like count for a review', async () => {
+      countReviewLikes.count.mockResolvedValue(12);
+
+      const result = await controller.likeCount(123);
+
+      expect(countReviewLikes.count).toHaveBeenCalledWith(123);
+      expect(result.review_id).toBe(123);
+      expect(result.count).toBe(12);
     });
   });
 });

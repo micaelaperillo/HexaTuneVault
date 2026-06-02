@@ -8,10 +8,10 @@ export class UserResponseDto {
   username!: string;
 
   @Expose()
-  firstName!: string;
+  first_name!: string;
 
   @Expose()
-  lastName!: string;
+  last_name!: string;
 
   @Expose()
   email!: string;
@@ -23,13 +23,13 @@ export class UserResponseDto {
   location!: string;
 
   @Expose()
-  profilePictureUrl!: string;
+  profile_picture_url!: string;
 
   @Expose()
-  followerCount!: number;
+  follower_count!: number;
 
   @Expose()
-  followingCount!: number;
+  following_count!: number;
 
   @Expose()
   self!: `/${string}`;

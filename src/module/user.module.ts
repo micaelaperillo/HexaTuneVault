@@ -2,11 +2,11 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { UserEntity } from '../entity/user.entity';
-import { USER_REPOSITORY } from '../repository/i-user.repository';
+import { USER_REPOSITORY } from '../repository/user-repository.port';
 import { UserRepository } from '../adapter/user.repository';
-import { PASSWORD_HASHER } from '../repository/i-password-hasher';
+import { PASSWORD_HASHER } from '../repository/password-hasher.port';
 import { Argon2idPasswordHasher } from '../adapter/argon2id-password-hasher';
-import { TOKEN_ISSUER } from '../repository/i-token-issuer';
+import { TOKEN_ISSUER } from '../repository/token-issuer.port';
 import { JwtTokenRepository } from '../adapter/jwt-token.repository';
 
 import {
@@ -22,10 +22,11 @@ import {
 } from '../use-case/user.service';
 
 import { UserController } from '../controller/user.controller';
+import { SessionController } from '../controller/session.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([UserEntity])],
-  controllers: [UserController],
+  controllers: [UserController, SessionController],
   providers: [
     { provide: USER_REPOSITORY, useClass: UserRepository },
     { provide: PASSWORD_HASHER, useClass: Argon2idPasswordHasher },

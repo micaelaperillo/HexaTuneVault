@@ -47,30 +47,49 @@ describe('ArtistController', () => {
   });
 
   describe('search', () => {
-    it('calls searcher port with name filter and returns mapped responses', async () => {
-      mockSearch.search.mockResolvedValue([mockArtist]);
-
-      const result = await controller.search({ q: mockArtist.name });
-
-      expect(mockSearch.search).toHaveBeenCalledWith({ name: 'The Beatles' });
-      expect(result).toHaveLength(1);
-      expect(result[0]).toEqual(mockResponse);
+    const pageOf = (artist: ArtistModel) => ({
+      items: [artist],
+      total: 1,
+      page: 1,
+      pageSize: 10,
     });
 
-    it('calls searcher port with genre filter and returns mapped responses', async () => {
-      mockSearch.search.mockResolvedValue([mockArtist]);
+    it('calls searcher port with name filter and returns a page of responses', async () => {
+      mockSearch.search.mockResolvedValue(pageOf(mockArtist));
+
+      const result = await controller.search({
+        q: mockArtist.name,
+        page: 1,
+        page_size: 10,
+      });
+
+      expect(mockSearch.search).toHaveBeenCalledWith({
+        name: 'The Beatles',
+        genre: undefined,
+        page: 1,
+        pageSize: 10,
+      });
+      expect(result.total).toBe(1);
+      expect(result.items[0]).toEqual(mockResponse);
+    });
+
+    it('calls searcher port with genre filter and returns a page of responses', async () => {
+      mockSearch.search.mockResolvedValue(pageOf(mockArtist));
 
       const result = await controller.search({
         q: mockArtist.name,
         genre: ['Rock'],
+        page: 1,
+        page_size: 10,
       });
 
       expect(mockSearch.search).toHaveBeenCalledWith({
         name: 'The Beatles',
         genre: ['Rock'],
+        page: 1,
+        pageSize: 10,
       });
-      expect(result).toHaveLength(1);
-      expect(result[0]).toEqual(mockResponse);
+      expect(result.items[0]).toEqual(mockResponse);
     });
   });
 

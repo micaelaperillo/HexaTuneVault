@@ -3,6 +3,7 @@ import type {
   CommentFilters,
   ReviewModel,
   UserModel,
+  Page,
 } from '../model';
 
 import type {
@@ -17,13 +18,16 @@ import type {
 import {
   COMMENT_REPOSITORY,
   type ICommentRepository,
-} from '../repository/i-comment.repository';
+} from '../repository/comment-repository.port';
 
-import { CommentNotFoundException } from '../error/comment';
+import {
+  CommentNotFoundException,
+  CommentDeletionForbiddenException,
+} from '../error/comment';
 
 import { Inject, Injectable } from '@nestjs/common';
 
-export { COMMENT_REPOSITORY } from '../repository/i-comment.repository';
+export { COMMENT_REPOSITORY } from '../repository/comment-repository.port';
 
 @Injectable()
 export class CommentService
@@ -53,11 +57,18 @@ export class CommentService
     return this.repo.create(comment);
   }
 
-  async deleteById(commentId: number): Promise<void> {
+  async deleteById(commentId: number, requesterId: number): Promise<void> {
+    const comment = await this.repo.findById(commentId);
+    if (!comment) {
+      throw new CommentNotFoundException(commentId);
+    }
+    if (comment.createdBy.id !== requesterId) {
+      throw new CommentDeletionForbiddenException();
+    }
     await this.repo.deleteById(commentId);
   }
 
-  async search(filters: CommentFilters): Promise<CommentModel[]> {
+  async search(filters: CommentFilters): Promise<Page<CommentModel>> {
     return this.repo.search(filters);
   }
 

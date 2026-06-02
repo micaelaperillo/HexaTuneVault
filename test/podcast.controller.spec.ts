@@ -34,6 +34,13 @@ describe('PodcastController', () => {
     reviews: '/api/reviews?podcast=Joe+Rogan',
   };
 
+  const pageOf = (podcast: PodcastModel) => ({
+    items: [podcast],
+    total: 1,
+    page: 1,
+    pageSize: 10,
+  });
+
   const mockGet = { get: jest.fn() };
   const mockSearch = { search: jest.fn() };
 
@@ -52,24 +59,37 @@ describe('PodcastController', () => {
   });
 
   describe('search', () => {
-    it('calls searcher port with name filter and returns mapped responses', async () => {
-      mockSearch.search.mockResolvedValue([mockPodcast]);
+    it('calls searcher port with name filter and returns a page of responses', async () => {
+      mockSearch.search.mockResolvedValue(pageOf(mockPodcast));
 
-      const result = await controller.search({ q: mockPodcast.name });
+      const result = await controller.search({
+        q: mockPodcast.name,
+        page: 1,
+        page_size: 10,
+      });
 
-      expect(mockSearch.search).toHaveBeenCalledWith({ name: 'Joe Rogan' });
-      expect(result).toHaveLength(1);
-      expect(result[0]).toEqual(mockResponse);
+      expect(mockSearch.search).toHaveBeenCalledWith({
+        name: 'Joe Rogan',
+        explicit: undefined,
+        mediaType: undefined,
+        market: undefined,
+        page: 1,
+        pageSize: 10,
+      });
+      expect(result.total).toBe(1);
+      expect(result.items[0]).toEqual(mockResponse);
     });
 
-    it('calls searcher port with filters and returns mapped responses', async () => {
-      mockSearch.search.mockResolvedValue([mockPodcast]);
+    it('calls searcher port with filters and returns a page of responses', async () => {
+      mockSearch.search.mockResolvedValue(pageOf(mockPodcast));
 
       const result = await controller.search({
         q: mockPodcast.name,
         market: 'US',
         explicit: 'true',
         media_type: 'video',
+        page: 1,
+        page_size: 10,
       });
 
       expect(mockSearch.search).toHaveBeenCalledWith({
@@ -77,9 +97,11 @@ describe('PodcastController', () => {
         market: 'US',
         explicit: true,
         mediaType: 'video',
+        page: 1,
+        pageSize: 10,
       });
-      expect(result).toHaveLength(1);
-      expect(result[0]).toEqual(mockResponse);
+      expect(result.total).toBe(1);
+      expect(result.items[0]).toEqual(mockResponse);
     });
   });
 

@@ -1,13 +1,13 @@
-import type { PodcastModel, PodcastFilters } from '../../model';
+import type { PodcastModel, PodcastFilters, Page } from '../../model';
 
 export const SEARCH_PODCAST = Symbol('ISearchPodcast');
 
 export interface ISearchPodcast {
   /**
-   * Search a podcast
+   * Search podcasts.
    *
-   * @param filters The search filters
-   * @returns The podcasts found
+   * @param filters The search filters (including optional pagination)
+   * @returns A page of podcasts found
    */
-  search(filters: PodcastFilters): Promise<PodcastModel[]>;
+  search(filters: PodcastFilters): Promise<Page<PodcastModel>>;
 }

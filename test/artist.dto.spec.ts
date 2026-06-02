@@ -19,7 +19,7 @@ describe('ArtistValidations', () => {
       const dto = transform({
         q: '  The Beatles  ',
         genre: ['  Rock  '],
-      } satisfies ArtistFilterDto);
+      });
       expect(dto.q).toBe('The Beatles');
       expect(dto.genre?.[0]).toBe('Rock');
     });
@@ -28,7 +28,7 @@ describe('ArtistValidations', () => {
       expect(
         validate({
           q: 'The Beatles',
-        } satisfies ArtistFilterDto),
+        }),
       ).toHaveLength(0);
     });
 
@@ -37,7 +37,7 @@ describe('ArtistValidations', () => {
         validate({
           q: 'The Beatles',
           genre: ['Rock', 'Roll'],
-        } satisfies ArtistFilterDto),
+        }),
       ).toHaveLength(0);
     });
 
@@ -49,7 +49,7 @@ describe('ArtistValidations', () => {
     it('should fail when query is empty', () => {
       const msgs = validate({
         q: '',
-      } satisfies ArtistFilterDto);
+      });
       expect(msgs.length).toBeGreaterThan(0);
     });
 
@@ -57,7 +57,7 @@ describe('ArtistValidations', () => {
       const msgs = validate({
         q: 'The Beatles',
         genre: ['Rock', '  '],
-      } satisfies ArtistFilterDto);
+      });
       expect(msgs.length).toBeGreaterThan(0);
     });
   });
