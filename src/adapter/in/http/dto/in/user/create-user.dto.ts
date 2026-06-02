@@ -1,4 +1,4 @@
-import { TrimString } from './transforms';
+import { TrimString } from '../../transforms';
 import {
   IsEmail,
   IsNotEmpty,

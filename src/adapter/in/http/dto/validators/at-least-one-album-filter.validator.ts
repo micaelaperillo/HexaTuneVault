@@ -3,7 +3,7 @@ import type {
   ValidationArguments,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import type { AlbumSearchDto } from '../album-search.dto';
+import type { AlbumSearchDto } from '../in/album/album-search.dto';
 
 @ValidatorConstraint({ name: 'atLeastOneAlbumFilter', async: false })
 export class AtLeastOneAlbumFilterConstraint implements ValidatorConstraintInterface {

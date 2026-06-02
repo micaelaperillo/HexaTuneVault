@@ -5,7 +5,7 @@ import {
   type IAuthenticateUser,
 } from '../../../../../src/port/in/user/';
 import type { AuthToken } from '../../../../../src/model';
-import { AuthResponseDto } from '../../../../../src/adapter/in/http/dto/auth-response.dto';
+import { AuthResponseDto } from '../../../../../src/adapter/in/http/dto/out/auth';
 
 describe('SessionController', () => {
   let controller: SessionController;

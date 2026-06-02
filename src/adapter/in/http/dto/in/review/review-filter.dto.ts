@@ -10,12 +10,18 @@ import {
   Validate,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { SortField, SortOrder } from '../../../../model/review-filter.model';
-import { SubjectType } from '../../../../model/review-subject';
-import { RATING_MIN, RATING_MAX } from '../../../../model/review-constraints';
-import { MaxRatingDtoConstraint } from './validators/max-rating.validator';
-import { DateRangeDtoConstraint } from './validators/date-range.validator';
-import { SubjectIdRequiresTypeDtoConstraint } from './validators/subject-id-requires-type.validator';
+import {
+  SortField,
+  SortOrder,
+} from '../../../../../../model/review-filter.model';
+import { SubjectType } from '../../../../../../model/review-subject';
+import {
+  RATING_MIN,
+  RATING_MAX,
+} from '../../../../../../model/review-constraints';
+import { MaxRatingDtoConstraint } from '../../validators/max-rating.validator';
+import { DateRangeDtoConstraint } from '../../validators/date-range.validator';
+import { SubjectIdRequiresTypeDtoConstraint } from '../../validators/subject-id-requires-type.validator';
 
 export class ReviewFilterDto {
   @IsOptional()

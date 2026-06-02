@@ -11,10 +11,8 @@ import { AppModule } from './../../src/app.module';
 import { SPOTIFY_API } from '../../src/adapter/out/catalog/spotify.provider';
 import { AllExceptionsFilter } from '../../src/adapter/in/http/filter/all-exceptions.filter';
 import { filters } from '../../src/adapter/in/http/filter/http-exception.mappers';
-import {
-  ArtistResponseDto,
-  PodcastResponseDto,
-} from '../../src/adapter/in/http/dto';
+import { ArtistResponseDto } from '../../src/adapter/in/http/dto/out/artist';
+import { PodcastResponseDto } from '../../src/adapter/in/http/dto/out/podcast';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication<App>;

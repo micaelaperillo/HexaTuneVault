@@ -38,12 +38,10 @@ import {
   type IListFollows,
 } from '../../../port/in';
 
-import { CreateUserDto } from './dto/create-user.dto';
-import { EditUserDto } from './dto/edit-user.dto';
-import { UserFilterDto } from './dto/user-filter.dto';
-import { UserResponseDto } from './dto/user-response.dto';
-import { PageDto } from './dto/page.dto';
-import { PageQueryDto } from './dto/page-query.dto';
+import { CreateUserDto, EditUserDto, UserFilterDto } from './dto/in/user';
+import { UserResponseDto } from './dto/out/user';
+import { PageDto } from './dto/out';
+import { PageQueryDto } from './dto/in';
 import { Public } from './decorator/public.decorator';
 import { pruneUndefined } from './prune-undefined';
 

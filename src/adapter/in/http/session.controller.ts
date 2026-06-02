@@ -5,8 +5,8 @@ import { plainToInstance } from 'class-transformer';
 
 import { AUTHENTICATE_USER, type IAuthenticateUser } from '../../../port/in';
 
-import { LoginUserDto } from './dto/login-user.dto';
-import { AuthResponseDto } from './dto/auth-response.dto';
+import { LoginUserDto } from './dto/in/auth';
+import { AuthResponseDto } from './dto/out/auth';
 import { Public } from './decorator/public.decorator';
 
 @Public()

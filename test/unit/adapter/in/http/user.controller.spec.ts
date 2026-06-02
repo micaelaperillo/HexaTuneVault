@@ -19,7 +19,7 @@ import {
   type IListFollows,
 } from '../../../../../src/port/in/user/';
 import { ForbiddenUserActionException } from '../../../../../src/error/user/';
-import { UserResponseDto } from '../../../../../src/adapter/in/http/dto/user-response.dto';
+import { UserResponseDto } from '../../../../../src/adapter/in/http/dto/out/user';
 import type { UserModel } from '../../../../../src/model';
 import type { AuthenticatedUser } from '../../../../../src/adapter/in/http/auth/authenticated-user';
 

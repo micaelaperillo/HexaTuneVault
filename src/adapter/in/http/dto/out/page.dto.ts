@@ -1,4 +1,4 @@
-import type { PageRequest } from '../../../../model/page.model';
+import type { PageRequest } from '../../../../../model/page.model';
 
 export class PageDto<T> {
   readonly items: T[];

@@ -11,8 +11,8 @@ import {
   LIKE_COMMENT,
 } from '../../../../../src/port/in/comment';
 import { CommentModel } from '../../../../../src/model/comment.model';
-import { CommentResponseDto } from '../../../../../src/adapter/in/http/dto/comment-response.dto';
-import { CreateCommentDto } from '../../../../../src/adapter/in/http/dto/create-comment.dto';
+import { CommentResponseDto } from '../../../../../src/adapter/in/http/dto/out/comment';
+import { CreateCommentDto } from '../../../../../src/adapter/in/http/dto/in/comment';
 import { UserModel } from '../../../../../src/model';
 import type { AuthenticatedUser } from '../../../../../src/adapter/in/http/auth/authenticated-user';
 

@@ -34,12 +34,12 @@ import {
   type ILikeComment,
 } from '../../../port/in';
 
-import { CreateCommentDto } from './dto/create-comment.dto';
-import { CommentFilterDto } from './dto/comment-filter.dto';
-import { CommentResponseDto } from './dto/comment-response.dto';
-import { CommentLikeCountResponse } from './dto/comment-like-count-response.dto';
-import { LikedResponseDto } from './dto/liked-response.dto';
-import { PageDto } from './dto/page.dto';
+import { CreateCommentDto, CommentFilterDto } from './dto/in/comment';
+import {
+  CommentResponseDto,
+  CommentLikeCountResponse,
+} from './dto/out/comment';
+import { LikedResponseDto, PageDto } from './dto/out';
 import { Public } from './decorator/public.decorator';
 import { CurrentUser } from './decorator/current-user.decorator';
 import type { AuthenticatedUser } from './auth/authenticated-user';

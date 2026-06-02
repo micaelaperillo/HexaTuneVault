@@ -3,7 +3,7 @@ import type {
   ValidationArguments,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import type { ReviewFilterDto } from '../review-filter.dto';
+import type { ReviewFilterDto } from '../in/review/review-filter.dto';
 
 @ValidatorConstraint({ async: false })
 export class SubjectIdRequiresTypeDtoConstraint implements ValidatorConstraintInterface {

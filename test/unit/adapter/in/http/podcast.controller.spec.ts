@@ -3,7 +3,7 @@ import { NotFoundException } from '@nestjs/common';
 
 import { PodcastController } from '../../../../../src/adapter/in/http/podcast.controller';
 import { GET_PODCAST, SEARCH_PODCAST } from '../../../../../src/port/in';
-import { PodcastResponseDto } from '../../../../../src/adapter/in/http/dto';
+import { PodcastResponseDto } from '../../../../../src/adapter/in/http/dto/out/podcast';
 
 import type { PodcastModel } from '../../../../../src/model';
 

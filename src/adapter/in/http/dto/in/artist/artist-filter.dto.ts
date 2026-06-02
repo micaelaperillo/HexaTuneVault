@@ -7,7 +7,7 @@ import {
   Min,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { TrimString, TrimStringArray, ToArray } from './transforms';
+import { TrimString, TrimStringArray, ToArray } from '../../transforms';
 
 export class ArtistFilterDto {
   @IsString()

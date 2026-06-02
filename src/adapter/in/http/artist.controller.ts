@@ -7,8 +7,9 @@ import {
   SEARCH_ARTIST,
 } from '../../../port/in';
 
-import { ArtistGetDto, ArtistFilterDto, ArtistResponseDto } from './dto';
-import { PageDto } from './dto/page.dto';
+import { ArtistGetDto, ArtistFilterDto } from './dto/in/artist';
+import { ArtistResponseDto } from './dto/out/artist';
+import { PageDto } from './dto/out';
 
 import {
   Controller,

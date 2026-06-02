@@ -1,41 +1,41 @@
 import {
+  IsBooleanString,
   IsInt,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
   Max,
   Min,
-  Validate,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { TrimString, ToNumber } from './transforms';
-import { AtLeastOneAlbumFilterConstraint } from './validators/at-least-one-album-filter.validator';
+import { TrimString } from '../../transforms';
 
-export class AlbumSearchDto {
+export class PodcastFilterDto {
+  @IsString()
+  @TrimString()
+  @IsNotEmpty()
+  readonly q!: string;
+
+  @IsOptional()
+  @IsBooleanString()
+  readonly explicit?: string;
+
   @IsOptional()
   @IsString()
   @TrimString()
   @IsNotEmpty()
-  readonly q?: string;
+  readonly media_type?: string;
 
   @IsOptional()
   @IsString()
   @TrimString()
   @IsNotEmpty()
-  readonly artist?: string;
-
-  @IsOptional()
-  @ToNumber()
-  @IsNumber()
-  @Min(0)
-  readonly year?: number;
+  readonly market?: string;
 
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  @Validate(AtLeastOneAlbumFilterConstraint)
   readonly page: number = 1;
 
   @IsOptional()

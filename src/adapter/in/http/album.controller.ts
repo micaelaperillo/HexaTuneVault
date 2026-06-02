@@ -7,8 +7,8 @@ import {
   SEARCH_ALBUM,
 } from '../../../port/in';
 
-import { AlbumResponseDto } from './dto';
-import { PageDto } from './dto/page.dto';
+import { AlbumResponseDto } from './dto/out/album';
+import { PageDto } from './dto/out';
 
 import {
   Controller,
@@ -20,9 +20,7 @@ import {
   Inject,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
-import { AlbumFilterDto } from './dto/album-filter.dto';
-import { AlbumSearchDto } from './dto/album-search.dto';
-import { AlbumGetDto } from './dto/album-get.dto';
+import { AlbumFilterDto, AlbumSearchDto, AlbumGetDto } from './dto/in/album';
 
 import { Public } from './decorator/public.decorator';
 

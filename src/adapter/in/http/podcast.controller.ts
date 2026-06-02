@@ -7,8 +7,9 @@ import {
   SEARCH_PODCAST,
 } from '../../../port/in';
 
-import { PodcastGetDto, PodcastFilterDto, PodcastResponseDto } from './dto';
-import { PageDto } from './dto/page.dto';
+import { PodcastGetDto, PodcastFilterDto } from './dto/in/podcast';
+import { PodcastResponseDto } from './dto/out/podcast';
+import { PageDto } from './dto/out';
 
 import {
   Controller,

@@ -33,11 +33,9 @@ import {
   HAS_LIKED_REVIEW,
   type IHasLikedReview,
 } from '../../../port/in';
-import { CreateReviewDto } from './dto/create-review.dto';
-import { ReviewFilterDto } from './dto/review-filter.dto';
-import { ReviewResponseDto } from './dto/review-response.dto';
-import { ReviewLikeCountResponse } from './dto/review-like-count-response.dto';
-import { LikedResponseDto } from './dto/liked-response.dto';
+import { CreateReviewDto, ReviewFilterDto } from './dto/in/review';
+import { ReviewResponseDto, ReviewLikeCountResponse } from './dto/out/review';
+import { LikedResponseDto, PageDto } from './dto/out';
 import type { ReviewFilters } from '../../../model/review-filter.model';
 import type { ReviewModel } from '../../../model';
 import { splitSubject } from '../../../model/review-subject';
@@ -45,7 +43,6 @@ import { plainToInstance } from 'class-transformer';
 import { Public } from './decorator/public.decorator';
 import { CurrentUser } from './decorator/current-user.decorator';
 import type { AuthenticatedUser } from './auth/authenticated-user';
-import { PageDto } from './dto/page.dto';
 
 @Controller('api/reviews')
 export class ReviewController {

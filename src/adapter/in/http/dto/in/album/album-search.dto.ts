@@ -6,11 +6,13 @@ import {
   IsString,
   Max,
   Min,
+  Validate,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { TrimString, ToNumber } from './transforms';
+import { TrimString, ToNumber } from '../../transforms';
+import { AtLeastOneAlbumFilterConstraint } from '../../validators/at-least-one-album-filter.validator';
 
-export class AlbumFilterDto {
+export class AlbumSearchDto {
   @IsOptional()
   @IsString()
   @TrimString()
@@ -24,8 +26,8 @@ export class AlbumFilterDto {
   readonly artist?: string;
 
   @IsOptional()
-  @IsNumber()
   @ToNumber()
+  @IsNumber()
   @Min(0)
   readonly year?: number;
 
@@ -33,6 +35,7 @@ export class AlbumFilterDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
+  @Validate(AtLeastOneAlbumFilterConstraint)
   readonly page: number = 1;
 
   @IsOptional()

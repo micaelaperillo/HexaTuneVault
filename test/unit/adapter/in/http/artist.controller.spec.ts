@@ -3,7 +3,7 @@ import { NotFoundException } from '@nestjs/common';
 
 import { ArtistController } from '../../../../../src/adapter/in/http/artist.controller';
 import { GET_ARTIST, SEARCH_ARTIST } from '../../../../../src/port/in';
-import { ArtistResponseDto } from '../../../../../src/adapter/in/http/dto';
+import { ArtistResponseDto } from '../../../../../src/adapter/in/http/dto/out/artist';
 
 import type { ArtistModel } from '../../../../../src/model';
 

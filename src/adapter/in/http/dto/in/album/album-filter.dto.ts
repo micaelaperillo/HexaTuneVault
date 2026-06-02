@@ -1,36 +1,33 @@
 import {
-  IsBooleanString,
   IsInt,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   Max,
   Min,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { TrimString } from './transforms';
+import { TrimString, ToNumber } from '../../transforms';
 
-export class PodcastFilterDto {
+export class AlbumFilterDto {
+  @IsOptional()
   @IsString()
   @TrimString()
   @IsNotEmpty()
-  readonly q!: string;
-
-  @IsOptional()
-  @IsBooleanString()
-  readonly explicit?: string;
+  readonly q?: string;
 
   @IsOptional()
   @IsString()
   @TrimString()
   @IsNotEmpty()
-  readonly media_type?: string;
+  readonly artist?: string;
 
   @IsOptional()
-  @IsString()
-  @TrimString()
-  @IsNotEmpty()
-  readonly market?: string;
+  @IsNumber()
+  @ToNumber()
+  @Min(0)
+  readonly year?: number;
 
   @IsOptional()
   @Type(() => Number)
