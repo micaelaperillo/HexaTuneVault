@@ -11,7 +11,6 @@ import { AlbumResponseDto } from '../dto';
 import { PageDto } from '../dto/page.dto';
 
 import {
-  BadRequestException,
   Controller,
   Get,
   Param,
@@ -22,6 +21,7 @@ import {
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { AlbumFilterDto } from '../dto/album.filter';
+import { AlbumSearchDto } from '../dto/album.search';
 import { AlbumGetDto } from '../dto/album.get';
 
 import { Public } from '../infrastructure/auth/public.decorator';
@@ -38,19 +38,11 @@ export class AlbumController {
 
   @Get()
   async search(
-    @Query() filters: AlbumFilterDto,
+    @Query() filters: AlbumSearchDto,
   ): Promise<PageDto<AlbumResponseDto>> {
     this.logger.debug(
       `Search album with q=${filters.q}, artist=${filters.artist}, year=${filters.year}`,
     );
-
-    if (
-      filters.q === undefined &&
-      filters.artist === undefined &&
-      filters.year === undefined
-    ) {
-      throw new BadRequestException();
-    }
 
     const { items, total, ...page } = await this.searcher.search({
       name: filters.q,

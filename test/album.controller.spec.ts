@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AlbumController } from '../src/controller/album.controller';
 import { GET_ALBUM, SEARCH_ALBUM } from '../src/use-case/album.service';
 import { AlbumModel } from '../src/model/album.model';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 
 describe('AlbumController', () => {
   let controller: AlbumController;
@@ -43,13 +43,6 @@ describe('AlbumController', () => {
   });
 
   describe('search', () => {
-    it('throws BadRequestException if no search criteria are provided', async () => {
-      await expect(
-        controller.search({ page: 1, page_size: 10 }),
-      ).rejects.toThrow(BadRequestException);
-      expect(mockSearch.search).not.toHaveBeenCalled();
-    });
-
     it('calls searcher port with name filter and returns a page of responses', async () => {
       mockSearch.search.mockResolvedValue(pageOf(mockAlbum));
       const result = await controller.search({
