@@ -1,9 +1,5 @@
 import type { PodcastModel, PodcastFilters, Page } from '../model';
 
-// Documentation import
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { PodcastProviderError } from '../error/podcast';
-
 export const PODCAST_PROVIDER = Symbol('IPodcastProvider');
 
 export interface IPodcastProvider {

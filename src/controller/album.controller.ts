@@ -71,7 +71,7 @@ export class AlbumController {
   }
 
   private static toResponse(this: void, album: AlbumModel): AlbumResponseDto {
-    const year_hack = new Intl.DateTimeFormat('en-US', {
+    const yearFormatter = new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
       // Crucial, otherwise new Date('2000').getFullYear() === 1999
       timeZone: 'UTC',
@@ -79,7 +79,7 @@ export class AlbumController {
 
     const params = new URLSearchParams({
       artist: album.artists[0],
-      year: year_hack.format(album.releaseDate),
+      year: yearFormatter.format(album.releaseDate),
     });
 
     return plainToInstance(

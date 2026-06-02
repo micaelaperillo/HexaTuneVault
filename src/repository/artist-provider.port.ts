@@ -1,9 +1,5 @@
 import type { ArtistModel, ArtistFilters, Page } from '../model';
 
-// Documentation import
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { ArtistProviderError } from '../error/artist';
-
 export const ARTIST_PROVIDER = Symbol('IArtistProvider');
 
 export interface IArtistProvider {
