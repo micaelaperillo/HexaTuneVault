@@ -69,4 +69,6 @@ export class CommentEntity {
     inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
   })
   likedBy!: UserEntity[];
+
+  likedByIds!: number[];
 }

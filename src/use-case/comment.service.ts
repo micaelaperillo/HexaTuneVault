@@ -11,8 +11,8 @@ import type {
   ISearchComment,
   IGetComment,
   IGetCommentReplies,
-  IGetCommentLikes,
   ILikeComment,
+  IHasLikedComment,
 } from '../port/comment';
 import {
   COMMENT_REPOSITORY,
@@ -33,7 +33,7 @@ export class CommentService
     ISearchComment,
     IGetComment,
     IGetCommentReplies,
-    IGetCommentLikes,
+    IHasLikedComment,
     ILikeComment
 {
   constructor(
@@ -44,7 +44,7 @@ export class CommentService
   async create(
     comment: Omit<
       CommentModel,
-      'id' | 'createdAt' | 'createdBy' | 'parentReview'
+      'id' | 'createdAt' | 'likes' | 'createdBy' | 'parentReview'
     > & {
       createdBy: Pick<UserModel, 'id'>;
       parentReview: Pick<ReviewModel, 'id'>;
@@ -79,14 +79,8 @@ export class CommentService
     return this.repo.findReplies(commentId);
   }
 
-  async getLikes(commentId: number): Promise<UserModel[]> {
-    const likes = await this.repo.findLikesByCommentId(commentId);
-
-    if (likes === null) {
-      throw new CommentNotFoundException(commentId);
-    }
-
-    return likes;
+  async hasLiked(commentId: number, userId: number): Promise<boolean> {
+    return this.repo.hasLike(commentId, userId);
   }
 
   async setLike(

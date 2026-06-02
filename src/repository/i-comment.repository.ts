@@ -28,7 +28,7 @@ export interface ICommentRepository {
   create(
     comment: Omit<
       CommentModel,
-      'id' | 'createdAt' | 'createdBy' | 'parentReview'
+      'id' | 'createdAt' | 'likes' | 'createdBy' | 'parentReview'
     > & {
       createdBy: Pick<UserModel, 'id'>;
       parentReview: Pick<ReviewModel, 'id'>;
@@ -57,21 +57,18 @@ export interface ICommentRepository {
   findReplies(parentCommentId: number): Promise<CommentModel[]>;
 
   /**
-   * Returns the ids of users who liked the comment.
-   *
-   * @returns The liking users, or `null` if the comment does not exist.
-   * The `null` vs. `[]` distinction lets the service tell "no such comment"
-   * apart from "comment with zero likes".
-   */
-  findLikesByCommentId(commentId: number): Promise<UserModel[] | null>;
-
-  /**
    * Deletes the comment by id (cascading to its replies). A no-op if the id
    * does not exist.
    *
    * @throws CommentDBException On a database error.
    */
   deleteById(id: number): Promise<void>;
+
+  /**
+   * Reports whether `userId` has liked the comment. Absence-tolerant: returns
+   * `false` for a non-existent comment rather than distinguishing it.
+   */
+  hasLike(commentId: number, userId: number): Promise<boolean>;
 
   /**
    * Adds a like from `userId` to the comment. Idempotent: does nothing if the

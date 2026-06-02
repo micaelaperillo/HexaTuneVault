@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { NotFoundException } from '@nestjs/common';
 import { CommentController } from '../src/controller/comment.controller';
 import {
   CREATE_COMMENT,
@@ -6,7 +7,7 @@ import {
   SEARCH_COMMENT,
   GET_COMMENT,
   GET_COMMENT_REPLIES,
-  GET_COMMENT_LIKES,
+  HAS_LIKED_COMMENT,
   LIKE_COMMENT,
 } from '../src/port/comment';
 import { CommentModel } from '../src/model/comment.model';
@@ -15,7 +16,6 @@ import { CreateCommentDto } from '../src/dto/create-comment.dto';
 import { SetCommentLikeDto } from '../src/dto/set-comment-like.dto';
 import { SubjectReference } from '../src/model/subject-reference';
 import { ReviewModel, UserModel } from '../src/model';
-import { UserResponseDto } from '../src/dto/user-response.dto';
 
 describe('CommentController', () => {
   let controller: CommentController;
@@ -46,6 +46,7 @@ describe('CommentController', () => {
       updatedAt: null,
     }),
     parentCommentId: null,
+    likes: 0,
   };
 
   const mockCreate = { create: jest.fn() };
@@ -53,7 +54,7 @@ describe('CommentController', () => {
   const mockSearch = { search: jest.fn() };
   const mockGet = { get: jest.fn() };
   const mockGetReplies = { getReplies: jest.fn() };
-  const mockGetLikes = { getLikes: jest.fn() };
+  const mockHasLiked = { hasLiked: jest.fn() };
   const mockLike = { setLike: jest.fn() };
 
   beforeEach(async () => {
@@ -67,7 +68,7 @@ describe('CommentController', () => {
         { provide: SEARCH_COMMENT, useValue: mockSearch },
         { provide: GET_COMMENT, useValue: mockGet },
         { provide: GET_COMMENT_REPLIES, useValue: mockGetReplies },
-        { provide: GET_COMMENT_LIKES, useValue: mockGetLikes },
+        { provide: HAS_LIKED_COMMENT, useValue: mockHasLiked },
         { provide: LIKE_COMMENT, useValue: mockLike },
       ],
     }).compile();
@@ -141,12 +142,14 @@ describe('CommentController', () => {
 
   describe('get', () => {
     it('calls get port and returns a CommentResponseDto with correct links', async () => {
-      mockGet.get.mockResolvedValue(mockComment);
+      mockGet.get.mockResolvedValue({ ...mockComment, likes: 3 });
       const result = await controller.get(1);
 
       expect(mockGet.get).toHaveBeenCalledWith(1);
       expect(result).toBeInstanceOf(CommentResponseDto);
       expect(result.self).toBe('/api/comments/1');
+      expect(result.like).toBe('/api/comments/1/like');
+      expect(result.likes).toBe(3);
     });
   });
 
@@ -164,18 +167,22 @@ describe('CommentController', () => {
     });
   });
 
-  describe('getLikes', () => {
-    it('calls getLikes port and returns an array of UserLinkDto', async () => {
-      const mockUser2: UserModel = { ...mockUser, id: 2 };
-      mockGetLikes.getLikes.mockResolvedValue([mockUser, mockUser2]);
+  describe('hasLiked', () => {
+    it('resolves (204) when the user has liked the comment', async () => {
+      mockHasLiked.hasLiked.mockResolvedValue(true);
 
-      const result = await controller.getLikes(1);
+      await expect(
+        controller.hasLiked(1, { user_id: 2 }),
+      ).resolves.toBeUndefined();
+      expect(mockHasLiked.hasLiked).toHaveBeenCalledWith(1, 2);
+    });
 
-      expect(mockGetLikes.getLikes).toHaveBeenCalledWith(1);
-      expect(result).toHaveLength(2);
-      expect(result[0]).toBeInstanceOf(UserResponseDto);
-      expect(result[0].id).toBe(1);
-      expect(result[1].id).toBe(2);
+    it('throws NotFoundException (404) when the user has not liked the comment', async () => {
+      mockHasLiked.hasLiked.mockResolvedValue(false);
+
+      await expect(controller.hasLiked(1, { user_id: 2 })).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

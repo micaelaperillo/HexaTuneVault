@@ -8,4 +8,5 @@ export interface CommentModel {
   parentReview: ReviewModel;
   // Use the comment id to prevent accidental infinite loops
   parentCommentId: CommentModel['id'] | null;
+  likes: number;
 }

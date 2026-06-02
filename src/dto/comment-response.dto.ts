@@ -14,7 +14,7 @@ export class CommentResponseDto {
   like!: `/${string}`;
 
   @Expose()
-  likes!: `/${string}`;
+  likes!: number;
 
   @Expose()
   replies!: `/${string}`;

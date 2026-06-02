@@ -12,6 +12,7 @@ import {
   Query,
   ParseIntPipe,
   HttpCode,
+  NotFoundException,
 } from '@nestjs/common';
 
 import {
@@ -25,8 +26,8 @@ import {
   type IGetComment,
   GET_COMMENT_REPLIES,
   type IGetCommentReplies,
-  GET_COMMENT_LIKES,
-  type IGetCommentLikes,
+  HAS_LIKED_COMMENT,
+  type IHasLikedComment,
   LIKE_COMMENT,
   type ILikeComment,
 } from '../port/comment/';
@@ -34,8 +35,8 @@ import {
 import { CreateCommentDto } from '../dto/create-comment.dto';
 import { CommentFiltersDto } from '../dto/comment-filters.dto';
 import { CommentResponseDto } from '../dto/comment-response.dto';
+import { CommentLikeQueryDto } from '../dto/comment-like-query.dto';
 import { SetCommentLikeDto } from '../dto/set-comment-like.dto';
-import { UserResponseDto } from '../dto/user-response.dto';
 
 import { plainToInstance } from 'class-transformer';
 
@@ -48,8 +49,8 @@ export class CommentController {
     @Inject(GET_COMMENT) private readonly getComment: IGetComment,
     @Inject(GET_COMMENT_REPLIES)
     private readonly getCommentReplies: IGetCommentReplies,
-    @Inject(GET_COMMENT_LIKES)
-    private readonly getCommentLikes: IGetCommentLikes,
+    @Inject(HAS_LIKED_COMMENT)
+    private readonly commentHasLiked: IHasLikedComment,
     @Inject(LIKE_COMMENT) private readonly likeComment: ILikeComment,
   ) {}
 
@@ -95,12 +96,16 @@ export class CommentController {
     return replies.map(CommentController.toResponse);
   }
 
-  @Get(':id/likes')
-  async getLikes(
+  @Get(':id/like')
+  @HttpCode(204)
+  async hasLiked(
     @Param('id', ParseIntPipe) id: number,
-  ): Promise<UserResponseDto[]> {
-    const likes = await this.getCommentLikes.getLikes(id);
-    return likes.map((l) => plainToInstance(UserResponseDto, l));
+    @Query() query: CommentLikeQueryDto,
+  ): Promise<void> {
+    const liked = await this.commentHasLiked.hasLiked(id, query.user_id);
+    if (!liked) {
+      throw new NotFoundException();
+    }
   }
 
   @Delete(':id')
