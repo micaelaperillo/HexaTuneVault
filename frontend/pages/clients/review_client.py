@@ -3,6 +3,7 @@ from urllib.parse import unquote
 from . import api_client
 from . import user_client
 from . import artist_client
+from .format_utils import date_only
 from . import album_client
 from . import podcast_client
 from .image_client import DEFAULT_PROFILE_IMAGE
@@ -130,7 +131,7 @@ def _to_profile_post(r: dict, request, cache) -> dict:
         'post_id': r.get('id'),
         'content': r.get('content', ''),
         'rating': r.get('rating', 0),
-        'date': r.get('created_at', ''),
+        'date': date_only(r.get('created_at', '')),
         'vault_vtype': subject_type,
         'vault_id': subject_id,
         'vault_name': name,
@@ -173,7 +174,7 @@ def _to_post(r: dict, request, cache) -> dict:
             'id': review_id,
             'user': username,
             'title': r.get('content', ''),
-            'date': r.get('created_at', ''),
+            'date': date_only(r.get('created_at', '')),
             'rating': r.get('rating', 0),
             'vault_id': subject_id,
             'likes': likes,

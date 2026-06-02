@@ -2,6 +2,7 @@
 from urllib.parse import quote
 
 from . import api_client
+from .format_utils import date_only
 
 
 def _items(data) -> list:
@@ -38,7 +39,7 @@ def _to_vault(album: dict) -> dict:
         'id': name,
         'album': name,
         'image': album.get('cover', ''),
-        'date': album.get('release_date', ''),
+        'date': date_only(album.get('release_date', '')),
         'total_tracks': album.get('total_tracks', ''),
         'external_url': external_urls.get('spotify', ''),
         'artists': album.get('artists') or [],

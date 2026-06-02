@@ -1,6 +1,7 @@
 
 from . import api_client
 from . import user_client
+from .format_utils import date_only
 from .image_client import DEFAULT_PROFILE_IMAGE as DEFAULT_AVATAR
 
 BASE = '/api/comments'
@@ -112,7 +113,7 @@ def _to_comment(c: dict, viewer_id, request, cache, with_replies=True) -> dict:
             'id': comment_id,
             'user': username,
             'content': c.get('content', ''),
-            'date': c.get('created_at', ''),
+            'date': date_only(c.get('created_at', '')),
         },
         'user': user_info,
         'likes': c.get('likes', 0),
