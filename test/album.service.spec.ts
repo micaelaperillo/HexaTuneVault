@@ -12,6 +12,9 @@ describe('AlbumService', () => {
     releaseDate: '1969',
     totalTracks: 17,
     artists: ['The Beatles'],
+    external_urls: {
+      spotify: 'spotify-url',
+    },
   };
 
   const mockProvider = {
@@ -39,7 +42,7 @@ describe('AlbumService', () => {
       const result = await service.search(filters);
 
       expect(mockProvider.search).toHaveBeenCalledWith(filters);
-      expect(result).toEqual([mockAlbum]);
+      expect(result).toStrictEqual([mockAlbum]);
     });
   });
 
@@ -50,7 +53,7 @@ describe('AlbumService', () => {
       const result = await service.get(filters);
 
       expect(mockProvider.get).toHaveBeenCalledWith(filters);
-      expect(result).toEqual(mockAlbum);
+      expect(result).toStrictEqual(mockAlbum);
     });
 
     it('returns null if provider returns null', async () => {
