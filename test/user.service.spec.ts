@@ -1,14 +1,14 @@
-import { UserService } from './user.service';
-import { InvalidCredentialsException } from '../error/user/invalid-credentials.exception';
-import type { IUserRepository } from '../repository/i-user.repository';
-import type { ITokenIssuer } from '../repository/i-token-issuer';
-import type { UserModel } from '../model/user.model';
-import type { JwtModel } from '../model/jwt.model';
-import { UserNotFoundException } from '../error/user/user-not-found.exception';
-import { SelfFollowException } from '../error/user/self-follow.exception';
-import { AlreadyFollowingException } from '../error/user/already-following.exception';
-import { NotFollowingException } from '../error/user/not-following.exception';
-import type { Page } from '../model/page.model';
+import { UserService } from '../src/use-case/user.service';
+import { InvalidCredentialsException } from '../src/error/user/invalid-credentials.exception';
+import type { IUserRepository } from '../src/repository/i-user.repository';
+import type { ITokenIssuer } from '../src/repository/i-token-issuer';
+import type { UserModel } from '../src/model/user.model';
+import type { JwtModel } from '../src/model/jwt.model';
+import { UserNotFoundException } from '../src/error/user/user-not-found.exception';
+import { SelfFollowException } from '../src/error/user/self-follow.exception';
+import { AlreadyFollowingException } from '../src/error/user/already-following.exception';
+import { NotFollowingException } from '../src/error/user/not-following.exception';
+import type { Page } from '../src/model/page.model';
 
 function makeService(
   repo: Partial<IUserRepository>,
@@ -195,8 +195,7 @@ describe('UserService.authenticate', () => {
     let issueCalled = false;
     const service = makeService(
       {
-        authenticate: () =>
-          Promise.reject(new InvalidCredentialsException()),
+        authenticate: () => Promise.reject(new InvalidCredentialsException()),
       },
       {
         issue: () => {

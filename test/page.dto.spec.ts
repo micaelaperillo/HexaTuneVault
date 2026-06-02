@@ -1,4 +1,4 @@
-import { PageDto } from './page.dto';
+import { PageDto } from '../src/dto/page.dto';
 
 describe('PageDto.of', () => {
   it('wraps items with the page metadata', () => {

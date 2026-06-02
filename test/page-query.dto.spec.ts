@@ -1,6 +1,6 @@
 import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
-import { PageQueryDto } from './page-query.dto';
+import { PageQueryDto } from '../src/dto/page-query.dto';
 
 describe('PageQueryDto', () => {
   it('applies defaults when query params are absent', () => {

@@ -1,9 +1,9 @@
 import { UnauthorizedException, type ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { JwtAuthGuard } from './jwt-auth.guard';
-import { Public } from './public.decorator';
-import { InvalidTokenException } from '../../error/auth/invalid-token.exception';
-import type { ITokenVerifier } from '../../repository/i-token-verifier';
+import { JwtAuthGuard } from '../src/infrastructure/auth/jwt-auth.guard';
+import { Public } from '../src/infrastructure/auth/public.decorator';
+import { InvalidTokenException } from '../src/error/auth/invalid-token.exception';
+import type { ITokenVerifier } from '../src/repository/i-token-verifier';
 
 const verifier: ITokenVerifier = {
   verify: (token) =>
@@ -60,7 +60,9 @@ describe('JwtAuthGuard', () => {
   });
 
   it('rejects a Bearer header with extra segments', async () => {
-    const ctx = makeContext({ headers: { authorization: 'Bearer good extra' } });
+    const ctx = makeContext({
+      headers: { authorization: 'Bearer good extra' },
+    });
 
     await expect(makeGuard().canActivate(ctx)).rejects.toBeInstanceOf(
       UnauthorizedException,

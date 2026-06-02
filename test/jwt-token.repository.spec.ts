@@ -1,7 +1,7 @@
-import { JwtTokenRepository } from './jwt-token.repository';
-import { InvalidTokenException } from '../error/auth/invalid-token.exception';
+import { JwtTokenRepository } from '../src/adapter/jwt-token.repository';
+import { InvalidTokenException } from '../src/error/auth/invalid-token.exception';
 import type { JwtService } from '@nestjs/jwt';
-import type { UserModel } from '../model/user.model';
+import type { UserModel } from '../src/model/user.model';
 
 function makeRepository(jwt: {
   signAsync?: (payload: unknown) => Promise<string>;

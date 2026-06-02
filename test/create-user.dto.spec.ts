@@ -1,6 +1,6 @@
 import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
-import { CreateUserDto } from './create-user.dto';
+import { CreateUserDto } from '../src/dto/create-user.dto';
 
 const validUser = {
   username: 'ada',
