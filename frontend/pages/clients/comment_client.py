@@ -1,5 +1,4 @@
 
-
 from . import api_client
 from . import user_client
 from .image_client import DEFAULT_PROFILE_IMAGE as DEFAULT_AVATAR
@@ -63,15 +62,16 @@ def set_like(comment_id, user_id, liked, request=None):
 
 
 def toggle_like(comment_id, user_id, request=None):
-    currently_liked = str(user_id) in _likers(comment_id, request=request)
+    currently_liked = has_liked(comment_id, user_id, request=request)
     return set_like(comment_id, user_id, not currently_liked, request=request)
 
 
-def _likers(comment_id, request=None) -> list[str]:
-    data = api_client.get_json(f'{BASE}/{comment_id}/likes', request=request, default=[])
-    if not isinstance(data, list):
-        return []
-    return [_id_from(item.get('user')) for item in data]
+def has_liked(comment_id, user_id, request=None) -> bool:
+    response = api_client.get(
+        f'{BASE}/{comment_id}/like', request=request,
+        params={'user_id': int(user_id)},
+    )
+    return response is not None and response.status_code == 204
 
 
 def _replies(comment_id, viewer_id, request, cache) -> list[dict]:
@@ -82,7 +82,6 @@ def _replies(comment_id, viewer_id, request, cache) -> list[dict]:
 
 
 def _author(author_id, request, cache) -> tuple[str, dict]:
-
     if author_id in cache:
         return cache[author_id]
     profile = user_client.get(author_id, request=request) if author_id else None
@@ -102,8 +101,8 @@ def _to_comment(c: dict, viewer_id, request, cache, with_replies=True) -> dict:
     comment_id = _id_from(c.get('self'))
     author_id = _id_from(c.get('author'))
     username, user_info = _author(author_id, request, cache)
-    likers = _likers(comment_id, request=request)
     replies = _replies(comment_id, viewer_id, request, cache) if with_replies else []
+    is_liked = viewer_id is not None and has_liked(comment_id, viewer_id, request=request)
     return {
         'comment': {
             'id': comment_id,
@@ -112,8 +111,8 @@ def _to_comment(c: dict, viewer_id, request, cache, with_replies=True) -> dict:
             'date': c.get('createdAt', ''),
         },
         'user': user_info,
-        'likes': len(likers),
-        'is_liked': viewer_id is not None and str(viewer_id) in likers,
+        'likes': c.get('likes', 0),
+        'is_liked': is_liked,
         'replies': replies,
         'replies_count': len(replies),
     }

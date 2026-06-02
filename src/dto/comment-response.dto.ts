@@ -11,7 +11,7 @@ export class CommentResponseDto {
   @Expose()
   like!: `/${string}`;
   @Expose()
-  likes!: `/${string}`;
+  likes!: number;
   @Expose()
   replies!: `/${string}`;
   @Expose()
@@ -29,7 +29,6 @@ export class CommentResponseDto {
     });
     dto.self = `/api/comments/${model.id}`;
     dto.like = `/api/comments/${model.id}/like`;
-    dto.likes = `/api/comments/${model.id}/likes`;
     dto.replies = `/api/comments/${model.id}/replies`;
     dto.collection = `/api/comments`;
     dto.review = `/api/reviews/${model.parentReviewId}`;

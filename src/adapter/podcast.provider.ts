@@ -36,6 +36,7 @@ export class SpotifyPodcastProvider implements IPodcastProvider {
         filters.name,
         ['show'],
         market,
+        10,
       );
       this.logger.debug(shows.items);
 

@@ -24,7 +24,12 @@ export class SpotifyArtistProvider implements IArtistProvider {
       const query = SpotifyArtistProvider.toQuery(filters);
       this.logger.debug(query);
 
-      const { artists } = await this.spotify.search(query, ['artist']);
+      const { artists } = await this.spotify.search(
+        query,
+        ['artist'],
+        undefined,
+        10,
+      );
       this.logger.debug(artists.items);
 
       return artists.items
@@ -44,10 +49,11 @@ export class SpotifyArtistProvider implements IArtistProvider {
   }
 
   private static toQuery(filters: ArtistFilters) {
+    const token = ' genre:';
     // TODO: Fix injection vulnerability
     return (
       filters.name +
-      (filters.genre?.length ? `,tag:${filters.genre?.join(',tag:')}` : '')
+      (filters.genre?.length ? `${token}${filters.genre?.join(token)}` : '')
     );
   }
 

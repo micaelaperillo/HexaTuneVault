@@ -13,6 +13,9 @@ describe('AlbumController', () => {
     releaseDate: '1969',
     totalTracks: 17,
     artists: ['The Beatles'],
+    external_urls: {
+      spotify: 'spotify-url',
+    },
   };
 
   const mockGet = { get: jest.fn() };
@@ -56,7 +59,7 @@ describe('AlbumController', () => {
         artist: undefined,
       });
       expect(result).toHaveLength(1);
-      expect(result[0]).toEqual({
+      expect(result[0]).toStrictEqual({
         name: 'Abbey Road',
         cover: 'cover-url',
         releaseDate: '1969',
@@ -64,6 +67,9 @@ describe('AlbumController', () => {
         artists: ['The Beatles'],
         self: '/api/albums/Abbey%20Road',
         reviews: '/api/reviews?album=Abbey+Road',
+        external_urls: {
+          spotify: 'spotify-url',
+        },
       });
     });
 
@@ -86,7 +92,7 @@ describe('AlbumController', () => {
       const result = await controller.get('Abbey Road');
 
       expect(mockGet.get).toHaveBeenCalledWith({ name: 'Abbey Road' });
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         name: 'Abbey Road',
         cover: 'cover-url',
         releaseDate: '1969',
@@ -94,6 +100,9 @@ describe('AlbumController', () => {
         artists: ['The Beatles'],
         self: '/api/albums/Abbey%20Road',
         reviews: '/api/reviews?album=Abbey+Road',
+        external_urls: {
+          spotify: 'spotify-url',
+        },
       });
     });
 

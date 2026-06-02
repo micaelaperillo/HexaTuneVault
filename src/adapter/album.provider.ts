@@ -24,7 +24,12 @@ export class SpotifyAlbumProvider implements IAlbumProvider {
       const query = SpotifyAlbumProvider.toQuery(filters);
       this.logger.debug(query);
 
-      const { albums } = await this.spotify.search(query, ['album']);
+      const { albums } = await this.spotify.search(
+        query,
+        ['album'],
+        undefined,
+        10,
+      );
       this.logger.debug(albums.items);
 
       return albums.items
@@ -59,14 +64,22 @@ export class SpotifyAlbumProvider implements IAlbumProvider {
 
   private static toModel(
     this: void,
-    { name, images, release_date, total_tracks, artists }: SimplifiedAlbum,
-  ) {
+    {
+      name,
+      images,
+      release_date,
+      total_tracks,
+      artists,
+      external_urls,
+    }: SimplifiedAlbum,
+  ): AlbumModel {
     return {
       name,
       cover: images[0].url,
       releaseDate: release_date,
       totalTracks: total_tracks,
       artists: artists.map((a) => a.name),
+      external_urls: { ...external_urls },
     };
   }
 }
