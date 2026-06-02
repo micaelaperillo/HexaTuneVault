@@ -8,17 +8,18 @@ import {
   Min,
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
+import { TrimString } from './transforms';
 
 export class AlbumFilterDto {
   @IsOptional()
   @IsString()
-  @Transform(({ value }) => (value as string).trim())
+  @TrimString()
   @IsNotEmpty()
   readonly q?: string;
 
   @IsOptional()
   @IsString()
-  @Transform(({ value }) => (value as string).trim())
+  @TrimString()
   @IsNotEmpty()
   readonly artist?: string;
 

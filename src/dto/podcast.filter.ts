@@ -7,11 +7,12 @@ import {
   Max,
   Min,
 } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
+import { TrimString } from './transforms';
 
 export class PodcastFilterDto {
   @IsString()
-  @Transform(({ value }) => (value as string).trim())
+  @TrimString()
   @IsNotEmpty()
   readonly q!: string;
 
@@ -21,13 +22,13 @@ export class PodcastFilterDto {
 
   @IsOptional()
   @IsString()
-  @Transform(({ value }) => (value as string).trim())
+  @TrimString()
   @IsNotEmpty()
   readonly media_type?: string;
 
   @IsOptional()
   @IsString()
-  @Transform(({ value }) => (value as string).trim())
+  @TrimString()
   @IsNotEmpty()
   readonly market?: string;
 

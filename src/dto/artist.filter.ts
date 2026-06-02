@@ -7,19 +7,20 @@ import {
   Min,
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
+import { TrimString, TrimStringArray } from './transforms';
 
 export class ArtistFilterDto {
   @IsString()
-  @Transform(({ value }) => (value as string).trim())
+  @TrimString()
   @IsNotEmpty()
   readonly q!: string;
 
   @IsOptional()
-  @Transform(
-    ({ value }) => (Array.isArray(value) ? value : [value]) as unknown[],
+  @Transform(({ value }: { value: unknown }) =>
+    Array.isArray(value) ? value.map((item: unknown) => item) : [value],
   )
   @IsString({ each: true })
-  @Transform(({ value }) => (value as string[]).map((s) => s.trim()))
+  @TrimStringArray()
   @IsNotEmpty({ each: true })
   readonly genre?: string[];
 

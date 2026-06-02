@@ -7,7 +7,7 @@ import {
   Min,
   Max,
 } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { TrimString } from './transforms';
 import { SubjectType } from '../model/subject-reference';
 import {
   RATING_MIN,
@@ -18,9 +18,7 @@ import {
 
 export class CreateReviewRequest {
   @IsString()
-  @Transform(({ value }: { value: unknown }) =>
-    typeof value === 'string' ? value.trim() : value,
-  )
+  @TrimString()
   @Length(CONTENT_MIN_LENGTH, CONTENT_MAX_LENGTH)
   content!: string;
 

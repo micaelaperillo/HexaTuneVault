@@ -1,14 +1,14 @@
-import { Transform } from 'class-transformer';
+import { TrimString } from './transforms';
 import { IsNotEmpty, IsString } from 'class-validator';
 
 export class LoginUserDto {
   @IsString()
-  @Transform(({ value }) => (value as string).trim())
+  @TrimString()
   @IsNotEmpty()
   username!: string;
 
   @IsString()
-  @Transform(({ value }) => (value as string).trim())
+  @TrimString()
   @IsNotEmpty()
   password!: string;
 }
