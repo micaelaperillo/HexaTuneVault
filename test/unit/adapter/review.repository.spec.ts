@@ -3,8 +3,8 @@ import { ReviewEntity } from '../../../src/entity/review.entity';
 import { ReviewRepositoryException } from '../../../src/adapter/persistence/review-repository.exception';
 import { QueryFailedError } from 'typeorm';
 import { SubjectType } from '../../../src/model/review-subject';
-import type { ReviewFilters } from '../../../src/model/review.filter';
-import { SortField, SortOrder } from '../../../src/model/review.filter';
+import type { ReviewFilters } from '../../../src/model/review-filter.model';
+import { SortField, SortOrder } from '../../../src/model/review-filter.model';
 import type { Repository } from 'typeorm';
 import { UserEntity } from '../../../src/entity';
 

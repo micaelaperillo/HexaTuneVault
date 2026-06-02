@@ -35,7 +35,7 @@ import {
 } from '../port/in/comment/';
 
 import { CreateCommentDto } from '../dto/create-comment.dto';
-import { CommentFiltersDto } from '../dto/comment-filters.dto';
+import { CommentFilterDto } from '../dto/comment-filter.dto';
 import { CommentResponseDto } from '../dto/comment-response.dto';
 import { CommentLikeCountResponse } from '../dto/comment-like-count-response.dto';
 import { LikedResponseDto } from '../dto/liked-response.dto';
@@ -85,7 +85,7 @@ export class CommentController {
   @Public()
   @Get()
   async search(
-    @Query() filters: CommentFiltersDto,
+    @Query() filters: CommentFilterDto,
   ): Promise<PageDto<CommentResponseDto>> {
     const { items, total, ...page } = await this.searchComment.search({
       createdById: filters.created_by_id,

@@ -1,6 +1,11 @@
 import 'reflect-metadata';
 import { plainToInstance } from 'class-transformer';
-import { TrimString, TrimStringArray } from '../../../src/dto/transforms';
+import {
+  TrimString,
+  TrimStringArray,
+  ToNumber,
+  ToArray,
+} from '../../../src/dto/transforms';
 
 class TrimStringDto {
   @TrimString()
@@ -9,6 +14,16 @@ class TrimStringDto {
 
 class TrimStringArrayDto {
   @TrimStringArray()
+  items!: unknown;
+}
+
+class ToNumberDto {
+  @ToNumber()
+  value!: unknown;
+}
+
+class ToArrayDto {
+  @ToArray()
   items!: unknown;
 }
 
@@ -49,5 +64,33 @@ describe('TrimStringArray', () => {
 
   it('returns a non-array number untouched', () => {
     expect(transform(99)).toBe(99);
+  });
+});
+
+describe('ToNumber', () => {
+  function transform(value: unknown): unknown {
+    return plainToInstance(ToNumberDto, { value }).value;
+  }
+
+  it('coerces a numeric string to a number', () => {
+    expect(transform('42')).toBe(42);
+  });
+
+  it('yields NaN for a non-numeric value', () => {
+    expect(transform('abc')).toBeNaN();
+  });
+});
+
+describe('ToArray', () => {
+  function transform(items: unknown): unknown {
+    return plainToInstance(ToArrayDto, { items }).items;
+  }
+
+  it('leaves an array untouched', () => {
+    expect(transform(['a', 'b'])).toEqual(['a', 'b']);
+  });
+
+  it('wraps a single value in an array', () => {
+    expect(transform('a')).toEqual(['a']);
   });
 });

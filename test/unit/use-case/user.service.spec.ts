@@ -9,7 +9,7 @@ import { SelfFollowException } from '../../../src/error/user/self-follow.excepti
 import { AlreadyFollowingException } from '../../../src/error/user/already-following.exception';
 import { NotFollowingException } from '../../../src/error/user/not-following.exception';
 import type { Page } from '../../../src/model/page.model';
-import type { UserFilters } from '../../../src/model/user.filter';
+import type { UserFilters } from '../../../src/model/user-filter.model';
 
 function makeService(
   repo: Partial<IUserRepository>,

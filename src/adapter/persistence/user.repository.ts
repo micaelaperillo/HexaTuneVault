@@ -6,7 +6,7 @@ import { MapErrors } from 'error-mapper-decorator';
 import { UserEntity } from '../../entity/user.entity';
 import { IUserRepository } from '../../port/out/user-repository.port';
 import type { UserModel } from '../../model/user.model';
-import type { UserFilters } from '../../model/user.filter';
+import type { UserFilters } from '../../model/user-filter.model';
 import type { Page, PageRequest } from '../../model/page.model';
 import { InvalidCredentialsException } from '../../error/user/invalid-credentials.exception';
 import {

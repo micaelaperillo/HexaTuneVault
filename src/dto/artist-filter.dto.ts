@@ -6,8 +6,8 @@ import {
   Max,
   Min,
 } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
-import { TrimString, TrimStringArray } from './transforms';
+import { Type } from 'class-transformer';
+import { TrimString, TrimStringArray, ToArray } from './transforms';
 
 export class ArtistFilterDto {
   @IsString()
@@ -16,9 +16,7 @@ export class ArtistFilterDto {
   readonly q!: string;
 
   @IsOptional()
-  @Transform(({ value }: { value: unknown }) =>
-    Array.isArray(value) ? value.map((item: unknown) => item) : [value],
-  )
+  @ToArray()
   @IsString({ each: true })
   @TrimStringArray()
   @IsNotEmpty({ each: true })

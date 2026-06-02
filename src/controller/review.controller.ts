@@ -34,11 +34,11 @@ import {
   type IHasLikedReview,
 } from '../port/in';
 import { CreateReviewDto } from '../dto/create-review.dto';
-import { ReviewFiltersDto } from '../dto/review-filters.dto';
+import { ReviewFilterDto } from '../dto/review-filter.dto';
 import { ReviewResponseDto } from '../dto/review-response.dto';
 import { ReviewLikeCountResponse } from '../dto/review-like-count-response.dto';
 import { LikedResponseDto } from '../dto/liked-response.dto';
-import type { ReviewFilters } from '../model/review.filter';
+import type { ReviewFilters } from '../model/review-filter.model';
 import type { ReviewModel } from '../model';
 import { splitSubject } from '../model/review-subject';
 import { plainToInstance } from 'class-transformer';
@@ -87,7 +87,7 @@ export class ReviewController {
   @Public()
   @Get()
   async search(
-    @Query() dto: ReviewFiltersDto,
+    @Query() dto: ReviewFilterDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<PageDto<ReviewResponseDto>> {
     const base = {

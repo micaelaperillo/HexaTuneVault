@@ -1,5 +1,5 @@
 import { CommentModel } from '../../../model/comment.model';
-import { CommentFilters } from '../../../model/comment.filter';
+import { CommentFilters } from '../../../model/comment-filter.model';
 import type { Page } from '../../../model/page.model';
 
 /** DI token for {@link ISearchComment}. */

@@ -1,7 +1,7 @@
 import type { Page } from '../../model';
 import type { ReviewModel } from '../../model/review.model';
 import type { ReviewSubject } from '../../model/review-subject';
-import type { ReviewFilters } from '../../model/review.filter';
+import type { ReviewFilters } from '../../model/review-filter.model';
 import type { UserModel } from '../../model';
 
 export const REVIEW_REPOSITORY = Symbol('IReviewRepository');

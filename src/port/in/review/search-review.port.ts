@@ -1,6 +1,6 @@
 import type { Page } from '../../../model';
 import type { ReviewModel } from '../../../model/review.model';
-import type { ReviewFilters } from '../../../model/review.filter';
+import type { ReviewFilters } from '../../../model/review-filter.model';
 
 export const SEARCH_REVIEW = Symbol('ISearchReview');
 

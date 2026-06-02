@@ -7,8 +7,8 @@ import {
   Max,
   Min,
 } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
-import { TrimString } from './transforms';
+import { Type } from 'class-transformer';
+import { TrimString, ToNumber } from './transforms';
 
 export class AlbumFilterDto {
   @IsOptional()
@@ -25,7 +25,7 @@ export class AlbumFilterDto {
 
   @IsOptional()
   @IsNumber()
-  @Transform(({ value }) => Number(value))
+  @ToNumber()
   @Min(0)
   readonly year?: number;
 

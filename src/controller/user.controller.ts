@@ -40,7 +40,7 @@ import {
 
 import { CreateUserDto } from '../dto/create-user.dto';
 import { EditUserDto } from '../dto/edit-user.dto';
-import { UserFiltersDto } from '../dto/user-filters.dto';
+import { UserFilterDto } from '../dto/user-filter.dto';
 import { UserResponseDto } from '../dto/user-response.dto';
 import { PageDto } from '../dto/page.dto';
 import { PageQueryDto } from '../dto/page-query.dto';
@@ -80,7 +80,7 @@ export class UserController {
   @Public()
   @Get()
   async search(
-    @Query() filters: UserFiltersDto,
+    @Query() filters: UserFilterDto,
   ): Promise<PageDto<UserResponseDto>> {
     const { items, total, ...page } = await this.searchUser.search({
       username: filters.username,

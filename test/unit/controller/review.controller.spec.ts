@@ -16,7 +16,7 @@ import { LIKE_REVIEW } from '../../../src/port/in/review/like-review.port';
 import { UNLIKE_REVIEW } from '../../../src/port/in/review/unlike-review.port';
 import { COUNT_REVIEW_LIKES } from '../../../src/port/in/review/count-review-likes.port';
 import { HAS_LIKED_REVIEW } from '../../../src/port/in/review/has-liked-review.port';
-import { SortField, SortOrder } from '../../../src/model/review.filter';
+import { SortField, SortOrder } from '../../../src/model/review-filter.model';
 import { SubjectType } from '../../../src/model/review-subject';
 import type { ReviewModel, UserModel } from '../../../src/model';
 import type { Response, Request } from 'express';

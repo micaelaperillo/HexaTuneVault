@@ -1,22 +1,20 @@
 import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class UserFiltersDto {
+export class CommentFilterDto {
   @IsOptional()
-  @IsString()
-  username?: string;
+  @Type(() => Number)
+  @IsInt()
+  created_by_id?: number;
 
   @IsOptional()
   @IsString()
-  email?: string;
+  content?: string;
 
   @IsOptional()
-  @IsString()
-  first_name?: string;
-
-  @IsOptional()
-  @IsString()
-  last_name?: string;
+  @Type(() => Number)
+  @IsInt()
+  review_id?: number;
 
   @IsOptional()
   @Type(() => Number)

@@ -20,9 +20,9 @@ import {
   Inject,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
-import { AlbumFilterDto } from '../dto/album.filter';
-import { AlbumSearchDto } from '../dto/album.search';
-import { AlbumGetDto } from '../dto/album.get';
+import { AlbumFilterDto } from '../dto/album-filter.dto';
+import { AlbumSearchDto } from '../dto/album-search.dto';
+import { AlbumGetDto } from '../dto/album-get.dto';
 
 import { Public } from '../infrastructure/auth/public.decorator';
 
