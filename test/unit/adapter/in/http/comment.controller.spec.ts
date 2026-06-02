@@ -10,7 +10,7 @@ import {
   HAS_LIKED_COMMENT,
   LIKE_COMMENT,
 } from '../../../../../src/port/in/comment';
-import { CommentModel } from '../../../../../src/model/comment.model';
+import { CommentModel } from '../../../../../src/model/comment';
 import { CommentResponseDto } from '../../../../../src/adapter/in/http/dto/out/comment';
 import { CreateCommentDto } from '../../../../../src/adapter/in/http/dto/in/comment';
 import { UserModel } from '../../../../../src/model';

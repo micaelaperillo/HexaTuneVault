@@ -9,7 +9,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 
-import type { SubjectType } from '../../../../model/review-subject';
+import type { SubjectType } from '../../../../model/review';
 import { UserEntity } from './user.entity';
 
 @Entity('reviews')

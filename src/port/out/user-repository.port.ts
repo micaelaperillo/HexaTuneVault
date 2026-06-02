@@ -1,6 +1,5 @@
-import type { UserModel } from '../../model';
-import type { UserFilters } from '../../model/user-filter.model';
-import type { Page, PageRequest } from '../../model/page.model';
+import type { UserModel, Page, PageRequest } from '../../model';
+import type { UserFilters } from '../../model/user';
 
 export const USER_REPOSITORY = Symbol('IUserRepository');
 

@@ -1,6 +1,6 @@
 import type { IntClosedRange } from 'type-fest';
 
-import type { PageableFilters } from '../../../model/page.model';
+import type { PageableFilters } from '../../../model';
 
 // Spotify caps a single search request at 50 items.
 const MAX_PAGE_SIZE = 50;

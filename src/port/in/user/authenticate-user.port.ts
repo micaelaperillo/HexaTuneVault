@@ -1,5 +1,5 @@
-import { UserModel } from '../../../model/user.model';
-import { AuthToken } from '../../../model/auth-token.model';
+import { UserModel } from '../../../model/user';
+import { AuthToken } from '../../../model';
 
 export const AUTHENTICATE_USER = Symbol('IAuthenticateUser');
 

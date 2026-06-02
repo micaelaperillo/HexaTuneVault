@@ -1,6 +1,6 @@
 import type { ValidationArguments } from 'class-validator';
 import { SubjectIdRequiresTypeDtoConstraint } from '../../../../../../../src/adapter/in/http/dto/validators/subject-id-requires-type.validator';
-import { SubjectType } from '../../../../../../../src/model/review-subject';
+import { SubjectType } from '../../../../../../../src/model/review';
 
 const args = (object: Record<string, unknown>): ValidationArguments =>
   ({ object }) as unknown as ValidationArguments;

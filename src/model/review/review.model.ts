@@ -1,4 +1,4 @@
-import type { UserModel } from '.';
+import type { UserModel } from '../user';
 import type { ReviewSubject } from './review-subject';
 
 export type ReviewModel = {

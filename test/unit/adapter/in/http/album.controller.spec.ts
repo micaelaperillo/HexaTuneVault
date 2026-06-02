@@ -4,7 +4,7 @@ import {
   GET_ALBUM,
   SEARCH_ALBUM,
 } from '../../../../../src/use-case/album.service';
-import { AlbumModel } from '../../../../../src/model/album.model';
+import { AlbumModel } from '../../../../../src/model/album';
 import { NotFoundException } from '@nestjs/common';
 
 describe('AlbumController', () => {

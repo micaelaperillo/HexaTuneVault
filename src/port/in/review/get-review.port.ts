@@ -1,4 +1,4 @@
-import type { ReviewModel } from '../../../model/review.model';
+import type { ReviewModel } from '../../../model/review';
 
 export const GET_REVIEW = Symbol('IGetReview');
 

@@ -1,5 +1,5 @@
 import { IsReviewSubjectConstraint } from '../../../../../../../src/adapter/in/http/dto/validators/is-review-subject.validator';
-import { SubjectType } from '../../../../../../../src/model/review-subject';
+import { SubjectType } from '../../../../../../../src/model/review';
 
 describe('IsReviewSubjectConstraint', () => {
   const c = new IsReviewSubjectConstraint();

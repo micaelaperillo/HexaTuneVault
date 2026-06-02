@@ -2,14 +2,12 @@ import { UserService } from '../../../src/use-case/user.service';
 import { InvalidCredentialsException } from '../../../src/error/user/invalid-credentials.exception';
 import type { IUserRepository } from '../../../src/port/out/user-repository.port';
 import type { ITokenIssuer } from '../../../src/port/out/token-issuer.port';
-import type { UserModel } from '../../../src/model/user.model';
-import type { AuthToken } from '../../../src/model/auth-token.model';
+import type { UserModel, UserFilters } from '../../../src/model/user';
+import type { AuthToken, Page } from '../../../src/model';
 import { UserNotFoundException } from '../../../src/error/user/user-not-found.exception';
 import { SelfFollowException } from '../../../src/error/user/self-follow.exception';
 import { AlreadyFollowingException } from '../../../src/error/user/already-following.exception';
 import { NotFollowingException } from '../../../src/error/user/not-following.exception';
-import type { Page } from '../../../src/model/page.model';
-import type { UserFilters } from '../../../src/model/user-filter.model';
 
 function makeService(
   repo: Partial<IUserRepository>,

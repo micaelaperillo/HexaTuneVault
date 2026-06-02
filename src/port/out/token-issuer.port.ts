@@ -1,5 +1,5 @@
-import type { UserModel } from '../../model/user.model';
-import type { AuthToken } from '../../model/auth-token.model';
+import type { UserModel } from '../../model/user';
+import type { AuthToken } from '../../model';
 
 export const TOKEN_ISSUER = Symbol('ITokenIssuer');
 

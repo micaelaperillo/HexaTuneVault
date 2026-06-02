@@ -1,6 +1,5 @@
-import { CommentModel } from '../../../model/comment.model';
-import { CommentFilters } from '../../../model/comment-filter.model';
-import type { Page } from '../../../model/page.model';
+import { CommentModel, CommentFilters } from '../../../model/comment';
+import type { Page } from '../../../model';
 
 /** DI token for {@link ISearchComment}. */
 export const SEARCH_COMMENT = Symbol('ISearchComment');

@@ -1,6 +1,6 @@
 import { ValidatorConstraint } from 'class-validator';
 import type { ValidatorConstraintInterface } from 'class-validator';
-import { SubjectType } from '../../../../../model/review-subject';
+import { SubjectType } from '../../../../../model/review';
 
 @ValidatorConstraint({ name: 'isReviewSubject', async: false })
 export class IsReviewSubjectConstraint implements ValidatorConstraintInterface {

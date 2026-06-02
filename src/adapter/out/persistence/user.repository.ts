@@ -9,9 +9,8 @@ import {
   type IPasswordHasher,
   PASSWORD_HASHER,
 } from '../../../port/out';
-import type { UserModel } from '../../../model/user.model';
-import type { UserFilters } from '../../../model/user-filter.model';
-import type { Page, PageRequest } from '../../../model/page.model';
+import type { UserModel, UserFilters } from '../../../model/user';
+import type { Page, PageRequest } from '../../../model';
 import { InvalidCredentialsException } from '../../../error/user/invalid-credentials.exception';
 import { containsInsensitive } from './like-escape';
 import { UserDBException } from '../../../port/out/persistence.error';

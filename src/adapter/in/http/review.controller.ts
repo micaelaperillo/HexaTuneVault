@@ -36,9 +36,8 @@ import {
 import { CreateReviewDto, ReviewFilterDto } from './dto/in/review';
 import { ReviewResponseDto, ReviewLikeCountResponse } from './dto/out/review';
 import { LikedResponseDto, PageDto } from './dto/out';
-import type { ReviewFilters } from '../../../model/review-filter.model';
+import { type ReviewFilters, splitSubject } from '../../../model/review';
 import type { ReviewModel } from '../../../model';
-import { splitSubject } from '../../../model/review-subject';
 import { plainToInstance } from 'class-transformer';
 import { Public } from './decorator/public.decorator';
 import { CurrentUser } from './decorator/current-user.decorator';

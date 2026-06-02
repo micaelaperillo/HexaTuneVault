@@ -1,12 +1,12 @@
 import { IsString, Length, IsInt, Min, Max, Validate } from 'class-validator';
 import { TrimString } from '../../transforms';
-import type { ReviewSubject } from '../../../../../../model/review-subject';
 import {
+  type ReviewSubject,
   RATING_MIN,
   RATING_MAX,
   CONTENT_MIN_LENGTH,
   CONTENT_MAX_LENGTH,
-} from '../../../../../../model/review-constraints';
+} from '../../../../../../model/review';
 import { IsReviewSubjectConstraint } from '../../validators/is-review-subject.validator';
 
 export class CreateReviewDto {

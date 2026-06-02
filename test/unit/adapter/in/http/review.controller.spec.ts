@@ -19,8 +19,8 @@ import { HAS_LIKED_REVIEW } from '../../../../../src/port/in/review/has-liked-re
 import {
   SortField,
   SortOrder,
-} from '../../../../../src/model/review-filter.model';
-import { SubjectType } from '../../../../../src/model/review-subject';
+  SubjectType,
+} from '../../../../../src/model/review';
 import type { ReviewModel, UserModel } from '../../../../../src/model';
 import type { Response, Request } from 'express';
 

@@ -5,11 +5,9 @@ import { MapErrors } from 'error-mapper-decorator';
 import { CommentEntity } from './entity/comment.entity';
 import { CommentLikeEntity } from './entity/comment-like.entity';
 import { ICommentRepository } from '../../../port/out';
-import type { CommentModel } from '../../../model/comment.model';
-import type { CommentFilters } from '../../../model/comment-filter.model';
-import type { ReviewModel, UserModel } from '../../../model';
-import type { Page } from '../../../model';
-import { buildSubject } from '../../../model/review-subject';
+import type { CommentModel, CommentFilters } from '../../../model/comment';
+import type { ReviewModel, UserModel, Page } from '../../../model';
+import { buildSubject } from '../../../model/review';
 import { escapeLike } from './like-escape';
 import { CommentDBException } from '../../../port/out/persistence.error';
 

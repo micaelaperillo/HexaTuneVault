@@ -1,4 +1,4 @@
-import { UserModel } from '../../../model/user.model';
+import { UserModel } from '../../../model/user';
 
 export const GET_USER = Symbol('IGetUser');
 

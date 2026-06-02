@@ -2,12 +2,12 @@ import { ReviewRepository } from '../../../../../src/adapter/out/persistence/rev
 import { ReviewEntity } from '../../../../../src/adapter/out/persistence/entity/review.entity';
 import { ReviewRepositoryException } from '../../../../../src/port/out/persistence.error';
 import { QueryFailedError } from 'typeorm';
-import { SubjectType } from '../../../../../src/model/review-subject';
-import type { ReviewFilters } from '../../../../../src/model/review-filter.model';
 import {
+  SubjectType,
+  type ReviewFilters,
   SortField,
   SortOrder,
-} from '../../../../../src/model/review-filter.model';
+} from '../../../../../src/model/review';
 import type { Repository } from 'typeorm';
 import { UserEntity } from '../../../../../src/adapter/out/persistence/entity';
 

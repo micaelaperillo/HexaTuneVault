@@ -1,4 +1,4 @@
-import type { PageableFilters } from './page.model';
+import type { PageableFilters } from '../page.model';
 import type { SubjectType } from './review-subject';
 
 export const SortField = {

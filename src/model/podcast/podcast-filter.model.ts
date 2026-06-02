@@ -1,4 +1,4 @@
-import type { PageableFilters } from './page.model';
+import type { PageableFilters } from '../page.model';
 
 export type PodcastFilters = PageableFilters & {
   readonly name: string;

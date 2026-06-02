@@ -24,8 +24,7 @@ import {
   type IReviewConfig,
 } from '../port/in/review/review-config.port';
 import type { Page } from '../model';
-import type { ReviewModel } from '../model/review.model';
-import type { ReviewFilters } from '../model/review-filter.model';
+import type { ReviewModel, ReviewFilters } from '../model/review';
 import { ReviewCooldownException } from '../error/review/review-cooldown.exception';
 import { ReviewNotFoundException } from '../error/review/review-not-found.exception';
 import { ForbiddenDeletionException } from '../error/review/forbidden-deletion.exception';

@@ -3,7 +3,7 @@ import {
   buildSubject,
   splitSubject,
   SubjectType,
-} from '../../../src/model/review-subject';
+} from '../../../../src/model/review';
 
 describe('buildSubject', () => {
   it('builds an album subject', () => {

@@ -1,5 +1,5 @@
 import type { UserModel } from '../../../model';
-import type { ReviewModel } from '../../../model/review.model';
+import type { ReviewModel } from '../../../model/review';
 
 export type CreateReviewCommand = Omit<
   ReviewModel,

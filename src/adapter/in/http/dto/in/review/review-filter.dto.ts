@@ -13,12 +13,10 @@ import { Type } from 'class-transformer';
 import {
   SortField,
   SortOrder,
-} from '../../../../../../model/review-filter.model';
-import { SubjectType } from '../../../../../../model/review-subject';
-import {
+  SubjectType,
   RATING_MIN,
   RATING_MAX,
-} from '../../../../../../model/review-constraints';
+} from '../../../../../../model/review';
 import { MaxRatingDtoConstraint } from '../../validators/max-rating.validator';
 import { DateRangeDtoConstraint } from '../../validators/date-range.validator';
 import { SubjectIdRequiresTypeDtoConstraint } from '../../validators/subject-id-requires-type.validator';

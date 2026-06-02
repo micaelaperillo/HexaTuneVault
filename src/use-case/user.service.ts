@@ -24,10 +24,8 @@ export {
   FOLLOW_USER,
   LIST_FOLLOWS,
 } from '../port/in/user';
-import { UserModel } from '../model/user.model';
-import { AuthToken } from '../model/auth-token.model';
-import { UserFilters } from '../model/user-filter.model';
-import { Page, PageRequest } from '../model/page.model';
+import { UserModel, UserFilters } from '../model/user';
+import { AuthToken, Page, PageRequest } from '../model';
 import { UserNotFoundException } from '../error/user/user-not-found.exception';
 import { AlreadyFollowingException } from '../error/user/already-following.exception';
 import { NotFollowingException } from '../error/user/not-following.exception';

@@ -1,4 +1,4 @@
-import type { PageableFilters } from './page.model';
+import type { PageableFilters } from '../page.model';
 
 export type CommentFilters = PageableFilters & {
   createdById?: number;

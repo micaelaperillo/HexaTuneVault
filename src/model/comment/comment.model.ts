@@ -1,4 +1,5 @@
-import { UserModel, ReviewModel } from '.';
+import { UserModel } from '../user';
+import { ReviewModel } from '../review';
 
 export type CommentModel = {
   id: number;

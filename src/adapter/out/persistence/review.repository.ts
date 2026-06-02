@@ -2,16 +2,19 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThan, TypeORMError } from 'typeorm';
 import { ReviewEntity } from './entity/review.entity';
-import type { ReviewModel } from '../../../model/review.model';
-import { splitSubject, buildSubject } from '../../../model/review-subject';
-import type { ReviewSubject } from '../../../model/review-subject';
-import type { Page } from '../../../model';
-import type { ReviewFilters } from '../../../model/review-filter.model';
-import { SortField, SortOrder } from '../../../model/review-filter.model';
+import {
+  type ReviewModel,
+  splitSubject,
+  buildSubject,
+  type ReviewSubject,
+  type ReviewFilters,
+  SortField,
+  SortOrder,
+} from '../../../model/review';
+import type { Page, UserModel } from '../../../model';
 import type { IReviewRepository } from '../../../port/out';
 import { MapErrors } from 'error-mapper-decorator';
 import { ReviewRepositoryException } from '../../../port/out/persistence.error';
-import type { UserModel } from '../../../model';
 import { UserEntity } from './entity';
 import { escapeLike } from './like-escape';
 
