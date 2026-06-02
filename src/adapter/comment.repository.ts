@@ -57,14 +57,13 @@ export class CommentRepository implements ICommentRepository {
     return entities.map((e) => this.toModel(e));
   }
 
+  async hasLike(commentId: number, userId: number): Promise<boolean> {
+    return this.run(() => this.likeExists(commentId, userId));
+  }
+
   async addLike(commentId: number, userId: number): Promise<void> {
     await this.run(async () => {
-      const alreadyLiked = await this.repo
-        .createQueryBuilder('comment')
-        .innerJoin('comment.likedBy', 'user', 'user.id = :userId', { userId })
-        .where('comment.id = :commentId', { commentId })
-        .getCount();
-      if (alreadyLiked === 0) {
+      if (!(await this.likeExists(commentId, userId))) {
         await this.repo
           .createQueryBuilder()
           .relation(CommentEntity, 'likedBy')
@@ -72,6 +71,18 @@ export class CommentRepository implements ICommentRepository {
           .add(userId);
       }
     });
+  }
+
+  private async likeExists(
+    commentId: number,
+    userId: number,
+  ): Promise<boolean> {
+    const count = await this.repo
+      .createQueryBuilder('comment')
+      .innerJoin('comment.likedBy', 'user', 'user.id = :userId', { userId })
+      .where('comment.id = :commentId', { commentId })
+      .getCount();
+    return count > 0;
   }
 
   async removeLike(commentId: number, userId: number): Promise<void> {

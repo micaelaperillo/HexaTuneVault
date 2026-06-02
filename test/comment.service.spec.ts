@@ -23,6 +23,7 @@ describe('CommentService', () => {
     findReplies: jest.fn(),
     search: jest.fn(),
     deleteById: jest.fn(),
+    hasLike: jest.fn(),
     addLike: jest.fn(),
     removeLike: jest.fn(),
   };
@@ -103,6 +104,24 @@ describe('CommentService', () => {
       mockRepo.deleteById.mockResolvedValue(undefined);
       await service.deleteById(1);
       expect(mockRepo.deleteById).toHaveBeenCalledWith(1);
+    });
+  });
+
+  describe('hasLiked', () => {
+    it('returns the repo result when the comment exists', async () => {
+      mockRepo.findById.mockResolvedValue(mockComment);
+      mockRepo.hasLike.mockResolvedValue(true);
+      const result = await service.hasLiked(1, 2);
+      expect(mockRepo.hasLike).toHaveBeenCalledWith(1, 2);
+      expect(result).toBe(true);
+    });
+
+    it('throws CommentNotFoundException when the comment does not exist', async () => {
+      mockRepo.findById.mockResolvedValue(null);
+      await expect(service.hasLiked(99, 2)).rejects.toThrow(
+        CommentNotFoundException,
+      );
+      expect(mockRepo.hasLike).not.toHaveBeenCalled();
     });
   });
 

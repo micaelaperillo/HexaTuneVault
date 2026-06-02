@@ -55,6 +55,12 @@ export interface ICommentRepository {
   deleteById(id: number): Promise<void>;
 
   /**
+   * Reports whether `userId` has liked the comment. Absence-tolerant: returns
+   * `false` for a non-existent comment rather than distinguishing it.
+   */
+  hasLike(commentId: number, userId: number): Promise<boolean>;
+
+  /**
    * Adds a like from `userId` to the comment. Idempotent: does nothing if the
    * user has already liked it.
    */

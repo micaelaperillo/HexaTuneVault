@@ -11,6 +11,7 @@ import {
   DELETE_COMMENT,
   GET_COMMENT,
   GET_COMMENT_REPLIES,
+  HAS_LIKED_COMMENT,
   LIKE_COMMENT,
   SEARCH_COMMENT,
 } from '../port/comment/';
@@ -27,6 +28,7 @@ import { CommentController } from '../controller/comment.controller';
     { provide: SEARCH_COMMENT, useClass: CommentService },
     { provide: GET_COMMENT, useClass: CommentService },
     { provide: GET_COMMENT_REPLIES, useClass: CommentService },
+    { provide: HAS_LIKED_COMMENT, useClass: CommentService },
     { provide: LIKE_COMMENT, useClass: CommentService },
   ],
 })

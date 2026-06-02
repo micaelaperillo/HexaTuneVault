@@ -191,7 +191,9 @@ describe('CommentRepository', () => {
         content: 'test',
         parentReviewId: 10,
       });
-      expect(qbMock.where).toHaveBeenCalledWith('comment.parentComment IS NULL');
+      expect(qbMock.where).toHaveBeenCalledWith(
+        'comment.parentComment IS NULL',
+      );
       expect(qbMock.andWhere).toHaveBeenCalledWith(
         'comment.createdBy = :createdById',
         { createdById: 1 },
@@ -210,8 +212,30 @@ describe('CommentRepository', () => {
     it('restricts to top-level comments when no filters are provided', async () => {
       qbMock.getMany.mockResolvedValue([]);
       await repository.search({});
-      expect(qbMock.where).toHaveBeenCalledWith('comment.parentComment IS NULL');
+      expect(qbMock.where).toHaveBeenCalledWith(
+        'comment.parentComment IS NULL',
+      );
       expect(qbMock.andWhere).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('hasLike', () => {
+    it('returns true when the user has liked the comment', async () => {
+      qbMock.getCount.mockResolvedValue(1);
+      const result = await repository.hasLike(1, 2);
+      expect(qbMock.innerJoin).toHaveBeenCalledWith(
+        'comment.likedBy',
+        'user',
+        'user.id = :userId',
+        { userId: 2 },
+      );
+      expect(result).toBe(true);
+    });
+
+    it('returns false when the user has not liked the comment', async () => {
+      qbMock.getCount.mockResolvedValue(0);
+      const result = await repository.hasLike(1, 2);
+      expect(result).toBe(false);
     });
   });
 

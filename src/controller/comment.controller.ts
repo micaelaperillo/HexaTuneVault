@@ -23,6 +23,8 @@ import {
   type IGetComment,
   GET_COMMENT_REPLIES,
   type IGetCommentReplies,
+  HAS_LIKED_COMMENT,
+  type IHasLikedComment,
   LIKE_COMMENT,
   type ILikeComment,
 } from '../port/comment/';
@@ -30,6 +32,8 @@ import {
 import { CreateCommentDto } from '../dto/create-comment.dto';
 import { CommentFiltersDto } from '../dto/comment-filters.dto';
 import { CommentResponseDto } from '../dto/comment-response.dto';
+import { CommentLikeQueryDto } from '../dto/comment-like-query.dto';
+import { CommentLikeStatusDto } from '../dto/comment-like-status.dto';
 import { SetCommentLikeDto } from '../dto/set-comment-like.dto';
 
 @Controller('api/comments')
@@ -41,6 +45,8 @@ export class CommentController {
     @Inject(GET_COMMENT) private readonly getComment: IGetComment,
     @Inject(GET_COMMENT_REPLIES)
     private readonly getCommentReplies: IGetCommentReplies,
+    @Inject(HAS_LIKED_COMMENT)
+    private readonly commentHasLiked: IHasLikedComment,
     @Inject(LIKE_COMMENT) private readonly likeComment: ILikeComment,
   ) {}
 
@@ -81,6 +87,15 @@ export class CommentController {
   ): Promise<CommentResponseDto[]> {
     const replies = await this.getCommentReplies.getReplies(id);
     return CommentResponseDto.fromMany(replies);
+  }
+
+  @Get(':id/like')
+  async hasLiked(
+    @Param('id', ParseIntPipe) id: number,
+    @Query() query: CommentLikeQueryDto,
+  ): Promise<CommentLikeStatusDto> {
+    const liked = await this.commentHasLiked.hasLiked(id, query.user_id);
+    return new CommentLikeStatusDto(liked);
   }
 
   @Delete(':id')

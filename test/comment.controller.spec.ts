@@ -6,10 +6,12 @@ import {
   SEARCH_COMMENT,
   GET_COMMENT,
   GET_COMMENT_REPLIES,
+  HAS_LIKED_COMMENT,
   LIKE_COMMENT,
 } from '../src/port/comment';
 import { CommentModel } from '../src/model/comment.model';
 import { CommentResponseDto } from '../src/dto/comment-response.dto';
+import { CommentLikeStatusDto } from '../src/dto/comment-like-status.dto';
 import { CreateCommentDto } from '../src/dto/create-comment.dto';
 import { SetCommentLikeDto } from '../src/dto/set-comment-like.dto';
 
@@ -31,6 +33,7 @@ describe('CommentController', () => {
   const mockSearch = { search: jest.fn() };
   const mockGet = { get: jest.fn() };
   const mockGetReplies = { getReplies: jest.fn() };
+  const mockHasLiked = { hasLiked: jest.fn() };
   const mockLike = { setLike: jest.fn() };
 
   beforeEach(async () => {
@@ -44,6 +47,7 @@ describe('CommentController', () => {
         { provide: SEARCH_COMMENT, useValue: mockSearch },
         { provide: GET_COMMENT, useValue: mockGet },
         { provide: GET_COMMENT_REPLIES, useValue: mockGetReplies },
+        { provide: HAS_LIKED_COMMENT, useValue: mockHasLiked },
         { provide: LIKE_COMMENT, useValue: mockLike },
       ],
     }).compile();
@@ -139,6 +143,17 @@ describe('CommentController', () => {
       expect(result[0]).toBeInstanceOf(CommentResponseDto);
       expect(result[0].self).toBe('/api/comments/2');
       expect(result[0].parent).toBe('/api/comments/1');
+    });
+  });
+
+  describe('hasLiked', () => {
+    it('calls hasLiked port with the comment id and user_id, returning a status dto', async () => {
+      mockHasLiked.hasLiked.mockResolvedValue(true);
+      const result = await controller.hasLiked(1, { user_id: 2 });
+
+      expect(mockHasLiked.hasLiked).toHaveBeenCalledWith(1, 2);
+      expect(result).toBeInstanceOf(CommentLikeStatusDto);
+      expect(result.liked).toBe(true);
     });
   });
 
