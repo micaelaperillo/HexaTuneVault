@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { SPOTIFY_API } from '../../../../../src/adapter/out/catalog/spotify.provider';
 import { SpotifyAlbumProvider } from '../../../../../src/adapter/out';
-import { AlbumProviderError } from '../../../../../src/adapter/out/catalog/album-provider.error';
+import { AlbumProviderError } from '../../../../../src/port/out/catalog.error';
 
 import type { AlbumModel } from '../../../../../src/model';
 

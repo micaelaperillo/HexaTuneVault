@@ -23,12 +23,16 @@ import {
 import { ReviewNotFoundException } from '../../../../error/review/review-not-found.exception';
 import { ForbiddenDeletionException } from '../../../../error/review/forbidden-deletion.exception';
 import { ReviewCooldownException } from '../../../../error/review/review-cooldown.exception';
-import { AlbumProviderError } from '../../../../adapter/out/catalog/album-provider.error';
-import { ArtistProviderError } from '../../../../adapter/out/catalog/artist-provider.error';
-import { PodcastProviderError } from '../../../../adapter/out/catalog/podcast-provider.error';
-import { CommentDBException } from '../../../../adapter/out/persistence/comment-db.exception';
-import { UserDBException } from '../../../../adapter/out/persistence/user-db.exception';
-import { ReviewRepositoryException } from '../../../../adapter/out/persistence/review-repository.exception';
+import {
+  AlbumProviderError,
+  ArtistProviderError,
+  PodcastProviderError,
+} from '../../../../port/out/catalog.error';
+import {
+  CommentDBException,
+  UserDBException,
+  ReviewRepositoryException,
+} from '../../../../port/out/persistence.error';
 
 // Single response envelope across the app: { statusCode, code, message }.
 // Domain exceptions carry a stable machine-readable `code`; for plain

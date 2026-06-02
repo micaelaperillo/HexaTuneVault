@@ -1,6 +1,6 @@
 import { ReviewRepository } from '../../../../../src/adapter/out/persistence/review.repository';
 import { ReviewEntity } from '../../../../../src/adapter/out/persistence/entity/review.entity';
-import { ReviewRepositoryException } from '../../../../../src/adapter/out/persistence/review-repository.exception';
+import { ReviewRepositoryException } from '../../../../../src/port/out/persistence.error';
 import { QueryFailedError } from 'typeorm';
 import { SubjectType } from '../../../../../src/model/review-subject';
 import type { ReviewFilters } from '../../../../../src/model/review-filter.model';

@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { SPOTIFY_API } from '../../../../../src/adapter/out/catalog/spotify.provider';
 import { SpotifyPodcastProvider } from '../../../../../src/adapter/out';
-import { PodcastProviderError } from '../../../../../src/adapter/out/catalog/podcast-provider.error';
+import { PodcastProviderError } from '../../../../../src/port/out/catalog.error';
 
 import type { PodcastModel } from '../../../../../src/model';
 

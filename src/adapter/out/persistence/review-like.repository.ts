@@ -5,7 +5,7 @@ import { ReviewLikeEntity } from './entity/review-like.entity';
 import { ReviewNotFoundException } from '../../../error/review/review-not-found.exception';
 import type { IReviewLikeRepository } from '../../../port/out/review-like-repository.port';
 import { MapErrors } from 'error-mapper-decorator';
-import { ReviewRepositoryException } from './review-repository.exception';
+import { ReviewRepositoryException } from '../../../port/out/persistence.error';
 
 const FOREIGN_KEY_VIOLATION = '23503';
 

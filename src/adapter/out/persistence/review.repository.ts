@@ -10,7 +10,7 @@ import type { ReviewFilters } from '../../../model/review-filter.model';
 import { SortField, SortOrder } from '../../../model/review-filter.model';
 import type { IReviewRepository } from '../../../port/out/review-repository.port';
 import { MapErrors } from 'error-mapper-decorator';
-import { ReviewRepositoryException } from './review-repository.exception';
+import { ReviewRepositoryException } from '../../../port/out/persistence.error';
 import type { UserModel } from '../../../model';
 import { UserEntity } from './entity';
 import { escapeLike } from './like-escape';

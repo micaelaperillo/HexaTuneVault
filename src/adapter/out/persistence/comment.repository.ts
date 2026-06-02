@@ -11,7 +11,7 @@ import type { ReviewModel, UserModel } from '../../../model';
 import type { Page } from '../../../model';
 import { buildSubject } from '../../../model/review-subject';
 import { escapeLike } from './like-escape';
-import { CommentDBException } from './comment-db.exception';
+import { CommentDBException } from '../../../port/out/persistence.error';
 
 @Injectable()
 @MapErrors(

@@ -4,7 +4,7 @@ import { QueryFailedError } from 'typeorm';
 import { CommentRepository } from '../../../../../src/adapter/out/persistence/comment.repository';
 import { CommentEntity } from '../../../../../src/adapter/out/persistence/entity/comment.entity';
 import { CommentLikeEntity } from '../../../../../src/adapter/out/persistence/entity/comment-like.entity';
-import { CommentDBException } from '../../../../../src/adapter/out/persistence/comment-db.exception';
+import { CommentDBException } from '../../../../../src/port/out/persistence.error';
 import { ReviewModel, UserModel } from '../../../../../src/model';
 import { UserEntity } from '../../../../../src/adapter/out/persistence/entity';
 import { ReviewEntity } from '../../../../../src/adapter/out/persistence/entity/review.entity';
