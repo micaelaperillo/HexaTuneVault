@@ -10,7 +10,7 @@ import { Public } from './public.decorator';
 import {
   TOKEN_VERIFIER,
   type ITokenVerifier,
-} from '../../repository/i-token-verifier';
+} from '../../repository/token-verifier.port';
 import type { AuthenticatedRequest } from './authenticated-request';
 import { InvalidTokenException } from '../../error/auth/invalid-token.exception';
 

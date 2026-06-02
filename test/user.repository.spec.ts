@@ -5,7 +5,7 @@
 // import { UserEntity } from '../src/entity/user.entity';
 // import { UserDBException } from '../src/error/user/user-db.exception';
 // import { InvalidCredentialsException } from '../src/error/user/invalid-credentials.exception';
-// import { PASSWORD_HASHER } from '../src/repository/i-password-hasher';
+// import { PASSWORD_HASHER } from '../src/repository/password-hasher.port';
 // import type { UserModel } from '../src/model/user.model';
 
 // describe('UserRepository', () => {

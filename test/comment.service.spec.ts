@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CommentService } from '../src/use-case/comment.service';
-import { COMMENT_REPOSITORY } from '../src/repository/i-comment.repository';
+import { COMMENT_REPOSITORY } from '../src/repository/comment-repository.port';
 import { CommentModel } from '../src/model/comment.model';
 import { CommentNotFoundException } from '../src/error/comment/comment-not-found.exception';
 import { CommentDeletionForbiddenException } from '../src/error/comment/comment-deletion-forbidden.exception';

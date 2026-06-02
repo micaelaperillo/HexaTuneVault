@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { MapErrors } from 'error-mapper-decorator';
 import { CommentEntity } from '../entity/comment.entity';
-import { ICommentRepository } from '../repository/i-comment.repository';
+import { ICommentRepository } from '../repository/comment-repository.port';
 import type { CommentModel } from '../model/comment.model';
 import type { CommentFilters } from '../model/comment.filter';
 import { ReviewModel, UserModel } from '../model';

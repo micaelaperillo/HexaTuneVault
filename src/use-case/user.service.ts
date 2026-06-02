@@ -1,17 +1,20 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { IAuthenticateUser } from '../port/user/i-authenticate-user.port';
-import { ICreateUser } from '../port/user/i-create-user.port';
-import { IEditUser } from '../port/user/i-edit-user.port';
-import { IDeleteUser } from '../port/user/i-delete-user.port';
-import { ISearchUser } from '../port/user/i-search-user.port';
-import { IGetUser } from '../port/user/i-get-user.port';
-import { IFollowUser } from '../port/user/i-follow-user.port';
-import { IListFollows } from '../port/user/i-list-follows.port';
+import { IAuthenticateUser } from '../port/user/authenticate-user.port';
+import { ICreateUser } from '../port/user/create-user.port';
+import { IEditUser } from '../port/user/edit-user.port';
+import { IDeleteUser } from '../port/user/delete-user.port';
+import { ISearchUser } from '../port/user/search-user.port';
+import { IGetUser } from '../port/user/get-user.port';
+import { IFollowUser } from '../port/user/follow-user.port';
+import { IListFollows } from '../port/user/list-follows.port';
 import {
   USER_REPOSITORY,
   type IUserRepository,
-} from '../repository/i-user.repository';
-import { TOKEN_ISSUER, type ITokenIssuer } from '../repository/i-token-issuer';
+} from '../repository/user-repository.port';
+import {
+  TOKEN_ISSUER,
+  type ITokenIssuer,
+} from '../repository/token-issuer.port';
 
 export {
   AUTHENTICATE_USER,

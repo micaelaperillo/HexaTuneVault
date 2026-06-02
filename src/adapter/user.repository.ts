@@ -4,7 +4,7 @@ import { ILike, Repository } from 'typeorm';
 import { MapErrors } from 'error-mapper-decorator';
 
 import { UserEntity } from '../entity/user.entity';
-import { IUserRepository } from '../repository/i-user.repository';
+import { IUserRepository } from '../repository/user-repository.port';
 import type { UserModel } from '../model/user.model';
 import type { UserFilters } from '../model/user.filter';
 import type { Page, PageRequest } from '../model/page.model';
@@ -12,7 +12,7 @@ import { InvalidCredentialsException } from '../error/user/invalid-credentials.e
 import {
   type IPasswordHasher,
   PASSWORD_HASHER,
-} from '../repository/i-password-hasher';
+} from '../repository/password-hasher.port';
 import { escapeLike } from './like-escape';
 import { userPersistenceFailure } from './user-error-mappings';
 

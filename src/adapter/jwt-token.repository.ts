@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { ITokenVerifier } from '../repository/i-token-verifier';
-import { ITokenIssuer } from '../repository/i-token-issuer';
+import { ITokenVerifier } from '../repository/token-verifier.port';
+import { ITokenIssuer } from '../repository/token-issuer.port';
 import { InvalidTokenException } from '../error/auth/invalid-token.exception';
 import { JwtModel, UserModel } from '../model';
 

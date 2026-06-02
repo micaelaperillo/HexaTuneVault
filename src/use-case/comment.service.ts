@@ -18,7 +18,7 @@ import type {
 import {
   COMMENT_REPOSITORY,
   type ICommentRepository,
-} from '../repository/i-comment.repository';
+} from '../repository/comment-repository.port';
 
 import {
   CommentNotFoundException,
@@ -27,7 +27,7 @@ import {
 
 import { Inject, Injectable } from '@nestjs/common';
 
-export { COMMENT_REPOSITORY } from '../repository/i-comment.repository';
+export { COMMENT_REPOSITORY } from '../repository/comment-repository.port';
 
 @Injectable()
 export class CommentService
