@@ -1,7 +1,7 @@
 import type { PageableFilters } from './page.model';
 
-export interface CommentFilters extends PageableFilters {
+export type CommentFilters = PageableFilters & {
   createdById?: number;
   content?: string;
   parentReviewId?: number;
-}
+};

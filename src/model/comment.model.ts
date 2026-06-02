@@ -1,6 +1,6 @@
 import { UserModel, ReviewModel } from '.';
 
-export interface CommentModel {
+export type CommentModel = {
   id: number;
   content: string;
   createdAt: Date;
@@ -9,4 +9,4 @@ export interface CommentModel {
   // Use the comment id to prevent accidental infinite loops
   parentCommentId: CommentModel['id'] | null;
   likes: number;
-}
+};

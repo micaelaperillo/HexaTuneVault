@@ -1,3 +1,3 @@
-export interface JwtModel {
+export type JwtModel = {
   accessToken: string;
-}
+};

@@ -1,7 +1,7 @@
 import type { UserModel } from '.';
 import type { ReviewSubject } from './review-subject';
 
-export interface ReviewModel {
+export type ReviewModel = {
   id: number;
   subject: ReviewSubject;
   content: string;
@@ -9,4 +9,4 @@ export interface ReviewModel {
   createdAt: Date;
   author: UserModel;
   updatedAt: Date | null;
-}
+};

@@ -1,6 +1,6 @@
 import type { PageableFilters } from './page.model';
 
-export interface ArtistFilters extends PageableFilters {
+export type ArtistFilters = PageableFilters & {
   readonly name: string;
   readonly genre?: string[];
-}
+};
