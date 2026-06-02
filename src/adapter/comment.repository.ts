@@ -180,7 +180,7 @@ export class CommentRepository implements ICommentRepository {
         updatedAt: entity.parentReview.updatedAt,
       },
       parentCommentId: entity.parentComment?.id ?? null,
-      likes: entity.likeCount ?? 0,
+      likes: entity.likeCount,
     };
   }
 }
