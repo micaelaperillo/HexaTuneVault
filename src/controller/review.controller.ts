@@ -18,25 +18,19 @@ import type { Response, Request } from 'express';
 import {
   CREATE_REVIEW,
   type ICreateReview,
-} from '../port/review/create-review.port';
-import {
   DELETE_REVIEW,
   type IDeleteReview,
-} from '../port/review/delete-review.port';
-import {
   SEARCH_REVIEW,
   type ISearchReview,
-} from '../port/review/search-review.port';
-import { GET_REVIEW, type IGetReview } from '../port/review/get-review.port';
-import { LIKE_REVIEW, type ILikeReview } from '../port/review/like-review.port';
-import {
+  GET_REVIEW,
+  type IGetReview,
+  LIKE_REVIEW,
+  type ILikeReview,
   UNLIKE_REVIEW,
   type IUnlikeReview,
-} from '../port/review/unlike-review.port';
-import {
   COUNT_REVIEW_LIKES,
   type ICountReviewLikes,
-} from '../port/review/count-review-likes.port';
+} from '../port';
 import { CreateReviewDto } from '../dto/create-review.dto';
 import { ReviewFiltersDto } from '../dto/review-filters.dto';
 import { ReviewResponseDto } from '../dto/review-response.dto';
@@ -139,7 +133,7 @@ export class ReviewController {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<ReviewLikeCountResponse> {
     const count = await this.countReviewLikes.count(id);
-    return ReviewLikeCountResponse.fromCount(id, count);
+    return plainToInstance(ReviewLikeCountResponse, { review_id: id, count });
   }
 
   private static toResponse(this: void, review: ReviewModel) {

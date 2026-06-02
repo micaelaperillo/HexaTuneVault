@@ -64,7 +64,7 @@ export class CommentController {
   ): Promise<CommentResponseDto> {
     const comment = await this.createComment.create({
       content: dto.content,
-      createdBy: { id: user.id },
+      createdBy: user,
       parentReview: { id: dto.parent_review_id },
       parentCommentId: dto.parent_comment_id ?? null,
     });
@@ -124,7 +124,10 @@ export class CommentController {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<CommentLikeCountResponse> {
     const comment = await this.getComment.get(id);
-    return CommentLikeCountResponse.fromCount(id, comment.likes);
+    return plainToInstance(CommentLikeCountResponse, {
+      comment_id: id,
+      count: comment.likes,
+    });
   }
 
   @Put(':id/likes')
