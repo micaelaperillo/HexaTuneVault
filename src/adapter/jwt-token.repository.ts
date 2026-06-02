@@ -1,14 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ITokenVerifier } from '../repository/i-token-verifier';
-import type { AuthenticatedUser } from '../model/authenticated-user';
+import { ITokenIssuer } from '../repository/i-token-issuer';
 import { InvalidTokenException } from '../error/auth/invalid-token.exception';
+import { JwtModel, UserModel } from '../model';
 
 @Injectable()
-export class JwtTokenVerifier implements ITokenVerifier {
+export class JwtTokenRepository implements ITokenVerifier, ITokenIssuer {
   constructor(private readonly jwt: JwtService) {}
 
-  async verify(token: string): Promise<AuthenticatedUser> {
+  async issue(user: UserModel): Promise<JwtModel> {
+    const accessToken = await this.jwt.signAsync({ sub: user.id });
+    return { accessToken };
+  }
+
+  async verify(token: string): Promise<Pick<UserModel, 'id'>> {
     let payload: Record<string, unknown>;
     try {
       payload = await this.jwt.verifyAsync(token);
@@ -16,11 +22,6 @@ export class JwtTokenVerifier implements ITokenVerifier {
       throw new InvalidTokenException();
     }
 
-    const userId = Number(payload.sub);
-    if (!Number.isInteger(userId) || typeof payload.username !== 'string') {
-      throw new InvalidTokenException();
-    }
-
-    return { userId, username: payload.username };
+    return { id: payload.sub as UserModel['id'] };
   }
 }
