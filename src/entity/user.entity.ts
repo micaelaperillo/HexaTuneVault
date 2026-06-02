@@ -60,8 +60,8 @@ export class UserEntity {
   @ManyToMany(() => UserEntity, (user) => user.followers)
   @JoinTable({
     name: 'user_follows',
-    joinColumn: { name: 'followerId', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'followingId', referencedColumnName: 'id' },
+    joinColumn: { name: 'follower_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'following_id', referencedColumnName: 'id' },
   })
   following!: UserEntity[];
 
@@ -75,14 +75,14 @@ export class UserEntity {
   @VirtualColumn({
     type: 'int',
     query: (alias) =>
-      `SELECT COUNT(*)::int FROM "user_follows" WHERE "followingId" = ${alias}.id`,
+      `SELECT COUNT(*)::int FROM "user_follows" WHERE "following_id" = ${alias}.id`,
   })
   followerCount?: number;
 
   @VirtualColumn({
     type: 'int',
     query: (alias) =>
-      `SELECT COUNT(*)::int FROM "user_follows" WHERE "followerId" = ${alias}.id`,
+      `SELECT COUNT(*)::int FROM "user_follows" WHERE "follower_id" = ${alias}.id`,
   })
   followingCount?: number;
 }
