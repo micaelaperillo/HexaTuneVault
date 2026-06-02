@@ -19,46 +19,53 @@ def _viewer_id(request) -> str | None:
     return None
 
 
+def _page_items(data) -> list:
+    if isinstance(data, list):
+        return data
+    if isinstance(data, dict) and isinstance(data.get('items'), list):
+        return data['items']
+    return []
+
+
 def list_for(review_id, request=None) -> list[dict]:
     data = api_client.get_json(
-        BASE, request=request, params={'reviewId': str(review_id)}, default=[],
+        BASE, request=request,
+        params={'review_id': str(review_id), 'page': 1, 'page_size': 10},
+        default={},
     )
-    if not isinstance(data, list):
-        return []
     viewer_id = _viewer_id(request)
     author_cache: dict[str, tuple[str, dict]] = {}
     return [
         _to_comment(c, viewer_id, request, author_cache, with_replies=True)
-        for c in data
+        for c in _page_items(data)
     ]
 
 
 def counts_by_subject(request=None) -> dict[str, int]:
-    data = api_client.get_json(BASE, request=request, default=[])
+    data = api_client.get_json(
+        BASE, request=request, params={'page': 1, 'page_size': 10}, default={},
+    )
     counts: dict[str, int] = {}
-    if isinstance(data, list):
-        for c in data:
-            key = _id_from(c.get('review'))
-            counts[key] = counts.get(key, 0) + 1
+    for c in _page_items(data):
+        key = _id_from(c.get('review'))
+        counts[key] = counts.get(key, 0) + 1
     return counts
 
 
 def create(content, review_id, created_by, parent_comment_id=None, request=None):
     body = {
         'content': content,
-        'createdById': int(created_by),
-        'parentReviewId': int(review_id),
+        'parent_review_id': int(review_id),
     }
     if parent_comment_id is not None:
-        body['parentCommentId'] = int(parent_comment_id)
+        body['parent_comment_id'] = int(parent_comment_id)
     return api_client.post(BASE, request=request, json=body)
 
 
 def set_like(comment_id, user_id, liked, request=None):
-    return api_client.patch(f'{BASE}/{comment_id}/like', request=request, json={
-        'user_id': int(user_id),
-        'liked': bool(liked),
-    })
+    if liked:
+        return api_client.put(f'{BASE}/{comment_id}/likes', request=request)
+    return api_client.delete(f'{BASE}/{comment_id}/likes', request=request)
 
 
 def toggle_like(comment_id, user_id, request=None):
@@ -67,10 +74,7 @@ def toggle_like(comment_id, user_id, request=None):
 
 
 def has_liked(comment_id, user_id, request=None) -> bool:
-    response = api_client.get(
-        f'{BASE}/{comment_id}/like', request=request,
-        params={'user_id': int(user_id)},
-    )
+    response = api_client.get(f'{BASE}/{comment_id}/like', request=request)
     return response is not None and response.status_code == 204
 
 
@@ -108,7 +112,7 @@ def _to_comment(c: dict, viewer_id, request, cache, with_replies=True) -> dict:
             'id': comment_id,
             'user': username,
             'content': c.get('content', ''),
-            'date': c.get('createdAt', ''),
+            'date': c.get('created_at', ''),
         },
         'user': user_info,
         'likes': c.get('likes', 0),

@@ -55,7 +55,7 @@ def signin(request):
             request.POST.get('password'),
         )
         if response is not None and response.ok:
-            token = response.json().get('accessToken')
+            token = response.json().get('access_token')
             return _set_token_cookie(redirect('home'), token)
         messages.info(request, 'Invalid username or password')
         return redirect('login')
@@ -78,7 +78,7 @@ def signup(request):
         if response is not None and response.ok:
             auth = user_client.authenticate(username, password)
             if auth is not None and auth.ok:
-                token = auth.json().get('accessToken')
+                token = auth.json().get('access_token')
                 return _set_token_cookie(redirect('profile'), token)
             return redirect('login')
 
@@ -138,7 +138,7 @@ def settings_profile(request):
         fields = {'biography': request.POST.get('bio', ''),'location':request.POST.get('location','')}
         image_url = image_client.upload(request.FILES.get('image'), request=request)
         if image_url:
-            fields['profilePictureUrl'] = image_url
+            fields['profile_picture_url'] = image_url
         user_client.edit(user_id, request=request, **fields)
         return redirect('settings')
 
@@ -390,7 +390,7 @@ def like_or_unlike_post(request):
     if request.method == 'POST':
         post_id = request.POST.get('post_id')
         path = request.POST.get('path', '/')
-        api_client.post(f'/api/posts/{post_id}/like', request=request)
+        review_client.toggle_like(post_id, request=request)
         return redirect(path)
     return redirect('home')
 

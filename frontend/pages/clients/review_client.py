@@ -40,7 +40,8 @@ def _subject_ref(link: str) -> tuple[str, str]:
 def list_for(subject_type, subject_id, request=None) -> list[dict]:
     data = api_client.get_json(
         BASE, request=request,
-        params={'subject_type': subject_type, 'subject_id': str(subject_id)},
+        params={'subject_type': subject_type, 'subject_id': str(subject_id),
+                'page': 1, 'page_size': 10},
         default=[],
     )
     author_cache: dict[str, tuple[str, dict]] = {}
@@ -58,14 +59,30 @@ def create(content, rating, subject_type, subject_id, request=None):
     return api_client.post(BASE, request=request, json={
         'content': content,
         'rating': _as_int(rating),
-        'subject_type': subject_type,
-        'subject_id': str(subject_id),
+        'subject': {subject_type: str(subject_id)},
     })
+
+
+def toggle_like(review_id, request=None):
+    response = api_client.put(f'{BASE}/{review_id}/likes', request=request)
+    if response is not None and response.status_code == 409:
+        return api_client.delete(f'{BASE}/{review_id}/likes', request=request)
+    return response
+
+
+def like_count(review_id, request=None) -> int:
+    data = api_client.get_json(
+        f'{BASE}/{review_id}/likes/count', request=request, default={},
+    )
+    if isinstance(data, dict):
+        return data.get('count') or 0
+    return 0
 
 
 def list_by_author(author_id, request=None) -> list[dict]:
     data = api_client.get_json(
-        BASE, request=request, params={'author_id': str(author_id)}, default=[],
+        BASE, request=request,
+        params={'author_id': str(author_id), 'page': 1, 'page_size': 10}, default=[],
     )
     subject_cache: dict[tuple[str, str], tuple[str, str]] = {}
     return [_to_profile_post(r, request, subject_cache) for r in _items(data)]
@@ -77,7 +94,8 @@ def feed(authors, request=None, limit=20) -> list[dict]:
     for author in authors:
         data = api_client.get_json(
             BASE, request=request,
-            params={'author_id': str(author['id'])}, default=[],)
+            params={'author_id': str(author['id']), 'page': 1, 'page_size': 10},
+            default=[],)
         for r in _items(data):
             item = _to_profile_post(r, request, subject_cache)
             item['user'] = author.get('username', '')
@@ -147,18 +165,21 @@ def _to_post(r: dict, request, cache) -> dict:
     author_id = _id_from(r.get('author'))
     _subject_type, subject_id = _subject_ref(r.get('subject'))
     username, user_info = _author(author_id, request, cache)
+    review_id = r.get('id')
+    likes = like_count(review_id, request=request)
     return {
         'author_id': author_id,
         'post': {
-            'id': r.get('id'),
+            'id': review_id,
             'user': username,
             'title': r.get('content', ''),
             'date': r.get('created_at', ''),
             'rating': r.get('rating', 0),
             'vault_id': subject_id,
+            'likes': likes,
         },
         'user': user_info,
-        'likes': 0,
+        'likes': likes,
         'is_liked': False,
         'comment_count': 0,
     }

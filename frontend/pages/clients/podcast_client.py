@@ -1,8 +1,16 @@
 from . import api_client
 
 
+def _items(data) -> list:
+    if isinstance(data, list):
+        return data
+    if isinstance(data, dict) and isinstance(data.get('items'), list):
+        return data['items']
+    return []
+
+
 def search(query: str, explicit: str = '', media_type: str = '', market: str = '', request=None) -> list[dict]:
-    params = {'q': query}
+    params = {'q': query, 'page': 1, 'page_size': 10}
     if explicit:
         params['explicit'] = explicit
     if media_type:
@@ -10,11 +18,9 @@ def search(query: str, explicit: str = '', media_type: str = '', market: str = '
     if market:
         params['market'] = market
     data = api_client.get_json(
-        '/api/podcasts', request=request, params=params, default=[]
+        '/api/podcasts', request=request, params=params, default={}
     )
-    if not isinstance(data, list):
-        return []
-    return [_to_vault(p) for p in data]
+    return [_to_vault(p) for p in _items(data)]
 
 
 def get(name: str, request=None) -> dict | None:

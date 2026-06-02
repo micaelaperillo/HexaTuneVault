@@ -1,6 +1,15 @@
 
 from . import api_client
 
+
+def _items(data) -> list:
+    if isinstance(data, list):
+        return data
+    if isinstance(data, dict) and isinstance(data.get('items'), list):
+        return data['items']
+    return []
+
+
 def search(query: str = '', artist: str = '', request=None) -> list[dict]:
     params = {}
     if query:
@@ -9,10 +18,10 @@ def search(query: str = '', artist: str = '', request=None) -> list[dict]:
         params['artist'] = artist
     if not params:
         return []
-    data = api_client.get_json('/api/albums', request=request, params=params, default=[])
-    if not isinstance(data, list):
-        return []
-    return [_to_vault(a) for a in data]
+    params['page'] = 1
+    params['page_size'] = 10
+    data = api_client.get_json('/api/albums', request=request, params=params, default={})
+    return [_to_vault(a) for a in _items(data)]
 
 
 def get(name: str, request=None) -> dict | None:
@@ -27,8 +36,8 @@ def _to_vault(album: dict) -> dict:
         'id': name,
         'album': name,
         'image': album.get('cover', ''),
-        'date': album.get('releaseDate', ''),
-        'total_tracks': album.get('totalTracks', ''),
+        'date': album.get('release_date', ''),
+        'total_tracks': album.get('total_tracks', ''),
         'external_url': external_urls.get('spotify', ''),
         'artists': album.get('artists') or [],
         'self': album.get('self'),

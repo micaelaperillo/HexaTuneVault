@@ -1,17 +1,23 @@
 from . import api_client
 
 
+def _items(data) -> list:
+    if isinstance(data, list):
+        return data
+    if isinstance(data, dict) and isinstance(data.get('items'), list):
+        return data['items']
+    return []
+
+
 def search(query: str, genre: str = '', request=None) -> list[dict]:
 
-    params = {'q': query}
+    params = {'q': query, 'page': 1, 'page_size': 10}
     if genre:
         params['genre'] = genre
     data = api_client.get_json(
-        '/api/artists', request=request, params=params, default=[]
+        '/api/artists', request=request, params=params, default={}
     )
-    if not isinstance(data, list):
-        return []
-    return [_to_vault(a) for a in data]
+    return [_to_vault(a) for a in _items(data)]
 
 
 def get(name: str, request=None) -> dict | None:

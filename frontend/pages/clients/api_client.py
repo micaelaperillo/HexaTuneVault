@@ -46,6 +46,24 @@ def patch(path: str, request=None, **kwargs) -> requests.Response | None:
         return None
 
 
+def put(path: str, request=None, **kwargs) -> requests.Response | None:
+    try:
+        return requests.put(
+            _url(path), headers=_headers(request), timeout=DEFAULT_TIMEOUT, **kwargs
+        )
+    except requests.RequestException:
+        return None
+
+
+def delete(path: str, request=None, **kwargs) -> requests.Response | None:
+    try:
+        return requests.delete(
+            _url(path), headers=_headers(request), timeout=DEFAULT_TIMEOUT, **kwargs
+        )
+    except requests.RequestException:
+        return None
+
+
 def get_json(path: str, request=None, default=None, **kwargs):
     response = get(path, request=request, **kwargs)
     if response is not None and response.ok:
