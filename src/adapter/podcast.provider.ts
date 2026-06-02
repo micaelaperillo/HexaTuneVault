@@ -12,6 +12,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { SPOTIFY_API } from '../infrastructure/api/provider';
 import { PodcastProviderError } from '../error/podcast';
 import { resolveSpotifyPage } from './spotify-pagination';
+import { MapErrors } from 'error-mapper-decorator';
 
 export { PODCAST_PROVIDER } from '../repository';
 
@@ -28,31 +29,27 @@ export class SpotifyPodcastProvider implements IPodcastProvider {
   /**
    * @override
    */
+  @MapErrors({ from: Error, to: (e) => new PodcastProviderError(e) })
   async search(filters: PodcastFilters): Promise<Page<PodcastModel>> {
-    try {
-      const market = (filters.market as Market) || DEFAULT_MARKET;
-      const { page, pageSize, limit, offset } = resolveSpotifyPage(filters);
-      this.logger.debug(`${filters.name} (market=${market})`);
+    const market = (filters.market as Market) || DEFAULT_MARKET;
+    const { page, pageSize, limit, offset } = resolveSpotifyPage(filters);
+    this.logger.debug(`${filters.name} (market=${market})`);
 
-      const { shows } = await this.spotify.search(
-        filters.name,
-        ['show'],
-        market,
-        limit,
-        offset,
-      );
-      this.logger.debug(shows.items);
+    const { shows } = await this.spotify.search(
+      filters.name,
+      ['show'],
+      market,
+      limit,
+      offset,
+    );
+    this.logger.debug(shows.items);
 
-      const items = shows.items
-        .filter((s) => s && s.images.length)
-        .filter((s) => SpotifyPodcastProvider.matchesFilters(s, filters))
-        .map(SpotifyPodcastProvider.toModel);
+    const items = shows.items
+      .filter((s) => s && s.images.length)
+      .filter((s) => SpotifyPodcastProvider.matchesFilters(s, filters))
+      .map(SpotifyPodcastProvider.toModel);
 
-      return { items, total: shows.total, page, pageSize };
-    } catch (e) {
-      if (!(e instanceof Error)) throw e;
-      throw new PodcastProviderError(e);
-    }
+    return { items, total: shows.total, page, pageSize };
   }
 
   /**

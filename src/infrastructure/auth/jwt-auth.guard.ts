@@ -1,11 +1,14 @@
+// `type` on CanActivate/ExecutionContext: decorating canActivate emits metadata
+// for its signature, which TS1272 requires be type-only (isolatedModules).
 import {
-  CanActivate,
-  ExecutionContext,
   Inject,
   Injectable,
   UnauthorizedException,
+  type CanActivate,
+  type ExecutionContext,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { MapErrors } from 'error-mapper-decorator';
 import { Public } from './public.decorator';
 import {
   TOKEN_VERIFIER,
@@ -21,6 +24,14 @@ export class JwtAuthGuard implements CanActivate {
     @Inject(TOKEN_VERIFIER) private readonly verifier: ITokenVerifier,
   ) {}
 
+  @MapErrors({
+    from: InvalidTokenException,
+    to: (error) =>
+      new UnauthorizedException({
+        code: 'UNAUTHORIZED',
+        message: error.message,
+      }),
+  })
   async canActivate(context: ExecutionContext): Promise<boolean> {
     if (this.isPublic(context)) {
       return true;
@@ -35,18 +46,8 @@ export class JwtAuthGuard implements CanActivate {
       });
     }
 
-    try {
-      request.user = await this.verifier.verify(token);
-      return true;
-    } catch (error) {
-      if (error instanceof InvalidTokenException) {
-        throw new UnauthorizedException({
-          code: 'UNAUTHORIZED',
-          message: error.message,
-        });
-      }
-      throw error;
-    }
+    request.user = await this.verifier.verify(token);
+    return true;
   }
 
   private isPublic(context: ExecutionContext): boolean {
