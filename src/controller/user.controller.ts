@@ -45,6 +45,7 @@ import { UserResponseDto } from '../dto/user-response.dto';
 import { PageDto } from '../dto/page.dto';
 import { PageQueryDto } from '../dto/page-query.dto';
 import { Public } from '../infrastructure/auth/public.decorator';
+import { pruneUndefined } from './prune-undefined';
 
 @Controller('api/users')
 export class UserController {
@@ -108,16 +109,17 @@ export class UserController {
     if (id !== current.id) {
       throw new ForbiddenUserActionException();
     }
-    const patch: Partial<UserModel> = { id };
-    if (dto.username !== undefined) patch.username = dto.username;
-    if (dto.password !== undefined) patch.password = dto.password;
-    if (dto.first_name !== undefined) patch.firstName = dto.first_name;
-    if (dto.last_name !== undefined) patch.lastName = dto.last_name;
-    if (dto.email !== undefined) patch.email = dto.email;
-    if (dto.biography !== undefined) patch.biography = dto.biography;
-    if (dto.location !== undefined) patch.location = dto.location;
-    if (dto.profile_picture_url !== undefined)
-      patch.profilePictureUrl = dto.profile_picture_url;
+    const patch = pruneUndefined<Partial<UserModel>>({
+      id,
+      username: dto.username,
+      password: dto.password,
+      firstName: dto.first_name,
+      lastName: dto.last_name,
+      email: dto.email,
+      biography: dto.biography,
+      location: dto.location,
+      profilePictureUrl: dto.profile_picture_url,
+    });
     const user = await this.editUser.edit(patch);
     return UserController.toResponse(user);
   }
