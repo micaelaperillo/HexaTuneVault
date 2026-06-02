@@ -1,5 +1,10 @@
-export class SelfFollowException extends Error {
+import { DomainException } from '../domain.exception';
+
+export class SelfFollowException extends DomainException {
   constructor(userId: number) {
-    super(`User with id ${userId} cannot follow themselves`);
+    super(
+      `User with id ${userId} cannot follow themselves`,
+      'UNPROCESSABLE_ENTITY',
+    );
   }
 }

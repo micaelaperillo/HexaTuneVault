@@ -1,4 +1,3 @@
-export * from './user-db.exception';
 export * from './user-not-found.exception';
 export * from './invalid-credentials.exception';
 export * from './already-following.exception';

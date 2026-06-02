@@ -1,20 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { IAuthenticateUser } from '../port/user/authenticate-user.port';
-import { ICreateUser } from '../port/user/create-user.port';
-import { IEditUser } from '../port/user/edit-user.port';
-import { IDeleteUser } from '../port/user/delete-user.port';
-import { ISearchUser } from '../port/user/search-user.port';
-import { IGetUser } from '../port/user/get-user.port';
-import { IFollowUser } from '../port/user/follow-user.port';
-import { IListFollows } from '../port/user/list-follows.port';
+import { IAuthenticateUser } from '../port/in/user/authenticate-user.port';
+import { ICreateUser } from '../port/in/user/create-user.port';
+import { IEditUser } from '../port/in/user/edit-user.port';
+import { IDeleteUser } from '../port/in/user/delete-user.port';
+import { ISearchUser } from '../port/in/user/search-user.port';
+import { IGetUser } from '../port/in/user/get-user.port';
+import { IFollowUser } from '../port/in/user/follow-user.port';
+import { IListFollows } from '../port/in/user/list-follows.port';
 import {
   USER_REPOSITORY,
   type IUserRepository,
-} from '../repository/user-repository.port';
-import {
   TOKEN_ISSUER,
   type ITokenIssuer,
-} from '../repository/token-issuer.port';
+} from '../port/out';
 
 export {
   AUTHENTICATE_USER,
@@ -25,17 +23,13 @@ export {
   GET_USER,
   FOLLOW_USER,
   LIST_FOLLOWS,
-} from '../port/user';
-import { UserModel } from '../model/user.model';
-import { JwtModel } from '../model/jwt.model';
-import { UserFilters } from '../model/user.filter';
-import { Page, PageRequest } from '../model/page.model';
+} from '../port/in/user';
+import { UserModel, UserFilters } from '../model/user';
+import { AuthToken, Page, PageRequest } from '../model';
 import { UserNotFoundException } from '../error/user/user-not-found.exception';
 import { AlreadyFollowingException } from '../error/user/already-following.exception';
 import { NotFollowingException } from '../error/user/not-following.exception';
 import { SelfFollowException } from '../error/user/self-follow.exception';
-
-// TODO hay un par de ifs aca, ver si estar en la misma capa
 
 @Injectable()
 export class UserService
@@ -58,7 +52,7 @@ export class UserService
 
   async authenticate(
     credentials: Pick<UserModel, 'username' | 'password'>,
-  ): Promise<JwtModel> {
+  ): Promise<AuthToken> {
     const user = await this.repo.authenticate(
       credentials.username,
       credentials.password,

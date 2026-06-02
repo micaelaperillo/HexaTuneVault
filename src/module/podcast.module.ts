@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 
-import { PodcastController } from '../controller/podcast.controller';
+import { PodcastController } from '../adapter/in/http/podcast.controller';
 import { ExternalApiModule } from '../infrastructure/api/api.module';
 
-import { SpotifyPodcastProvider, PODCAST_PROVIDER } from '../adapter';
+import { SpotifyPodcastProvider } from '../adapter/out';
+import { PODCAST_PROVIDER } from '../port/out';
 
 import {
   PodcastService,

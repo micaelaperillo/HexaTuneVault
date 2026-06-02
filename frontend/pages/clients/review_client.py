@@ -26,6 +26,11 @@ def _id_from(link: str, default: str = '') -> str:
     return unquote(link.rstrip('/').rsplit('/', 1)[-1])
 
 
+def _viewer_authenticated(request) -> bool:
+    user = getattr(request, 'user', None)
+    return user is not None and getattr(user, 'is_authenticated', False)
+
+
 def _subject_ref(link: str) -> tuple[str, str]:
     """'/api/albums/Abbey Road' -> ('album', 'Abbey Road')."""
     if not link:
@@ -64,11 +69,19 @@ def create(content, rating, subject_type, subject_id, request=None):
     })
 
 
+def has_liked(review_id, request=None) -> bool:
+    data = api_client.get_json(
+        f'{BASE}/{review_id}/likes/me', request=request, default={},
+    )
+    return bool(data.get('liked')) if isinstance(data, dict) else False
+
+
 def toggle_like(review_id, request=None):
-    response = api_client.put(f'{BASE}/{review_id}/likes', request=request)
-    if response is not None and response.status_code == 409:
+    # Like/unlike are now idempotent 204s, so toggle off the current state
+    # instead of relying on a 409 from a repeated like.
+    if has_liked(review_id, request=request):
         return api_client.delete(f'{BASE}/{review_id}/likes', request=request)
-    return response
+    return api_client.put(f'{BASE}/{review_id}/likes', request=request)
 
 
 def like_count(review_id, request=None) -> int:
@@ -168,6 +181,7 @@ def _to_post(r: dict, request, cache) -> dict:
     username, user_info = _author(author_id, request, cache)
     review_id = r.get('id')
     likes = like_count(review_id, request=request)
+    is_liked = _viewer_authenticated(request) and has_liked(review_id, request=request)
     return {
         'author_id': author_id,
         'post': {
@@ -181,6 +195,6 @@ def _to_post(r: dict, request, cache) -> dict:
         },
         'user': user_info,
         'likes': likes,
-        'is_liked': False,
+        'is_liked': is_liked,
         'comment_count': 0,
     }

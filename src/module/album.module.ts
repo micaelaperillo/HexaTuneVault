@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 
-import { AlbumController } from '../controller/album.controller';
+import { AlbumController } from '../adapter/in/http/album.controller';
 import { ExternalApiModule } from '../infrastructure/api/api.module';
 import { DatabaseModule } from '../infrastructure/database/database.module';
 
-import { SpotifyAlbumProvider, ALBUM_PROVIDER } from '../adapter';
+import { SpotifyAlbumProvider } from '../adapter/out';
+import { ALBUM_PROVIDER } from '../port/out';
 
 import {
   AlbumService,

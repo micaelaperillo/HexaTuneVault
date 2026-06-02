@@ -1,0 +1,20 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "roots": ["<rootDir>/integration"],
+  "testRegex": "\\.int-spec\\.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": [
+      "ts-jest",
+      {
+        "tsconfig": "<rootDir>/../tsconfig.spec.json",
+        "diagnostics": { "ignoreCodes": [151002] }
+      }
+    ]
+  },
+  "setupFiles": ["reflect-metadata"],
+  "testEnvironment": "node",
+  "globalSetup": "<rootDir>/integration/global-setup.ts",
+  "globalTeardown": "<rootDir>/integration/global-teardown.ts",
+  "testTimeout": 180000
+}

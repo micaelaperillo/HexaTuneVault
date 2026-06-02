@@ -1,11 +1,11 @@
-import type { IGetPodcast, ISearchPodcast } from '../port/podcast';
+import type { IGetPodcast, ISearchPodcast } from '../port/in/podcast';
 import type { PodcastFilters, PodcastModel, Page } from '../model';
 
-import { type IPodcastProvider, PODCAST_PROVIDER } from '../repository';
+import { type IPodcastProvider, PODCAST_PROVIDER } from '../port/out';
 
 import { Inject, Injectable } from '@nestjs/common';
 
-export { GET_PODCAST, SEARCH_PODCAST } from '../port/podcast';
+export { GET_PODCAST, SEARCH_PODCAST } from '../port/in/podcast';
 
 @Injectable()
 export class PodcastService implements ISearchPodcast, IGetPodcast {

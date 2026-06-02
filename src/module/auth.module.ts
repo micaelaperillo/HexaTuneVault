@@ -1,32 +1,28 @@
 import { Global, Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
 import { JwtModule, type JwtModuleOptions } from '@nestjs/jwt';
 
-import { TOKEN_VERIFIER } from '../repository/token-verifier.port';
-import { JwtTokenRepository } from '../adapter/jwt-token.repository';
-import { JwtAuthGuard } from '../infrastructure/auth/jwt-auth.guard';
+import { TOKEN_VERIFIER } from '../port/out';
+import { JwtTokenRepository } from '../adapter/out/auth/jwt-token.repository';
+import { JwtAuthGuard } from '../adapter/in/http/guard/jwt-auth.guard';
 
 @Global()
 @Module({
   imports: [
     JwtModule.registerAsync({
-      useFactory: (): JwtModuleOptions => {
-        const secret = process.env.JWT_SECRET;
-        if (!secret) {
-          throw new Error('JWT_SECRET is not set');
-        }
-        return {
-          secret,
-          signOptions: {
-            // `@types/jsonwebtoken` types `expiresIn` as `number | StringValue`
-            // (an `ms` template-literal type), so a plain `string` from the env
-            // needs this assertion. Keep the env value a valid `ms` span (e.g. '1h').
-            expiresIn: (process.env.JWT_EXPIRES_IN ?? '1h') as NonNullable<
-              JwtModuleOptions['signOptions']
-            >['expiresIn'],
-          },
-        };
-      },
+      inject: [ConfigService],
+      useFactory: (config: ConfigService): JwtModuleOptions => ({
+        secret: config.getOrThrow<string>('JWT_SECRET'),
+        signOptions: {
+          // `@types/jsonwebtoken` types `expiresIn` as `number | StringValue`
+          // (an `ms` template-literal type), so a plain `string` from the env
+          // needs this assertion. Keep the env value a valid `ms` span (e.g. '1h').
+          expiresIn: config.get<string>('JWT_EXPIRES_IN', '1h') as NonNullable<
+            JwtModuleOptions['signOptions']
+          >['expiresIn'],
+        },
+      }),
     }),
   ],
   providers: [

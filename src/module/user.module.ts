@@ -1,13 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { UserEntity } from '../entity/user.entity';
-import { USER_REPOSITORY } from '../repository/user-repository.port';
-import { UserRepository } from '../adapter/user.repository';
-import { PASSWORD_HASHER } from '../repository/password-hasher.port';
-import { Argon2idPasswordHasher } from '../adapter/argon2id-password-hasher';
-import { TOKEN_ISSUER } from '../repository/token-issuer.port';
-import { JwtTokenRepository } from '../adapter/jwt-token.repository';
+import { UserEntity } from '../adapter/out/persistence/entity/user.entity';
+import { USER_REPOSITORY, PASSWORD_HASHER, TOKEN_ISSUER } from '../port/out';
+import { UserRepository } from '../adapter/out/persistence/user.repository';
+import { Argon2idPasswordHasher } from '../adapter/out/auth/argon2id-password-hasher';
+import { JwtTokenRepository } from '../adapter/out/auth/jwt-token.repository';
 
 import {
   UserService,
@@ -21,8 +19,8 @@ import {
   LIST_FOLLOWS,
 } from '../use-case/user.service';
 
-import { UserController } from '../controller/user.controller';
-import { SessionController } from '../controller/session.controller';
+import { UserController } from '../adapter/in/http/user.controller';
+import { SessionController } from '../adapter/in/http/session.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([UserEntity])],

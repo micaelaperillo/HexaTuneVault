@@ -2,35 +2,32 @@ import { Injectable, Inject } from '@nestjs/common';
 import type {
   ICreateReview,
   CreateReviewCommand,
-} from '../port/review/create-review.port';
+} from '../port/in/review/create-review.port';
 import type {
   IDeleteReview,
   DeleteReviewCommand,
-} from '../port/review/delete-review.port';
-import type { IGetReview } from '../port/review/get-review.port';
-import type { ISearchReview } from '../port/review/search-review.port';
-import type { ILikeReview } from '../port/review/like-review.port';
-import type { IUnlikeReview } from '../port/review/unlike-review.port';
-import type { ICountReviewLikes } from '../port/review/count-review-likes.port';
+} from '../port/in/review/delete-review.port';
+import type { IGetReview } from '../port/in/review/get-review.port';
+import type { ISearchReview } from '../port/in/review/search-review.port';
+import type { ILikeReview } from '../port/in/review/like-review.port';
+import type { IUnlikeReview } from '../port/in/review/unlike-review.port';
+import type { ICountReviewLikes } from '../port/in/review/count-review-likes.port';
+import type { IHasLikedReview } from '../port/in/review/has-liked-review.port';
 import {
   REVIEW_REPOSITORY,
   type IReviewRepository,
-} from '../repository/review-repository.port';
-import {
   REVIEW_LIKE_REPOSITORY,
   type IReviewLikeRepository,
-} from '../repository/review-like-repository.port';
+} from '../port/out';
 import {
   REVIEW_CONFIG,
   type IReviewConfig,
-} from '../port/review/review-config.port';
+} from '../port/in/review/review-config.port';
 import type { Page } from '../model';
-import type { ReviewModel } from '../model/review.model';
-import type { ReviewFilters } from '../model/review.filter';
+import type { ReviewModel, ReviewFilters } from '../model/review';
 import { ReviewCooldownException } from '../error/review/review-cooldown.exception';
 import { ReviewNotFoundException } from '../error/review/review-not-found.exception';
 import { ForbiddenDeletionException } from '../error/review/forbidden-deletion.exception';
-import { NotLikedException } from '../error/review/not-liked.exception';
 
 @Injectable()
 export class ReviewService
@@ -41,7 +38,8 @@ export class ReviewService
     ISearchReview,
     ILikeReview,
     IUnlikeReview,
-    ICountReviewLikes
+    ICountReviewLikes,
+    IHasLikedReview
 {
   private readonly cooldownSeconds: number;
 
@@ -94,21 +92,23 @@ export class ReviewService
   }
 
   async like(reviewId: number, userId: number): Promise<void> {
-    await this.ensureReviewExists(reviewId);
+    // Idempotent. A missing review surfaces as ReviewNotFoundException via the
+    // repository's foreign-key mapping, so no separate existence check is needed.
     await this.likes.addLike(reviewId, userId);
   }
 
   async unlike(reviewId: number, userId: number): Promise<void> {
     await this.ensureReviewExists(reviewId);
-    const removed = await this.likes.removeLike(reviewId, userId);
-    if (!removed) {
-      throw new NotLikedException();
-    }
+    await this.likes.removeLike(reviewId, userId);
   }
 
   async count(reviewId: number): Promise<number> {
     await this.ensureReviewExists(reviewId);
     return this.likes.countLikes(reviewId);
+  }
+
+  async hasLiked(reviewId: number, userId: number): Promise<boolean> {
+    return this.likes.hasLike(reviewId, userId);
   }
 
   private async ensureReviewExists(reviewId: number): Promise<void> {

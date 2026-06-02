@@ -1,11 +1,11 @@
-import type { IGetArtist, ISearchArtist } from '../port/artist';
+import type { IGetArtist, ISearchArtist } from '../port/in/artist';
 import type { ArtistFilters, ArtistModel, Page } from '../model';
 
-import { type IArtistProvider, ARTIST_PROVIDER } from '../repository';
+import { type IArtistProvider, ARTIST_PROVIDER } from '../port/out';
 
 import { Inject, Injectable } from '@nestjs/common';
 
-export { GET_ARTIST, SEARCH_ARTIST } from '../port/artist';
+export { GET_ARTIST, SEARCH_ARTIST } from '../port/in/artist';
 
 @Injectable()
 export class ArtistService implements ISearchArtist, IGetArtist {

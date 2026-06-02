@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { CommentEntity } from '../entity/comment.entity';
-import { COMMENT_REPOSITORY } from '../repository/comment-repository.port';
-import { CommentRepository } from '../adapter/comment.repository';
+import { CommentEntity } from '../adapter/out/persistence/entity/comment.entity';
+import { CommentLikeEntity } from '../adapter/out/persistence/entity/comment-like.entity';
+import { COMMENT_REPOSITORY } from '../port/out';
+import { CommentRepository } from '../adapter/out/persistence/comment.repository';
 
 import { CommentService } from '../use-case/comment.service';
 import {
@@ -14,12 +15,12 @@ import {
   HAS_LIKED_COMMENT,
   LIKE_COMMENT,
   SEARCH_COMMENT,
-} from '../port/comment/';
+} from '../port/in/comment/';
 
-import { CommentController } from '../controller/comment.controller';
+import { CommentController } from '../adapter/in/http/comment.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([CommentEntity])],
+  imports: [TypeOrmModule.forFeature([CommentEntity, CommentLikeEntity])],
   controllers: [CommentController],
   providers: [
     { provide: COMMENT_REPOSITORY, useClass: CommentRepository },
