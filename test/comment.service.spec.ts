@@ -14,13 +14,13 @@ describe('CommentService', () => {
     createdById: 1,
     parentReviewId: 10,
     parentCommentId: null,
+    likes: 0,
   };
 
   const mockRepo = {
     create: jest.fn(),
     findById: jest.fn(),
     findReplies: jest.fn(),
-    findLikesByCommentId: jest.fn(),
     search: jest.fn(),
     deleteById: jest.fn(),
     addLike: jest.fn(),
@@ -85,22 +85,6 @@ describe('CommentService', () => {
         CommentNotFoundException,
       );
       expect(mockRepo.findReplies).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('getLikes', () => {
-    it('returns the likedBy ids when comment exists', async () => {
-      mockRepo.findLikesByCommentId.mockResolvedValue([2, 3]);
-      const result = await service.getLikes(1);
-      expect(mockRepo.findLikesByCommentId).toHaveBeenCalledWith(1);
-      expect(result).toEqual([2, 3]);
-    });
-
-    it('throws CommentNotFoundException when comment does not exist', async () => {
-      mockRepo.findLikesByCommentId.mockResolvedValue(null);
-      await expect(service.getLikes(99)).rejects.toThrow(
-        CommentNotFoundException,
-      );
     });
   });
 

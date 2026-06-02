@@ -23,8 +23,6 @@ import {
   type IGetComment,
   GET_COMMENT_REPLIES,
   type IGetCommentReplies,
-  GET_COMMENT_LIKES,
-  type IGetCommentLikes,
   LIKE_COMMENT,
   type ILikeComment,
 } from '../port/comment/';
@@ -33,7 +31,6 @@ import { CreateCommentDto } from '../dto/create-comment.dto';
 import { CommentFiltersDto } from '../dto/comment-filters.dto';
 import { CommentResponseDto } from '../dto/comment-response.dto';
 import { SetCommentLikeDto } from '../dto/set-comment-like.dto';
-import { UserLinkDto } from '../dto/user-link.dto';
 
 @Controller('api/comments')
 export class CommentController {
@@ -44,8 +41,6 @@ export class CommentController {
     @Inject(GET_COMMENT) private readonly getComment: IGetComment,
     @Inject(GET_COMMENT_REPLIES)
     private readonly getCommentReplies: IGetCommentReplies,
-    @Inject(GET_COMMENT_LIKES)
-    private readonly getCommentLikes: IGetCommentLikes,
     @Inject(LIKE_COMMENT) private readonly likeComment: ILikeComment,
   ) {}
 
@@ -86,14 +81,6 @@ export class CommentController {
   ): Promise<CommentResponseDto[]> {
     const replies = await this.getCommentReplies.getReplies(id);
     return CommentResponseDto.fromMany(replies);
-  }
-
-  @Get(':id/likes')
-  async getLikes(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<UserLinkDto[]> {
-    const likes = await this.getCommentLikes.getLikes(id);
-    return UserLinkDto.fromMany(likes);
   }
 
   @Delete(':id')

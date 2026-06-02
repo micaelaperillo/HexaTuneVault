@@ -6,12 +6,10 @@ import {
   SEARCH_COMMENT,
   GET_COMMENT,
   GET_COMMENT_REPLIES,
-  GET_COMMENT_LIKES,
   LIKE_COMMENT,
 } from '../src/port/comment';
 import { CommentModel } from '../src/model/comment.model';
 import { CommentResponseDto } from '../src/dto/comment-response.dto';
-import { UserLinkDto } from '../src/dto/user-link.dto';
 import { CreateCommentDto } from '../src/dto/create-comment.dto';
 import { SetCommentLikeDto } from '../src/dto/set-comment-like.dto';
 
@@ -25,6 +23,7 @@ describe('CommentController', () => {
     createdById: 1,
     parentReviewId: 10,
     parentCommentId: null,
+    likes: 0,
   };
 
   const mockCreate = { create: jest.fn() };
@@ -32,7 +31,6 @@ describe('CommentController', () => {
   const mockSearch = { search: jest.fn() };
   const mockGet = { get: jest.fn() };
   const mockGetReplies = { getReplies: jest.fn() };
-  const mockGetLikes = { getLikes: jest.fn() };
   const mockLike = { setLike: jest.fn() };
 
   beforeEach(async () => {
@@ -46,7 +44,6 @@ describe('CommentController', () => {
         { provide: SEARCH_COMMENT, useValue: mockSearch },
         { provide: GET_COMMENT, useValue: mockGet },
         { provide: GET_COMMENT_REPLIES, useValue: mockGetReplies },
-        { provide: GET_COMMENT_LIKES, useValue: mockGetLikes },
         { provide: LIKE_COMMENT, useValue: mockLike },
       ],
     }).compile();
@@ -120,12 +117,14 @@ describe('CommentController', () => {
 
   describe('get', () => {
     it('calls get port and returns a CommentResponseDto with correct links', async () => {
-      mockGet.get.mockResolvedValue(mockComment);
+      mockGet.get.mockResolvedValue({ ...mockComment, likes: 3 });
       const result = await controller.get(1);
 
       expect(mockGet.get).toHaveBeenCalledWith(1);
       expect(result).toBeInstanceOf(CommentResponseDto);
       expect(result.self).toBe('/api/comments/1');
+      expect(result.like).toBe('/api/comments/1/like');
+      expect(result.likes).toBe(3);
     });
   });
 
@@ -140,19 +139,6 @@ describe('CommentController', () => {
       expect(result[0]).toBeInstanceOf(CommentResponseDto);
       expect(result[0].self).toBe('/api/comments/2');
       expect(result[0].parent).toBe('/api/comments/1');
-    });
-  });
-
-  describe('getLikes', () => {
-    it('calls getLikes port and returns an array of UserLinkDto', async () => {
-      mockGetLikes.getLikes.mockResolvedValue([2, 3]);
-      const result = await controller.getLikes(1);
-
-      expect(mockGetLikes.getLikes).toHaveBeenCalledWith(1);
-      expect(result).toHaveLength(2);
-      expect(result[0]).toBeInstanceOf(UserLinkDto);
-      expect(result[0].user).toBe('/api/users/2');
-      expect(result[1].user).toBe('/api/users/3');
     });
   });
 

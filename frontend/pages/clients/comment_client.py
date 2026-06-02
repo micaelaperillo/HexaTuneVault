@@ -49,7 +49,6 @@ def toggle_like(comment_id, user_id=None, request=None):
 
 
 def _to_comment(c: dict, viewer_id: str = CURRENT_USER_ID) -> dict:
-    liked_by = c.get('likedBy') or []
     return {
         'comment': {
             'id': c.get('id'),
@@ -57,9 +56,9 @@ def _to_comment(c: dict, viewer_id: str = CURRENT_USER_ID) -> dict:
             'content': c.get('content', ''),
             'date': c.get('createdAt', ''),
         },
-        'user': _placeholder_user(),                
-        'likes': len(liked_by),
-        'is_liked': str(viewer_id) in [str(u) for u in liked_by],
-        'replies': [],                              
+        'user': _placeholder_user(),
+        'likes': c.get('likes', 0),
+        'is_liked': False,  # per-user like state is not exposed by the API
+        'replies': [],
         'replies_count': 0,
     }

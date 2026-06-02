@@ -4,7 +4,6 @@ import { IDeleteComment } from '../port/comment/i-delete-comment.port';
 import { ISearchComment } from '../port/comment/i-search-comment.port';
 import { IGetComment } from '../port/comment/i-get-comment.port';
 import { IGetCommentReplies } from '../port/comment/i-get-comment-replies.port';
-import { IGetCommentLikes } from '../port/comment/i-get-comment-likes.port';
 import { ILikeComment } from '../port/comment/i-like-comment-port';
 import {
   COMMENT_REPOSITORY,
@@ -22,7 +21,6 @@ export class CommentService
     ISearchComment,
     IGetComment,
     IGetCommentReplies,
-    IGetCommentLikes,
     ILikeComment
 {
   constructor(
@@ -31,7 +29,7 @@ export class CommentService
   ) {}
 
   async create(
-    comment: Omit<CommentModel, 'id' | 'createdAt'>,
+    comment: Omit<CommentModel, 'id' | 'createdAt' | 'likes'>,
   ): Promise<CommentModel> {
     return this.repo.create(comment);
   }
@@ -58,14 +56,6 @@ export class CommentService
       throw new CommentNotFoundException(commentId);
     }
     return this.repo.findReplies(commentId);
-  }
-
-  async getLikes(commentId: number): Promise<number[]> {
-    const likes = await this.repo.findLikesByCommentId(commentId);
-    if (!likes) {
-      throw new CommentNotFoundException(commentId);
-    }
-    return likes;
   }
 
   async setLike(
