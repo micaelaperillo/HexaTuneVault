@@ -10,4 +10,5 @@ export * from './user.model';
 export * from './user.filter';
 export * from './review.model';
 export * from './jwt.model';
+export * from './authenticated-user';
 export * from './page.model';

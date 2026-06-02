@@ -5,7 +5,7 @@ import {
   NestMiddleware,
 } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-
+import { AuthModule } from './module/auth.module';
 import { DatabaseModule } from './infrastructure/database/database.module';
 import { ReviewModule } from './module/review.module';
 import { ArtistModule } from './module/artist.module';
@@ -29,6 +29,7 @@ export class LoggerMiddleware implements NestMiddleware {
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    AuthModule,
     DatabaseModule,
     ReviewModule,
     ArtistModule,

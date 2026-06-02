@@ -23,6 +23,9 @@ import { plainToInstance } from 'class-transformer';
 import { AlbumFilterDto } from '../dto/album.filter';
 import { AlbumGetDto } from '../dto/album.get';
 
+import { Public } from '../infrastructure/auth/public.decorator';
+
+@Public()
 @Controller('api/albums')
 export class AlbumController {
   private readonly logger = new Logger(AlbumController.name);
