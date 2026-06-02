@@ -8,6 +8,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { SPOTIFY_API } from '../infrastructure/api/provider';
 import { ArtistProviderError } from '../error/artist';
 import { resolveSpotifyPage } from './spotify-pagination';
+import { escapeSpotifyTerm } from './spotify-query';
 import { MapErrors } from 'error-mapper-decorator';
 
 export { ARTIST_PROVIDER } from '../repository';
@@ -52,11 +53,11 @@ export class SpotifyArtistProvider implements IArtistProvider {
 
   private static toQuery(filters: ArtistFilters) {
     const token = ' genre:';
-    // TODO: Fix injection vulnerability
-    return (
-      filters.name +
-      (filters.genre?.length ? `${token}${filters.genre?.join(token)}` : '')
-    );
+    const name = escapeSpotifyTerm(filters.name);
+    const genres = (filters.genre ?? [])
+      .map(escapeSpotifyTerm)
+      .filter((g) => g.length);
+    return name + (genres.length ? `${token}${genres.join(token)}` : '');
   }
 
   private static toModel(this: void, { name, images, external_urls }: Artist) {

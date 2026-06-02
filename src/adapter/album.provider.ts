@@ -8,6 +8,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { SPOTIFY_API } from '../infrastructure/api/provider';
 import { AlbumProviderError } from '../error/album';
 import { resolveSpotifyPage } from './spotify-pagination';
+import { escapeSpotifyTerm } from './spotify-query';
 import { MapErrors } from 'error-mapper-decorator';
 
 export { ALBUM_PROVIDER } from '../repository';
@@ -54,11 +55,11 @@ export class SpotifyAlbumProvider implements IAlbumProvider {
     const params: string[] = [];
 
     if (filters.name) {
-      params.push(filters.name);
+      params.push(escapeSpotifyTerm(filters.name));
     }
 
     if (filters.artist) {
-      params.push(filters.artist);
+      params.push(escapeSpotifyTerm(filters.artist));
     }
 
     if (filters.year) {
