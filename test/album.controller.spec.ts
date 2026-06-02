@@ -69,8 +69,8 @@ describe('AlbumController', () => {
       expect(result.items[0]).toEqual({
         name: 'Abbey Road',
         cover: 'cover-url',
-        releaseDate: new Date('1969'),
-        totalTracks: 17,
+        release_date: new Date('1969'),
+        total_tracks: 17,
         artists: ['The Beatles'],
         self: '/api/albums/Abbey%20Road?artist=The+Beatles&year=1969',
         reviews: '/api/reviews?album=Abbey+Road',
@@ -133,8 +133,8 @@ describe('AlbumController', () => {
       expect(result).toEqual({
         name: 'Abbey Road',
         cover: 'cover-url',
-        releaseDate: new Date('1969'),
-        totalTracks: 17,
+        release_date: new Date('1969'),
+        total_tracks: 17,
         artists: ['The Beatles'],
         self: '/api/albums/Abbey%20Road?artist=The+Beatles&year=1969',
         reviews: '/api/reviews?album=Abbey+Road',

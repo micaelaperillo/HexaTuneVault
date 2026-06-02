@@ -12,11 +12,11 @@ export class UserFiltersDto {
 
   @IsOptional()
   @IsString()
-  firstName?: string;
+  first_name?: string;
 
   @IsOptional()
   @IsString()
-  lastName?: string;
+  last_name?: string;
 
   @IsOptional()
   @Type(() => Number)

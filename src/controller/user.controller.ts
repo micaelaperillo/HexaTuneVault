@@ -63,7 +63,16 @@ export class UserController {
   @Public()
   @Post()
   async create(@Body() dto: CreateUserDto): Promise<UserResponseDto> {
-    const user = await this.createUser.create(dto);
+    const user = await this.createUser.create({
+      username: dto.username,
+      password: dto.password,
+      firstName: dto.first_name,
+      lastName: dto.last_name,
+      email: dto.email,
+      biography: dto.biography,
+      location: dto.location,
+      profilePictureUrl: dto.profile_picture_url,
+    });
     return UserController.toResponse(user);
   }
 
@@ -75,8 +84,8 @@ export class UserController {
     const { items, total, ...page } = await this.searchUser.search({
       username: filters.username,
       email: filters.email,
-      firstName: filters.firstName,
-      lastName: filters.lastName,
+      firstName: filters.first_name,
+      lastName: filters.last_name,
       page: filters.page,
       pageSize: filters.page_size,
     });
@@ -99,7 +108,17 @@ export class UserController {
     if (id !== current.id) {
       throw new ForbiddenUserActionException();
     }
-    const user = await this.editUser.edit({ ...dto, id });
+    const patch: Partial<UserModel> = { id };
+    if (dto.username !== undefined) patch.username = dto.username;
+    if (dto.password !== undefined) patch.password = dto.password;
+    if (dto.first_name !== undefined) patch.firstName = dto.first_name;
+    if (dto.last_name !== undefined) patch.lastName = dto.last_name;
+    if (dto.email !== undefined) patch.email = dto.email;
+    if (dto.biography !== undefined) patch.biography = dto.biography;
+    if (dto.location !== undefined) patch.location = dto.location;
+    if (dto.profile_picture_url !== undefined)
+      patch.profilePictureUrl = dto.profile_picture_url;
+    const user = await this.editUser.edit(patch);
     return UserController.toResponse(user);
   }
 
@@ -121,10 +140,11 @@ export class UserController {
     @Param('id', ParseIntPipe) id: number,
     @Query() page: PageQueryDto,
   ): Promise<PageDto<UserResponseDto>> {
-    const result = await this.listFollows.findFollowers(id, page);
+    const req = { page: page.page, pageSize: page.page_size };
+    const result = await this.listFollows.findFollowers(id, req);
     return PageDto.of(
       result.items.map(UserController.toResponse),
-      page,
+      req,
       result.total,
     );
   }
@@ -135,10 +155,11 @@ export class UserController {
     @Param('id', ParseIntPipe) id: number,
     @Query() page: PageQueryDto,
   ): Promise<PageDto<UserResponseDto>> {
-    const result = await this.listFollows.findFollowing(id, page);
+    const req = { page: page.page, pageSize: page.page_size };
+    const result = await this.listFollows.findFollowing(id, req);
     return PageDto.of(
       result.items.map(UserController.toResponse),
-      page,
+      req,
       result.total,
     );
   }
@@ -165,10 +186,16 @@ export class UserController {
     return plainToInstance(
       UserResponseDto,
       {
-        ...user,
+        id: user.id,
+        username: user.username,
+        first_name: user.firstName,
+        last_name: user.lastName,
+        email: user.email,
+        biography: user.biography,
         location: user.location ?? '',
-        followerCount: user.followerCount ?? 0,
-        followingCount: user.followingCount ?? 0,
+        profile_picture_url: user.profilePictureUrl,
+        follower_count: user.followerCount ?? 0,
+        following_count: user.followingCount ?? 0,
         self: `/api/users/${user.id}`,
       },
       { excludeExtraneousValues: true },

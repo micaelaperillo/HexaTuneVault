@@ -5,7 +5,7 @@ export class CommentFiltersDto {
   @IsOptional()
   @Type(() => Number)
   @IsInt()
-  createdById?: number;
+  created_by_id?: number;
 
   @IsOptional()
   @IsString()
@@ -14,7 +14,7 @@ export class CommentFiltersDto {
   @IsOptional()
   @Type(() => Number)
   @IsInt()
-  reviewId?: number;
+  review_id?: number;
 
   @IsOptional()
   @Type(() => Number)

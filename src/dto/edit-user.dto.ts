@@ -24,13 +24,13 @@ export class EditUserDto {
   @IsString()
   @Transform(({ value }) => (value as string).trim())
   @IsNotEmpty()
-  firstName?: string;
+  first_name?: string;
 
   @IsOptional()
   @IsString()
   @Transform(({ value }) => (value as string).trim())
   @IsNotEmpty()
-  lastName?: string;
+  last_name?: string;
 
   @IsOptional()
   @IsEmail()
@@ -48,5 +48,5 @@ export class EditUserDto {
 
   @IsOptional()
   @IsString()
-  profilePictureUrl?: string;
+  profile_picture_url?: string;
 }

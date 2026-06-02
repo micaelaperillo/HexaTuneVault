@@ -21,12 +21,12 @@ export class CreateUserDto {
   @IsString()
   @Transform(({ value }) => (value as string).trim())
   @IsNotEmpty()
-  firstName!: string;
+  first_name!: string;
 
   @IsString()
   @Transform(({ value }) => (value as string).trim())
   @IsNotEmpty()
-  lastName!: string;
+  last_name!: string;
 
   @IsEmail()
   email!: string;
@@ -41,5 +41,5 @@ export class CreateUserDto {
   location?: string;
 
   @IsString()
-  profilePictureUrl!: string;
+  profile_picture_url!: string;
 }

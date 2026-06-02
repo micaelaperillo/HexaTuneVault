@@ -83,7 +83,7 @@ describe('CommentController', () => {
       mockCreate.create.mockResolvedValue(mockComment);
       const dto: CreateCommentDto = {
         content: 'Test comment',
-        parentReviewId: 10,
+        parent_review_id: 10,
       };
 
       const result = await controller.create(dto, currentUser);
@@ -106,8 +106,8 @@ describe('CommentController', () => {
       });
       const dto: CreateCommentDto = {
         content: 'A reply',
-        parentReviewId: 10,
-        parentCommentId: 5,
+        parent_review_id: 10,
+        parent_comment_id: 5,
       };
 
       const result = await controller.create(dto, currentUser);
@@ -131,8 +131,8 @@ describe('CommentController', () => {
         pageSize: 20,
       });
       const result = await controller.search({
-        createdById: 1,
-        reviewId: 10,
+        created_by_id: 1,
+        review_id: 10,
         page: 1,
         page_size: 20,
       });

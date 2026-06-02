@@ -65,8 +65,8 @@ export class CommentController {
     const comment = await this.createComment.create({
       content: dto.content,
       createdBy: { id: user.id },
-      parentReview: { id: dto.parentReviewId },
-      parentCommentId: dto.parentCommentId ?? null,
+      parentReview: { id: dto.parent_review_id },
+      parentCommentId: dto.parent_comment_id ?? null,
     });
 
     return CommentController.toResponse(comment);
@@ -78,9 +78,9 @@ export class CommentController {
     @Query() filters: CommentFiltersDto,
   ): Promise<PageDto<CommentResponseDto>> {
     const { items, total, ...page } = await this.searchComment.search({
-      createdById: filters.createdById,
+      createdById: filters.created_by_id,
       content: filters.content,
-      parentReviewId: filters.reviewId,
+      parentReviewId: filters.review_id,
       page: filters.page,
       pageSize: filters.page_size,
     });
@@ -159,6 +159,7 @@ export class CommentController {
       CommentResponseDto,
       {
         ...comment,
+        created_at: comment.createdAt,
         self: `/api/comments/${comment.id}`,
         like: `/api/comments/${comment.id}/like`,
         replies: `/api/comments/${comment.id}/replies`,

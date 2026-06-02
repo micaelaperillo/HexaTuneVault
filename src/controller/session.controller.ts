@@ -23,8 +23,10 @@ export class SessionController {
   }
 
   private static toResponse(this: void, token: JwtModel) {
-    return plainToInstance(AuthResponseDto, token, {
-      excludeExtraneousValues: true,
-    });
+    return plainToInstance(
+      AuthResponseDto,
+      { access_token: token.accessToken },
+      { excludeExtraneousValues: true },
+    );
   }
 }

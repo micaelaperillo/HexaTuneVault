@@ -8,10 +8,10 @@ export class CreateCommentDto {
 
   @IsInt()
   @Type(() => Number)
-  parentReviewId!: number;
+  parent_review_id!: number;
 
   @IsOptional()
   @Type(() => Number)
   @IsInt()
-  parentCommentId?: number;
+  parent_comment_id?: number;
 }

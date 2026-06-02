@@ -94,6 +94,8 @@ export class AlbumController {
       AlbumResponseDto,
       {
         ...album,
+        release_date: album.releaseDate,
+        total_tracks: album.totalTracks,
         self: `/api/albums/${encodeURIComponent(album.name)}?${params}`,
         reviews: `/api/reviews?${new URLSearchParams({ album: album.name })}`,
       },
