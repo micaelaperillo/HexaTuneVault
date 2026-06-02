@@ -34,7 +34,7 @@ export class TypeOrmReviewLikeRepository implements IReviewLikeRepository {
     },
     reviewPersistenceFailure,
   )
-  async addLike(reviewId: number, userId: string): Promise<void> {
+  async addLike(reviewId: number, userId: number): Promise<void> {
     // Duplicate (PK) -> AlreadyLiked, missing-review FK -> not-found, both via
     // the decorator rules above.
     await this.repo
@@ -45,7 +45,7 @@ export class TypeOrmReviewLikeRepository implements IReviewLikeRepository {
   }
 
   @MapErrors(reviewPersistenceFailure)
-  async removeLike(reviewId: number, userId: string): Promise<boolean> {
+  async removeLike(reviewId: number, userId: number): Promise<boolean> {
     const result = await this.repo.delete({ reviewId, userId });
     return (result.affected ?? 0) > 0;
   }

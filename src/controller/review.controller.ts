@@ -121,7 +121,7 @@ export class ReviewController {
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<void> {
-    await this.likeReview.like(id, String(user.id));
+    await this.likeReview.like(id, user.id);
   }
 
   @Delete(':id/likes')
@@ -130,7 +130,7 @@ export class ReviewController {
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<void> {
-    await this.unlikeReview.unlike(id, String(user.id));
+    await this.unlikeReview.unlike(id, user.id);
   }
 
   @Public()

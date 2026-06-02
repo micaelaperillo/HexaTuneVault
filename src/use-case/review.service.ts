@@ -103,12 +103,12 @@ export class ReviewService
     return this.reviews.search(criteria);
   }
 
-  async like(reviewId: number, userId: string): Promise<void> {
+  async like(reviewId: number, userId: number): Promise<void> {
     await this.ensureReviewExists(reviewId);
     await this.likes.addLike(reviewId, userId);
   }
 
-  async unlike(reviewId: number, userId: string): Promise<void> {
+  async unlike(reviewId: number, userId: number): Promise<void> {
     await this.ensureReviewExists(reviewId);
     const removed = await this.likes.removeLike(reviewId, userId);
     if (!removed) {

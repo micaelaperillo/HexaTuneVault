@@ -190,7 +190,7 @@ describe('ReviewController', () => {
     it('should like a review on behalf of the current user', async () => {
       await controller.like(123, mockUser);
 
-      expect(likeReview.like).toHaveBeenCalledWith(123, '1');
+      expect(likeReview.like).toHaveBeenCalledWith(123, 1);
     });
   });
 
@@ -198,7 +198,7 @@ describe('ReviewController', () => {
     it('should unlike a review on behalf of the current user', async () => {
       await controller.unlike(123, mockUser);
 
-      expect(unlikeReview.unlike).toHaveBeenCalledWith(123, '1');
+      expect(unlikeReview.unlike).toHaveBeenCalledWith(123, 1);
     });
   });
 

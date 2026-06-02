@@ -179,15 +179,15 @@ describe('ReviewService', () => {
     it('adds a like when the review exists', async () => {
       reviewRepo.findById.mockResolvedValue(reviewBy(mockUser));
 
-      await service.like(1, '7');
+      await service.like(1, 7);
 
-      expect(likeRepo.addLike).toHaveBeenCalledWith(1, '7');
+      expect(likeRepo.addLike).toHaveBeenCalledWith(1, 7);
     });
 
     it('throws ReviewNotFoundException when the review is missing', async () => {
       reviewRepo.findById.mockResolvedValue(null);
 
-      await expect(service.like(999, '7')).rejects.toThrow(
+      await expect(service.like(999, 7)).rejects.toThrow(
         ReviewNotFoundException,
       );
       expect(likeRepo.addLike).not.toHaveBeenCalled();
@@ -199,22 +199,22 @@ describe('ReviewService', () => {
       reviewRepo.findById.mockResolvedValue(reviewBy(mockUser));
       likeRepo.removeLike.mockResolvedValue(true);
 
-      await service.unlike(1, '7');
+      await service.unlike(1, 7);
 
-      expect(likeRepo.removeLike).toHaveBeenCalledWith(1, '7');
+      expect(likeRepo.removeLike).toHaveBeenCalledWith(1, 7);
     });
 
     it('throws NotLikedException when there is no like to remove', async () => {
       reviewRepo.findById.mockResolvedValue(reviewBy(mockUser));
       likeRepo.removeLike.mockResolvedValue(false);
 
-      await expect(service.unlike(1, '7')).rejects.toThrow(NotLikedException);
+      await expect(service.unlike(1, 7)).rejects.toThrow(NotLikedException);
     });
 
     it('throws ReviewNotFoundException when the review is missing', async () => {
       reviewRepo.findById.mockResolvedValue(null);
 
-      await expect(service.unlike(999, '7')).rejects.toThrow(
+      await expect(service.unlike(999, 7)).rejects.toThrow(
         ReviewNotFoundException,
       );
       expect(likeRepo.removeLike).not.toHaveBeenCalled();

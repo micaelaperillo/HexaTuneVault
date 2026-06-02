@@ -35,12 +35,12 @@ describe('TypeOrmReviewLikeRepository', () => {
 
   describe('addLike', () => {
     it('should insert the like row', async () => {
-      await repository.addLike(1, '42');
+      await repository.addLike(1, 42);
 
       expect(mockInsertQb.insert).toHaveBeenCalled();
       expect(mockInsertQb.values).toHaveBeenCalledWith({
         reviewId: 1,
-        userId: '42',
+        userId: 42,
       });
       expect(mockInsertQb.execute).toHaveBeenCalled();
     });
@@ -51,7 +51,7 @@ describe('TypeOrmReviewLikeRepository', () => {
       } as unknown as Error);
       mockInsertQb.execute.mockRejectedValue(dupError);
 
-      await expect(repository.addLike(1, '42')).rejects.toThrow(
+      await expect(repository.addLike(1, 42)).rejects.toThrow(
         AlreadyLikedException,
       );
     });
@@ -62,7 +62,7 @@ describe('TypeOrmReviewLikeRepository', () => {
       } as unknown as Error);
       mockInsertQb.execute.mockRejectedValue(fkError);
 
-      await expect(repository.addLike(999, '42')).rejects.toThrow(
+      await expect(repository.addLike(999, 42)).rejects.toThrow(
         ReviewNotFoundException,
       );
     });
@@ -73,7 +73,7 @@ describe('TypeOrmReviewLikeRepository', () => {
       } as unknown as Error);
       mockInsertQb.execute.mockRejectedValue(otherError);
 
-      await expect(repository.addLike(1, '42')).rejects.toThrow(
+      await expect(repository.addLike(1, 42)).rejects.toThrow(
         ReviewRepositoryException,
       );
     });
@@ -82,7 +82,7 @@ describe('TypeOrmReviewLikeRepository', () => {
       const bug = new TypeError('cannot read property of undefined');
       mockInsertQb.execute.mockRejectedValue(bug);
 
-      await expect(repository.addLike(1, '42')).rejects.toBe(bug);
+      await expect(repository.addLike(1, 42)).rejects.toBe(bug);
     });
   });
 
@@ -90,19 +90,19 @@ describe('TypeOrmReviewLikeRepository', () => {
     it('should return true when a row was removed', async () => {
       mockRepo.delete.mockResolvedValue({ affected: 1, raw: [] });
 
-      const result = await repository.removeLike(1, '42');
+      const result = await repository.removeLike(1, 42);
 
       expect(result).toBe(true);
       expect(mockRepo.delete).toHaveBeenCalledWith({
         reviewId: 1,
-        userId: '42',
+        userId: 42,
       });
     });
 
     it('should return false when no row was removed', async () => {
       mockRepo.delete.mockResolvedValue({ affected: 0, raw: [] });
 
-      const result = await repository.removeLike(1, '42');
+      const result = await repository.removeLike(1, 42);
 
       expect(result).toBe(false);
     });
@@ -110,7 +110,7 @@ describe('TypeOrmReviewLikeRepository', () => {
     it('should return false when affected is undefined', async () => {
       mockRepo.delete.mockResolvedValue({ raw: [] });
 
-      const result = await repository.removeLike(1, '42');
+      const result = await repository.removeLike(1, 42);
 
       expect(result).toBe(false);
     });
