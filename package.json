@@ -17,7 +17,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:integration": "jest --config ./test/jest-integration.json --runInBand"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.24",
@@ -46,6 +47,7 @@
     "@nestjs/cli": "^11.0.21",
     "@nestjs/schematics": "^11.1.0",
     "@nestjs/testing": "^11.1.24",
+    "@testcontainers/postgresql": "^12.0.1",
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
     "@types/multer": "^2.1.0",
@@ -60,10 +62,12 @@
     "prettier": "^3.8.3",
     "source-map-support": "^0.5.21",
     "supertest": "^7.2.2",
+    "testcontainers": "^12.0.1",
     "ts-jest": "^29.4.11",
     "ts-loader": "^9.5.7",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
+    "tslib": "^2.8.1",
     "type-fest": "^5.7.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.60.0"
@@ -81,7 +85,13 @@
     ],
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
+      "^.+\\.(t|j)s$": [
+        "ts-jest",
+        {
+          "tsconfig": "tsconfig.spec.json",
+          "diagnostics": { "ignoreCodes": [151002] }
+        }
+      ]
     },
     "setupFiles": [
       "reflect-metadata"
