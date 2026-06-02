@@ -3,7 +3,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtModule, type JwtModuleOptions } from '@nestjs/jwt';
 
 import { TOKEN_VERIFIER } from '../repository/i-token-verifier';
-import { JwtTokenVerifier } from '../adapter/jwt-token-verifier';
+import { JwtTokenRepository } from '../adapter/jwt-token.repository';
 import { JwtAuthGuard } from '../infrastructure/auth/jwt-auth.guard';
 
 @Global()
@@ -30,7 +30,7 @@ import { JwtAuthGuard } from '../infrastructure/auth/jwt-auth.guard';
     }),
   ],
   providers: [
-    { provide: TOKEN_VERIFIER, useClass: JwtTokenVerifier },
+    { provide: TOKEN_VERIFIER, useClass: JwtTokenRepository },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
   ],
   exports: [JwtModule],

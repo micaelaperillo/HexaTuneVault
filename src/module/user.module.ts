@@ -7,7 +7,7 @@ import { UserRepository } from '../adapter/user.repository';
 import { PASSWORD_HASHER } from '../repository/i-password-hasher';
 import { Argon2idPasswordHasher } from '../adapter/argon2id-password-hasher';
 import { TOKEN_ISSUER } from '../repository/i-token-issuer';
-import { JwtTokenIssuer } from '../adapter/jwt-token-issuer';
+import { JwtTokenRepository } from '../adapter/jwt-token.repository';
 
 import {
   UserService,
@@ -29,7 +29,7 @@ import { UserController } from '../controller/user.controller';
   providers: [
     { provide: USER_REPOSITORY, useClass: UserRepository },
     { provide: PASSWORD_HASHER, useClass: Argon2idPasswordHasher },
-    { provide: TOKEN_ISSUER, useClass: JwtTokenIssuer },
+    { provide: TOKEN_ISSUER, useClass: JwtTokenRepository },
     { provide: AUTHENTICATE_USER, useClass: UserService },
     { provide: CREATE_USER, useClass: UserService },
     { provide: EDIT_USER, useClass: UserService },
