@@ -35,8 +35,9 @@
 }
 
 .sub-gallery-item {
-    flex: 0 0 calc(33.33% - 80px);
-    margin-bottom: 20px;
+    flex: 0 0 247px;
+    margin: 0 3%;
+    margin-bottom: 40px;
 }
 
 .sub-gallery {

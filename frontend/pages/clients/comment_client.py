@@ -1,64 +1,123 @@
+
 from . import api_client
+from . import user_client
+from .format_utils import date_only
+from .image_client import DEFAULT_PROFILE_IMAGE as DEFAULT_AVATAR
 
-# --- placeholders until the user/auth API exists -------------------------
-CURRENT_USERNAME = 'anonymous'
-CURRENT_USER_ID = '1'  # the like endpoint parses user_id as an integer
-PLACEHOLDER_AVATAR = '/static/resources/default_profile.jpg'
-
-TYPE_REVIEW = 'review'
+BASE = '/api/comments'
 
 
-def _placeholder_user() -> dict:
-    # commentBox.html reads user.profileimg.url and user.isArtist.
-    return {'profileimg': {'url': PLACEHOLDER_AVATAR}, 'isArtist': False}
+def _id_from(link: str, default: str = '') -> str:
+    if not link:
+        return default
+    return link.rstrip('/').rsplit('/', 1)[-1]
 
 
-def list_for(associated_to, associated_type: str = TYPE_REVIEW, request=None) -> list[dict]:
+def _viewer_id(request) -> str | None:
+    user = getattr(request, 'user', None)
+    if user is not None and getattr(user, 'is_authenticated', False):
+        return str(user.id)
+    return None
+
+
+def _page_items(data) -> list:
+    if isinstance(data, list):
+        return data
+    if isinstance(data, dict) and isinstance(data.get('items'), list):
+        return data['items']
+    return []
+
+
+def list_for(review_id, request=None) -> list[dict]:
     data = api_client.get_json(
-        '/comments', request=request,
-        params={'associatedType': associated_type}, default=[],
+        BASE, request=request,
+        params={'review_id': str(review_id), 'page': 1, 'page_size': 10},
+        default={},
     )
-    if not isinstance(data, list):
-        return []
+    viewer_id = _viewer_id(request)
+    author_cache: dict[str, tuple[str, dict]] = {}
     return [
-        _to_comment(c) for c in data
-        if str(c.get('associatedTo')) == str(associated_to)
+        _to_comment(c, viewer_id, request, author_cache, with_replies=True)
+        for c in _page_items(data)
     ]
 
 
-def create(content, associated_to, associated_type: str = TYPE_REVIEW,
-           created_by=None, request=None):
-    return api_client.post('/comments', request=request, json={
-        'content': content,
-        'createdBy': created_by or CURRENT_USERNAME,
-        'associatedTo': str(associated_to),
-        'associatedType': associated_type,
-    })
-
-
-def toggle_like(comment_id, user_id=None, request=None):
-    uid = user_id or CURRENT_USER_ID
-    response = api_client.patch(
-        f'/comments/{comment_id}/like', request=request, json={'user_id': uid}
+def counts_by_subject(request=None) -> dict[str, int]:
+    data = api_client.get_json(
+        BASE, request=request, params={'page': 1, 'page_size': 10}, default={},
     )
-    if response is not None and response.status_code == 409:
-        return api_client.patch(
-            f'/comments/{comment_id}/unlike', request=request, json={'user_id': uid}
-        )
-    return response
+    counts: dict[str, int] = {}
+    for c in _page_items(data):
+        key = _id_from(c.get('review'))
+        counts[key] = counts.get(key, 0) + 1
+    return counts
 
 
-def _to_comment(c: dict, viewer_id: str = CURRENT_USER_ID) -> dict:
+def create(content, review_id, created_by, parent_comment_id=None, request=None):
+    body = {
+        'content': content,
+        'parent_review_id': int(review_id),
+    }
+    if parent_comment_id is not None:
+        body['parent_comment_id'] = int(parent_comment_id)
+    return api_client.post(BASE, request=request, json=body)
+
+
+def set_like(comment_id, user_id, liked, request=None):
+    if liked:
+        return api_client.put(f'{BASE}/{comment_id}/likes', request=request)
+    return api_client.delete(f'{BASE}/{comment_id}/likes', request=request)
+
+
+def toggle_like(comment_id, user_id, request=None):
+    currently_liked = has_liked(comment_id, user_id, request=request)
+    return set_like(comment_id, user_id, not currently_liked, request=request)
+
+
+def has_liked(comment_id, user_id, request=None) -> bool:
+    response = api_client.get(f'{BASE}/{comment_id}/like', request=request)
+    return response is not None and response.status_code == 204
+
+
+def _replies(comment_id, viewer_id, request, cache) -> list[dict]:
+    data = api_client.get_json(f'{BASE}/{comment_id}/replies', request=request, default=[])
+    if not isinstance(data, list):
+        return []
+    return [_to_comment(c, viewer_id, request, cache, with_replies=False) for c in data]
+
+
+def _author(author_id, request, cache) -> tuple[str, dict]:
+    if author_id in cache:
+        return cache[author_id]
+    profile = user_client.get(author_id, request=request) if author_id else None
+    if profile:
+        username = profile.get('user') or author_id
+        info = {
+            'profileimg': {'url': profile.get('profileimg') or DEFAULT_AVATAR},
+        }
+    else:
+        username = author_id
+        info = {'profileimg': {'url': DEFAULT_AVATAR}}
+    cache[author_id] = (username, info)
+    return username, info
+
+
+def _to_comment(c: dict, viewer_id, request, cache, with_replies=True) -> dict:
+    comment_id = _id_from(c.get('self'))
+    author_id = _id_from(c.get('author'))
+    username, user_info = _author(author_id, request, cache)
+    replies = _replies(comment_id, viewer_id, request, cache) if with_replies else []
+    is_liked = viewer_id is not None and has_liked(comment_id, viewer_id, request=request)
     return {
         'comment': {
-            'id': c.get('id'),
-            'user': c.get('createdBy', ''),
+            'id': comment_id,
+            'user': username,
             'content': c.get('content', ''),
-            'date': c.get('createdAt', ''),
+            'date': date_only(c.get('created_at', '')),
         },
-        'user': _placeholder_user(),
+        'user': user_info,
         'likes': c.get('likes', 0),
-        'is_liked': False,  # per-user like state is not exposed by the API
-        'replies': [],
-        'replies_count': 0,
+        'is_liked': is_liked,
+        'replies': replies,
+        'replies_count': len(replies),
     }

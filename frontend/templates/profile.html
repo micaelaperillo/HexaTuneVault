@@ -24,12 +24,8 @@
                                     <img class="image-large" src="{{user_profile.profileimg}}" alt="profile image">
                                 </figure>
                                     <div style="margin-left: 50px; font-size: 20px;">
-                                        {% if user_profile.isArtist %}
-                                        <label style="font-weight: bold; display: flex; align-items: center;">{{ user_profile.user }} <i class="material-icons" style="color: rgb(0, 128, 255); margin-left: 10px;">verified</i></label>
-                                        {% else %}
                                         <label style="font-weight: bold;">{{ user_profile.user }}</label>
                                         <br>
-                                        {% endif %}
                                         <label style="color: rgb(182, 182, 182)">Profile</label>
                                     </div>
                                 </div>
@@ -95,11 +91,6 @@
                 </div>
 
                 <div class="comments-favs">
-                    <div class="btn-group">
-                        <button onclick="showContent('comments')" id="commentsBtn" class = "btn-left activeButton">Comments</button>
-                        <button onclick="showContent('favs')" id="favsBtn" class = "btn-right">Favourites</button>
-                    </div>
-
                     <div id="commentsContent" class="comments">
                         {% if user_posts %}
                             {% for post in user_posts %}
@@ -112,22 +103,6 @@
                         {% else %}
                             <div style="display: flex; justify-content: center; margin: 40px 0;">
                                 <label><i class="material-icons noResultsIcon">search_off</i> No comments yet</label>
-                            </div>
-                        {% endif %}
-                    </div>
-
-                    <div id="favsContent" class="favs" style="display: none;">
-                        {% if user_favourites.top %}
-                            <div class='gallery-profile'>
-                                {% for fav_id, fav_data in user_favourites.top.items %}
-                                    <div class='gallery-profile-item'>
-                                    {% include 'miniPreviewVault.html' with vault=fav_data %}
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <div style="display: flex; justify-content: center; margin: 40px 0;">
-                                <label><i class="material-icons noResultsIcon">search_off</i> No favourites yet</label>
                             </div>
                         {% endif %}
                     </div>
@@ -158,9 +133,6 @@
                         <div class="follow-users">
                             <img src="{{follower.img}}" class="follow-img">
                             <p style="margin: 0;">{{follower.username}}</p>
-                             {% if follower.is_artist %} 
-                                <i class="material-icons" style="color: rgb(0, 128, 255); margin-left: 10px;">verified</i>
-                            {% endif %}
                         </div>
                     </a>
                 {% endfor %}
@@ -176,9 +148,6 @@
                         <div class="follow-users">
                             <img src="{{following.img}}" class="follow-img">
                             <p style="margin: 0;">{{following.username}}</p>
-                             {% if following.is_artist %} 
-                                <i class="material-icons" style="color: rgb(0, 128, 255); margin-left: 10px;">verified</i>
-                            {% endif %}
                         </div>
                     </a>
                 {% endfor %}
@@ -187,29 +156,6 @@
         </div>
 
         <script>
-            function showContent(contentType) {
-                var commentsBtn = document.getElementById('commentsBtn');
-                var favsBtn = document.getElementById('favsBtn');
-
-                var commentsContent = document.getElementById('commentsContent');
-                var favsContent = document.getElementById('favsContent');
-
-                if (contentType === 'comments') {
-                    commentsBtn.classList.add('activeButton');
-                    favsBtn.classList.remove('activeButton');
-
-                    commentsContent.style.display = 'block';
-                    favsContent.style.display = 'none';
-
-                } else if (contentType === 'favs') {
-                    commentsBtn.classList.remove('activeButton');
-                    favsBtn.classList.add('activeButton');
-
-                    commentsContent.style.display = 'none';
-                    favsContent.style.display = 'block';
-                }
-            }
-
             function showPopup() {
               var popup = document.getElementById("popup");
               popup.style.display = "block";

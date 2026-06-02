@@ -10,9 +10,6 @@
             <div class="comment">
                 <div class="comment-header">
                     <h4 class="comment-title">{{username}}</h4>
-                    {% if is_artist %}
-                        <i class="material-icons" style="color: rgb(0, 128, 255); margin-left: 10px;">verified</i>
-                    {% endif %}
                     <p class="date" style="margin-right: 20px;">{{date}}</p>
                     {% if rating != 0 and with_likes %}
                         <span class="star-rating">
@@ -31,9 +28,6 @@
             <div class="comment">
                 <div class="comment-header">
                     <h4 class="comment-title">@{{username}}</h4>
-                    {% if is_artist %}
-                        <i class="material-icons" style="color: rgb(0, 128, 255); margin-left: 10px;">verified</i>
-                    {% endif %}
                     <p class="date">{{date}}</p>
                 </div>
                 <p class="commentary">{{title}}</p>

@@ -40,37 +40,12 @@
                     <p class="type">Artist</p>
                     {% elif  vault.type == 'podcast' %}
                     <p class="type">Podcast</p>
-                    {% elif  vault.type == 'episode' %}
-                    <p class="type">Episode</p>
                     {% endif %}
                     <div class="info-header">
                     <h2>{{vault.title}}</h2>
                     <div class="button" style="display: flex; align-items: center;">
 
                         <p style="margin-right: 8px;">{{likes}}</p>
-
-                        {% if user.is_authenticated %}
-                            <form action="{% url 'favourite' %}" method="POST">
-                                {% csrf_token %}
-                                <input type="hidden" value="{{vault.id}}" name="vault_id" />
-                                <input type="hidden" value="{{vault_id}}" name="vault_id_path" />
-                                <input type="hidden" value="{{vault.type}}" name="vtype" />
-                                <button type="submit" style="background-color: transparent; border: none; color: white; display: flex; align-items: center;">
-                                    {% if is_fav %}
-                                    <i class="material-icons" style="cursor: pointer; margin-right: 20px; color:rgb(255, 70, 70);">favorite</i>
-                                    {% else %}
-                                    <i class="material-icons" style="cursor: pointer; margin-right: 20px;">favorite_border</i>
-                                    {% endif %}
-                                </button>
-                            </form>
-                        {% else %}
-                            <a href="/login" style="text-decoration: none;">
-                                <button style="background-color: transparent; border: none; color: white; display: flex; align-items: center;">
-                                    <i class="material-icons" style="cursor: pointer; margin-right: 20px;">favorite_border</i>
-                                </button>
-                            </a>
-                        {% endif %}
-                        
 
                         <a href="{{vault.external_url}}" style="text-decoration: none;">
                             <button class="spotifyButton">
@@ -94,12 +69,9 @@
                         {% elif  vault.type == 'podcast' %}
                         <p class="info-separation">·</p>
                         <p class="info-item-2">{{vault.total_tracks}} episodes </p>
-                        {% elif  vault.type == 'episode' %}
-                        <p class="info-separation">·</p>
-                        <p class="info-item-2">{{vault.total_tracks}} min </p>
                         {% endif %}
                     </div>
-                    {% if vault.type == 'podcast' or vault.type == 'episode' %}
+                    {% if vault.type == 'podcast' %}
                     <div class="description">
                         <p>{{vault.description}}</p>
                     </div>
@@ -131,7 +103,7 @@
                         {% endif %}
                     </div>
                     <div class="text-area">
-                        {{ form.title }}
+                        <textarea name="title" placeholder="Share your thoughts..." required></textarea>
                         <button class="submit-button" type="submit">
                             <i class="material-icons">send</i>
                         </button>
@@ -142,7 +114,7 @@
                     {% for a_post in posts %}
                         <hr>
                         {% with post=a_post.post %}
-                        {% include 'commentBox.html' with username="@"|add:post.user date=post.date title=post.title type=vault.type id=post.vault_id post_id=post.id rating=post.rating img=a_post.user.profileimg.url likes=a_post.likes is_liked=a_post.is_liked is_post=is_post path=path with_likes="true" is_artist=a_post.user.isArtist %}
+                        {% include 'commentBox.html' with username="@"|add:post.user date=post.date title=post.title type=vault.type id=post.vault_id post_id=post.id rating=post.rating img=a_post.user.profileimg.url likes=a_post.likes is_liked=a_post.is_liked is_post=is_post path=path with_likes="true" %}
                         <a href="{% url 'post' vtype=vault.type id=post.vault_id post_id=post.id %}" style="text-decoration: none;">
                             <div class="replies-button-box">
                                 <button class="replies-button">
