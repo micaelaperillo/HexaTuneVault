@@ -74,6 +74,57 @@ describe('ReviewLikeRepository', () => {
 
       await expect(repository.addLike(1, 42)).rejects.toBe(bug);
     });
+
+    it('falls through to ReviewRepositoryException when driverError is null', async () => {
+      const errorWithNullDriver = new QueryFailedError('insert', [], {
+        toString: () => 'sentinel',
+      } as unknown as Error);
+      (errorWithNullDriver as unknown as { driverError: null }).driverError =
+        null;
+      mockInsertQb.execute.mockRejectedValue(errorWithNullDriver);
+
+      await expect(repository.addLike(1, 42)).rejects.toThrow(
+        ReviewRepositoryException,
+      );
+    });
+
+    it('falls through to ReviewRepositoryException when driverError is a non-object primitive', async () => {
+      const errorWithPrimitiveDriver = new QueryFailedError('insert', [], {
+        toString: () => 'sentinel',
+      } as unknown as Error);
+      (
+        errorWithPrimitiveDriver as unknown as { driverError: number }
+      ).driverError = 42;
+      mockInsertQb.execute.mockRejectedValue(errorWithPrimitiveDriver);
+
+      await expect(repository.addLike(1, 42)).rejects.toThrow(
+        ReviewRepositoryException,
+      );
+    });
+
+    it('falls through to ReviewRepositoryException when driverError has no code property', async () => {
+      const errorWithNoCode = new QueryFailedError(
+        'insert',
+        [],
+        {} as unknown as Error,
+      );
+      mockInsertQb.execute.mockRejectedValue(errorWithNoCode);
+
+      await expect(repository.addLike(1, 42)).rejects.toThrow(
+        ReviewRepositoryException,
+      );
+    });
+
+    it('falls through to ReviewRepositoryException when driverError code is not a string', async () => {
+      const errorWithNumericCode = new QueryFailedError('insert', [], {
+        code: 23503,
+      } as unknown as Error);
+      mockInsertQb.execute.mockRejectedValue(errorWithNumericCode);
+
+      await expect(repository.addLike(1, 42)).rejects.toThrow(
+        ReviewRepositoryException,
+      );
+    });
   });
 
   describe('removeLike', () => {

@@ -9,6 +9,7 @@ import { SelfFollowException } from '../src/error/user/self-follow.exception';
 import { AlreadyFollowingException } from '../src/error/user/already-following.exception';
 import { NotFollowingException } from '../src/error/user/not-following.exception';
 import type { Page } from '../src/model/page.model';
+import type { UserFilters } from '../src/model/user.filter';
 
 function makeService(
   repo: Partial<IUserRepository>,
@@ -165,6 +166,66 @@ describe('UserService.unfollow', () => {
     await service.unfollow(1, 2);
 
     expect(unfollowedWith).toEqual([1, 2]);
+  });
+});
+
+describe('UserService.deleteById', () => {
+  it('delegates to the repository without additional logic', async () => {
+    let deletedId: number | undefined;
+    const service = makeService({
+      deleteById: (id) => {
+        deletedId = id;
+        return Promise.resolve();
+      },
+    });
+
+    await service.deleteById(42);
+
+    expect(deletedId).toBe(42);
+  });
+});
+
+describe('UserService.search', () => {
+  it('delegates to the repository and returns the page', async () => {
+    const page: Page<UserModel> = {
+      items: [storedUser],
+      page: 1,
+      pageSize: 10,
+      total: 1,
+    };
+    const service = makeService({
+      search: () => Promise.resolve(page),
+    });
+
+    const filters: UserFilters = { username: 'alice', page: 1, pageSize: 10 };
+    const result = await service.search(filters);
+
+    expect(result).toBe(page);
+  });
+
+  it('passes filters through to the repository unchanged', async () => {
+    let receivedFilters: UserFilters | undefined;
+    const page: Page<UserModel> = {
+      items: [],
+      page: 1,
+      pageSize: 20,
+      total: 0,
+    };
+    const service = makeService({
+      search: (f) => {
+        receivedFilters = f;
+        return Promise.resolve(page);
+      },
+    });
+
+    const filters: UserFilters = {
+      email: 'alice@example.com',
+      page: 1,
+      pageSize: 20,
+    };
+    await service.search(filters);
+
+    expect(receivedFilters).toBe(filters);
   });
 });
 

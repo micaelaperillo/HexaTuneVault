@@ -69,6 +69,14 @@ describe('JwtAuthGuard', () => {
     );
   });
 
+  it('rejects a Bearer header with an empty token', async () => {
+    const ctx = makeContext({ headers: { authorization: 'Bearer ' } });
+
+    await expect(makeGuard().canActivate(ctx)).rejects.toBeInstanceOf(
+      UnauthorizedException,
+    );
+  });
+
   it('rejects an invalid token', async () => {
     const ctx = makeContext({ headers: { authorization: 'Bearer bad' } });
 

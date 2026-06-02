@@ -302,6 +302,18 @@ describe('ReviewRepository', () => {
       expect(mockQb.take).toHaveBeenCalledWith(10);
     });
 
+    it('defaults to page 1 when page is 0', async () => {
+      await repository.search({ ...baseFilters, page: 0 });
+
+      expect(mockQb.skip).toHaveBeenCalledWith(0);
+    });
+
+    it('defaults to pageSize 20 when pageSize is 0', async () => {
+      await repository.search({ ...baseFilters, pageSize: 0 });
+
+      expect(mockQb.take).toHaveBeenCalledWith(20);
+    });
+
     it('should map entities to domain models', async () => {
       mockQb.getManyAndCount.mockResolvedValue([[makeEntity()], 1]);
 

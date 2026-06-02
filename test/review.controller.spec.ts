@@ -17,6 +17,7 @@ import { UNLIKE_REVIEW } from '../src/port/review/unlike-review.port';
 import { COUNT_REVIEW_LIKES } from '../src/port/review/count-review-likes.port';
 import { HAS_LIKED_REVIEW } from '../src/port/review/has-liked-review.port';
 import { SortField, SortOrder } from '../src/model/review.filter';
+import { SubjectType } from '../src/model/review-subject';
 import type { ReviewModel, UserModel } from '../src/model';
 import type { Response, Request } from 'express';
 
@@ -205,6 +206,91 @@ describe('ReviewController', () => {
 
       expect(hasLikedReview.hasLiked).toHaveBeenCalledWith(123, 1);
       expect(result.liked).toBe(true);
+    });
+  });
+
+  describe('search with subject_type filter', () => {
+    it('includes subjectType and subjectId when subject_type is provided', async () => {
+      searchReview.search.mockResolvedValue({
+        items: [reviewModel()],
+        total: 1,
+        page: 1,
+        pageSize: 10,
+      });
+
+      await controller.search(
+        {
+          page: 1,
+          page_size: 10,
+          sort_by: SortField.CREATED_AT,
+          sort_order: SortOrder.DESC,
+          subject_type: SubjectType.ALBUM,
+          subject_id: '1',
+        },
+        mockResponse as unknown as Response,
+      );
+
+      expect(searchReview.search).toHaveBeenCalledWith(
+        expect.objectContaining({ subjectType: 'album', subjectId: '1' }),
+      );
+    });
+
+    it('sets subjectType and subjectId to undefined when subject_type is absent', async () => {
+      searchReview.search.mockResolvedValue({
+        items: [],
+        total: 0,
+        page: 1,
+        pageSize: 10,
+      });
+
+      await controller.search(
+        {
+          page: 1,
+          page_size: 10,
+          sort_by: SortField.CREATED_AT,
+          sort_order: SortOrder.DESC,
+        },
+        mockResponse as unknown as Response,
+      );
+
+      expect(searchReview.search).toHaveBeenCalledWith(
+        expect.objectContaining({
+          subjectType: undefined,
+          subjectId: undefined,
+        }),
+      );
+    });
+  });
+
+  describe('toResponse subject variants', () => {
+    it('maps an artist subject to /api/artists/:id', async () => {
+      getReview.get.mockResolvedValue(
+        reviewModel({ subject: { artist: 'The Beatles' } }),
+      );
+
+      const result = await controller.getById(123);
+
+      expect(result.subject).toBe('/api/artists/The Beatles');
+    });
+
+    it('maps a podcast subject to /api/podcasts/:id', async () => {
+      getReview.get.mockResolvedValue(
+        reviewModel({ subject: { podcast: 'JRE' } }),
+      );
+
+      const result = await controller.getById(123);
+
+      expect(result.subject).toBe('/api/podcasts/JRE');
+    });
+
+    it('maps a track subject to /api/tracks/:id', async () => {
+      getReview.get.mockResolvedValue(
+        reviewModel({ subject: { track: 'track-123' } }),
+      );
+
+      const result = await controller.getById(123);
+
+      expect(result.subject).toBe('/api/tracks/track-123');
     });
   });
 });

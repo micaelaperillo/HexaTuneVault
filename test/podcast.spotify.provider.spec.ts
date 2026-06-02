@@ -213,6 +213,20 @@ describe('SpotifyPodcastProvider', () => {
 
       await expect(provider.search(filters)).rejects.toBe('new Error()');
     });
+
+    it('excludes shows with undefined media_type when a mediaType filter is set', async () => {
+      const res = structuredClone(mockApiResponse);
+      const noMediaType = { ...mockApiResponse.shows.items[0] };
+      (noMediaType as { media_type: string | undefined }).media_type =
+        undefined;
+      res.shows.items.push(noMediaType);
+      mockInfrastructure.search.mockResolvedValue(res);
+      const filters = { name: 'Joe Rogan', mediaType: 'mixed' };
+
+      const result = await provider.search(filters);
+
+      expect(result.items).toStrictEqual(mockMappedApiResponse);
+    });
   });
 
   describe('get', () => {

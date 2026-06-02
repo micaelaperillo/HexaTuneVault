@@ -169,6 +169,22 @@ describe('SpotifyArtistProvider', () => {
 
       await expect(provider.search(filters)).rejects.toBe('new Error()');
     });
+
+    it('drops genres that collapse to empty after escaping', async () => {
+      mockInfrastructure.search.mockResolvedValue(mockApiResponse);
+      const filters = { name: 'The Beatles', genre: ['Rock', '":"'] };
+
+      const result = await provider.search(filters);
+
+      expect(mockInfrastructure.search).toHaveBeenCalledWith(
+        'The Beatles genre:Rock',
+        ['artist'],
+        undefined,
+        10,
+        0,
+      );
+      expect(result.items).toStrictEqual(mockMappedApiResponse);
+    });
   });
 
   describe('get', () => {

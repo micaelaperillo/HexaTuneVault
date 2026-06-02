@@ -112,4 +112,30 @@ describe('ArtistController', () => {
       expect(mockGet.get).toHaveBeenCalledWith({ name: 'Unknown Artist' });
     });
   });
+
+  describe('search with multiple genres', () => {
+    it('forwards multiple genre values to the searcher port', async () => {
+      mockSearch.search.mockResolvedValue({
+        items: [mockArtist],
+        total: 1,
+        page: 1,
+        pageSize: 10,
+      });
+
+      const result = await controller.search({
+        q: mockArtist.name,
+        genre: ['Rock', 'Pop'],
+        page: 1,
+        page_size: 10,
+      });
+
+      expect(mockSearch.search).toHaveBeenCalledWith({
+        name: 'The Beatles',
+        genre: ['Rock', 'Pop'],
+        page: 1,
+        pageSize: 10,
+      });
+      expect(result.items[0]).toEqual(mockResponse);
+    });
+  });
 });

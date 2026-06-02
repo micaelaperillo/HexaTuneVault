@@ -124,4 +124,21 @@ describe('PodcastController', () => {
       expect(mockGet.get).toHaveBeenCalledWith({ name: 'Unknown Podcast' });
     });
   });
+
+  describe('search with explicit=false', () => {
+    it('maps explicit string "false" to boolean false', async () => {
+      mockSearch.search.mockResolvedValue(pageOf(mockPodcast));
+
+      await controller.search({
+        q: mockPodcast.name,
+        explicit: 'false',
+        page: 1,
+        page_size: 10,
+      });
+
+      expect(mockSearch.search).toHaveBeenCalledWith(
+        expect.objectContaining({ explicit: false }),
+      );
+    });
+  });
 });

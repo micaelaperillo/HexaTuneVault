@@ -1,0 +1,53 @@
+import 'reflect-metadata';
+import { plainToInstance } from 'class-transformer';
+import { TrimString, TrimStringArray } from '../src/dto/transforms';
+
+class TrimStringDto {
+  @TrimString()
+  value!: unknown;
+}
+
+class TrimStringArrayDto {
+  @TrimStringArray()
+  items!: unknown;
+}
+
+describe('TrimString', () => {
+  function transform(value: unknown): unknown {
+    return plainToInstance(TrimStringDto, { value }).value;
+  }
+
+  it('trims a string value', () => {
+    expect(transform('  hello  ')).toBe('hello');
+  });
+
+  it('returns a non-string value untouched', () => {
+    expect(transform(42)).toBe(42);
+  });
+
+  it('returns null untouched', () => {
+    expect(transform(null)).toBe(null);
+  });
+});
+
+describe('TrimStringArray', () => {
+  function transform(items: unknown): unknown {
+    return plainToInstance(TrimStringArrayDto, { items }).items;
+  }
+
+  it('trims each string element of an array', () => {
+    expect(transform(['  a  ', '  b  '])).toEqual(['a', 'b']);
+  });
+
+  it('leaves non-string elements in an array untouched', () => {
+    expect(transform([42, '  hello  '])).toEqual([42, 'hello']);
+  });
+
+  it('returns a non-array value untouched', () => {
+    expect(transform('not-an-array')).toBe('not-an-array');
+  });
+
+  it('returns a non-array number untouched', () => {
+    expect(transform(99)).toBe(99);
+  });
+});

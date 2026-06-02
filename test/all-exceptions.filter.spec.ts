@@ -103,4 +103,18 @@ describe('AllExceptionsFilter', () => {
       message: 'Http Exception',
     });
   });
+
+  it('falls back to exception.message when the body is a non-record value', () => {
+    const exception = new HttpException(
+      500 as unknown as string,
+      HttpStatus.BAD_GATEWAY,
+    );
+
+    filter.catch(exception, mockHost);
+
+    expect(mockStatus).toHaveBeenCalledWith(HttpStatus.BAD_GATEWAY);
+    expect(mockJson).toHaveBeenCalledWith(
+      expect.objectContaining({ statusCode: 502, code: 'ERROR' }),
+    );
+  });
 });

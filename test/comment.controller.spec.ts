@@ -248,4 +248,48 @@ describe('CommentController', () => {
       expect(mockLike.setLike).toHaveBeenCalledWith(1, 2, false);
     });
   });
+
+  describe('search with content filter and no review_id', () => {
+    it('passes content filter and undefined parentReviewId when review_id is absent', async () => {
+      mockSearch.search.mockResolvedValue({
+        items: [mockComment],
+        total: 1,
+        page: 1,
+        pageSize: 20,
+      });
+
+      const result = await controller.search({
+        content: 'Test',
+        page: 1,
+        page_size: 20,
+      });
+
+      expect(mockSearch.search).toHaveBeenCalledWith({
+        createdById: undefined,
+        content: 'Test',
+        parentReviewId: undefined,
+        page: 1,
+        pageSize: 20,
+      });
+      expect(result.items[0]).toBeInstanceOf(CommentResponseDto);
+    });
+  });
+
+  describe('create with null parentCommentId in toResponse', () => {
+    it('omits parent link when parentCommentId is null', async () => {
+      mockCreate.create.mockResolvedValue({
+        ...mockComment,
+        parentCommentId: null,
+      });
+
+      const result = await controller.create(
+        { content: 'Test', parent_review_id: 10 },
+        currentUser,
+        mockResponse,
+        mockRequest,
+      );
+
+      expect(result.parent).toBeUndefined();
+    });
+  });
 });

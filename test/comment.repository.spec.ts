@@ -266,6 +266,37 @@ describe('CommentRepository', () => {
       );
       expect(qbMock.andWhere).not.toHaveBeenCalled();
     });
+
+    it('honours an explicit positive page and pageSize', async () => {
+      qbMock.getManyAndCount.mockResolvedValue([[mockEntity], 1]);
+      const result = await repository.search({ page: 2, pageSize: 5 });
+      expect(qbMock.skip).toHaveBeenCalledWith(5);
+      expect(qbMock.take).toHaveBeenCalledWith(5);
+      expect(result.page).toBe(2);
+      expect(result.pageSize).toBe(5);
+    });
+  });
+
+  describe('toModel branches', () => {
+    it('maps parentCommentId to the parent comment entity id when parentComment is present', async () => {
+      const parentCommentEntity: CommentEntity = {
+        ...mockEntity,
+        id: 50,
+        parentComment: null,
+        parentCommentId: null,
+      };
+      const entityWithParent: CommentEntity = {
+        ...mockEntity,
+        id: 200,
+        parentComment: parentCommentEntity,
+        parentCommentId: 50,
+      };
+      qbMock.getOne.mockResolvedValue(entityWithParent);
+
+      const result = await repository.findById(200);
+
+      expect(result?.parentCommentId).toBe(50);
+    });
   });
 
   describe('hasLike', () => {
@@ -304,6 +335,19 @@ describe('CommentRepository', () => {
         commentId: 1,
         userId: 2,
       });
+    });
+  });
+
+  describe('like counts', () => {
+    it('maps the grouped like-count rows onto the comment', async () => {
+      qbMock.getOne.mockResolvedValue(mockEntity);
+      likeInsertQb.getRawMany.mockResolvedValueOnce([
+        { commentId: 100, count: '3' },
+      ]);
+
+      const result = await repository.findById(100);
+
+      expect(result?.likes).toBe(3);
     });
   });
 });

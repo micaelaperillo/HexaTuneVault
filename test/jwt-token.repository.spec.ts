@@ -47,4 +47,34 @@ describe('JwtTokenRepository.verify', () => {
       InvalidTokenException,
     );
   });
+
+  it('throws InvalidTokenException when sub is a non-integer string', async () => {
+    const repository = makeRepository({
+      verifyAsync: () => Promise.resolve({ sub: 'not-a-number' }),
+    });
+
+    await expect(repository.verify('bad-sub-token')).rejects.toBeInstanceOf(
+      InvalidTokenException,
+    );
+  });
+
+  it('throws InvalidTokenException when sub is zero', async () => {
+    const repository = makeRepository({
+      verifyAsync: () => Promise.resolve({ sub: 0 }),
+    });
+
+    await expect(repository.verify('zero-sub-token')).rejects.toBeInstanceOf(
+      InvalidTokenException,
+    );
+  });
+
+  it('throws InvalidTokenException when sub is negative', async () => {
+    const repository = makeRepository({
+      verifyAsync: () => Promise.resolve({ sub: -1 }),
+    });
+
+    await expect(repository.verify('neg-sub-token')).rejects.toBeInstanceOf(
+      InvalidTokenException,
+    );
+  });
 });

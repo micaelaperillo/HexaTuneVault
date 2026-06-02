@@ -145,5 +145,21 @@ describe('AlbumController', () => {
       ).rejects.toThrow(NotFoundException);
       expect(mockGet.get).toHaveBeenCalledWith({ name: 'Unknown Album' });
     });
+
+    it('passes artist and year filters to getter port when provided', async () => {
+      mockGet.get.mockResolvedValue(mockAlbum);
+
+      const result = await controller.get(
+        { name: 'Abbey Road' },
+        { artist: 'The Beatles', year: 1969, page: 1, page_size: 10 },
+      );
+
+      expect(mockGet.get).toHaveBeenCalledWith({
+        name: 'Abbey Road',
+        artist: 'The Beatles',
+        year: 1969,
+      });
+      expect(result.name).toBe('Abbey Road');
+    });
   });
 });
