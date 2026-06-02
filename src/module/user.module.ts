@@ -22,10 +22,11 @@ import {
 } from '../use-case/user.service';
 
 import { UserController } from '../controller/user.controller';
+import { SessionController } from '../controller/session.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([UserEntity])],
-  controllers: [UserController],
+  controllers: [UserController, SessionController],
   providers: [
     { provide: USER_REPOSITORY, useClass: UserRepository },
     { provide: PASSWORD_HASHER, useClass: Argon2idPasswordHasher },
