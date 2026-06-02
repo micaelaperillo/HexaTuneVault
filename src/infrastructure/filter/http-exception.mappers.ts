@@ -110,14 +110,7 @@ export class TooManyRequestsMapper implements ExceptionFilter {
   }
 }
 
-@Catch(
-  CommentDBException,
-  UserDBException,
-  ArtistProviderError,
-  AlbumProviderError,
-  PodcastProviderError,
-  ReviewRepositoryException,
-)
+@Catch(CommentDBException, UserDBException, ReviewRepositoryException)
 export class InternalServerErrorMapper implements ExceptionFilter {
   catch(exception: Error, host: ArgumentsHost): void {
     send(
@@ -126,6 +119,21 @@ export class InternalServerErrorMapper implements ExceptionFilter {
       exception,
       'INTERNAL_ERROR',
       'An unexpected error occurred',
+    );
+  }
+}
+
+// Upstream catalog provider (Spotify) failures are gateway errors, not faults
+// in this service, so they surface as 502 rather than 500.
+@Catch(AlbumProviderError, ArtistProviderError, PodcastProviderError)
+export class BadGatewayMapper implements ExceptionFilter {
+  catch(exception: Error, host: ArgumentsHost): void {
+    send(
+      host,
+      HttpStatus.BAD_GATEWAY,
+      exception,
+      'BAD_GATEWAY',
+      'Upstream catalog provider failed',
     );
   }
 }
@@ -139,4 +147,5 @@ export const filters = [
   new UnprocessableEntityMapper(),
   new TooManyRequestsMapper(),
   new InternalServerErrorMapper(),
+  new BadGatewayMapper(),
 ] as const;
