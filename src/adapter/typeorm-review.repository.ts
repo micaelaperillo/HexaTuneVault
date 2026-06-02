@@ -12,6 +12,7 @@ import { MapErrors } from 'error-mapper-decorator';
 import { reviewPersistenceFailure } from './review-error-mappings';
 import type { UserModel } from '../model';
 import { UserEntity } from '../entity';
+import { escapeLike } from './like-escape';
 
 const SORT_FIELD_COLUMN: Record<SortField, string> = {
   [SortField.CREATED_AT]: 'review.createdAt',
@@ -70,7 +71,7 @@ export class TypeOrmReviewRepository implements IReviewRepository {
       .innerJoinAndSelect('review.author', 'user');
 
     if (criteria.content) {
-      const escaped = criteria.content.replace(/[%_\\]/g, '\\$&');
+      const escaped = escapeLike(criteria.content);
       qb.andWhere('review.content ILIKE :content', {
         content: `%${escaped}%`,
       });

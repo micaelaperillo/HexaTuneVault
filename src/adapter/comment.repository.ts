@@ -8,6 +8,7 @@ import { CommentFilters } from '../model/comment.filter';
 import { CommentDBException } from '../error/comment/comment-db.exception';
 import { ReviewModel, UserModel } from '../model';
 import { SubjectReference } from '../model/subject-reference';
+import { escapeLike } from './like-escape';
 
 @Injectable()
 export class CommentRepository implements ICommentRepository {
@@ -111,7 +112,7 @@ export class CommentRepository implements ICommentRepository {
     }
     if (filters.content !== undefined) {
       qb.andWhere('comment.content ILIKE :content', {
-        content: `%${filters.content}%`,
+        content: `%${escapeLike(filters.content)}%`,
       });
     }
     if (filters.parentReviewId !== undefined) {

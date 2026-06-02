@@ -13,6 +13,7 @@ import {
   type IPasswordHasher,
   PASSWORD_HASHER,
 } from '../repository/i-password-hasher';
+import { escapeLike } from './like-escape';
 
 @Injectable()
 export class UserRepository implements IUserRepository {
@@ -47,16 +48,16 @@ export class UserRepository implements IUserRepository {
     return this.run(() =>
       this.repo.findBy({
         ...(filters.username !== undefined && {
-          username: ILike(`%${filters.username}%`),
+          username: ILike(`%${escapeLike(filters.username)}%`),
         }),
         ...(filters.email !== undefined && {
-          email: ILike(`%${filters.email}%`),
+          email: ILike(`%${escapeLike(filters.email)}%`),
         }),
         ...(filters.firstName !== undefined && {
-          firstName: ILike(`%${filters.firstName}%`),
+          firstName: ILike(`%${escapeLike(filters.firstName)}%`),
         }),
         ...(filters.lastName !== undefined && {
-          lastName: ILike(`%${filters.lastName}%`),
+          lastName: ILike(`%${escapeLike(filters.lastName)}%`),
         }),
       }),
     );
