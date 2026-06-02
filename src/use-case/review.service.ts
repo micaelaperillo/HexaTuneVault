@@ -12,9 +12,18 @@ import type { ISearchReview } from '../port/review/search-review.port';
 import type { ILikeReview } from '../port/review/like-review.port';
 import type { IUnlikeReview } from '../port/review/unlike-review.port';
 import type { ICountReviewLikes } from '../port/review/count-review-likes.port';
-import type { IReviewRepository } from '../repository/review-repository.port';
-import type { IReviewLikeRepository } from '../repository/review-like-repository.port';
-import type { IReviewConfig } from '../port/review/review-config.port';
+import {
+  REVIEW_REPOSITORY,
+  type IReviewRepository,
+} from '../repository/review-repository.port';
+import {
+  REVIEW_LIKE_REPOSITORY,
+  type IReviewLikeRepository,
+} from '../repository/review-like-repository.port';
+import {
+  REVIEW_CONFIG,
+  type IReviewConfig,
+} from '../port/review/review-config.port';
 import type { PaginatedResult } from '../common/paginated-result';
 import type { ReviewSearchCriteria } from '../model/review-search-criteria';
 import { ReviewModel } from '../model/review.model';
@@ -23,11 +32,6 @@ import { ReviewCooldownException } from '../error/review/review-cooldown.excepti
 import { ReviewNotFoundException } from '../error/review/review-not-found.exception';
 import { ForbiddenDeletionException } from '../error/review/forbidden-deletion.exception';
 import { NotLikedException } from '../error/review/not-liked.exception';
-import {
-  REVIEW_REPOSITORY,
-  REVIEW_LIKE_REPOSITORY,
-  REVIEW_CONFIG,
-} from '../port/review/tokens';
 
 @Injectable()
 export class ReviewService

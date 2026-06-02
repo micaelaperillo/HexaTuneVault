@@ -15,27 +15,33 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import type { Response, Request } from 'express';
-import type { ICreateReview } from '../port/review/create-review.port';
-import type { IDeleteReview } from '../port/review/delete-review.port';
-import type { ISearchReview } from '../port/review/search-review.port';
-import type { IGetReview } from '../port/review/get-review.port';
-import type { ILikeReview } from '../port/review/like-review.port';
-import type { IUnlikeReview } from '../port/review/unlike-review.port';
-import type { ICountReviewLikes } from '../port/review/count-review-likes.port';
+import {
+  CREATE_REVIEW,
+  type ICreateReview,
+} from '../port/review/create-review.port';
+import {
+  DELETE_REVIEW,
+  type IDeleteReview,
+} from '../port/review/delete-review.port';
+import {
+  SEARCH_REVIEW,
+  type ISearchReview,
+} from '../port/review/search-review.port';
+import { GET_REVIEW, type IGetReview } from '../port/review/get-review.port';
+import { LIKE_REVIEW, type ILikeReview } from '../port/review/like-review.port';
+import {
+  UNLIKE_REVIEW,
+  type IUnlikeReview,
+} from '../port/review/unlike-review.port';
+import {
+  COUNT_REVIEW_LIKES,
+  type ICountReviewLikes,
+} from '../port/review/count-review-likes.port';
 import { CreateReviewRequest } from '../dto/create-review.request';
 import { SearchReviewQueryDto } from '../dto/search-review-query.dto';
 import { ReviewResponse } from '../dto/review-response.dto';
 import { ReviewLikeCountResponse } from '../dto/review-like-count-response.dto';
 import { ReviewSearchCriteriaMapper } from './review-search-criteria.mapper';
-import {
-  CREATE_REVIEW,
-  DELETE_REVIEW,
-  SEARCH_REVIEW,
-  GET_REVIEW,
-  LIKE_REVIEW,
-  UNLIKE_REVIEW,
-  COUNT_REVIEW_LIKES,
-} from '../port/review/tokens';
 
 @Controller('api/reviews')
 export class ReviewController {

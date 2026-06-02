@@ -7,15 +7,13 @@ import type { IGetReview } from '../src/port/review/get-review.port';
 import type { ILikeReview } from '../src/port/review/like-review.port';
 import type { IUnlikeReview } from '../src/port/review/unlike-review.port';
 import type { ICountReviewLikes } from '../src/port/review/count-review-likes.port';
-import {
-  CREATE_REVIEW,
-  DELETE_REVIEW,
-  SEARCH_REVIEW,
-  GET_REVIEW,
-  LIKE_REVIEW,
-  UNLIKE_REVIEW,
-  COUNT_REVIEW_LIKES,
-} from '../src/port/review/tokens';
+import { CREATE_REVIEW } from '../src/port/review/create-review.port';
+import { DELETE_REVIEW } from '../src/port/review/delete-review.port';
+import { SEARCH_REVIEW } from '../src/port/review/search-review.port';
+import { GET_REVIEW } from '../src/port/review/get-review.port';
+import { LIKE_REVIEW } from '../src/port/review/like-review.port';
+import { UNLIKE_REVIEW } from '../src/port/review/unlike-review.port';
+import { COUNT_REVIEW_LIKES } from '../src/port/review/count-review-likes.port';
 import { SubjectType, SubjectReference } from '../src/model/subject-reference';
 import { ReviewModel } from '../src/model/review.model';
 import { SortField, SortOrder } from '../src/model/review-search-criteria';

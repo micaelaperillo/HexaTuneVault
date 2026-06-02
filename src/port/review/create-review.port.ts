@@ -9,6 +9,8 @@ export interface CreateReviewCommand {
   authorId: string;
 }
 
+export const CREATE_REVIEW = Symbol('ICreateReview');
+
 export interface ICreateReview {
   create(cmd: CreateReviewCommand): Promise<ReviewModel>;
 }

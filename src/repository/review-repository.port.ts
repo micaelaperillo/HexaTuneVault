@@ -3,6 +3,8 @@ import type { ReviewModel } from '../model/review.model';
 import type { SubjectReference } from '../model/subject-reference';
 import type { ReviewSearchCriteria } from '../model/review-search-criteria';
 
+export const REVIEW_REPOSITORY = Symbol('IReviewRepository');
+
 export interface IReviewRepository {
   save(review: ReviewModel): Promise<ReviewModel>;
   findById(id: number): Promise<ReviewModel | null>;
