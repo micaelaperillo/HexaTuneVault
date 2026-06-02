@@ -1,5 +1,7 @@
-export class InvalidCredentialsException extends Error {
+import { DomainException } from '../domain.exception';
+
+export class InvalidCredentialsException extends DomainException {
   constructor() {
-    super('Invalid username or password');
+    super('Invalid username or password', 'UNAUTHORIZED');
   }
 }
