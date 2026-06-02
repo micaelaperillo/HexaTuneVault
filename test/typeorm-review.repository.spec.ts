@@ -1,5 +1,7 @@
 import { TypeOrmReviewRepository } from '../src/adapter/typeorm-review.repository';
 import { ReviewEntity } from '../src/entity/review.entity';
+import { ReviewRepositoryException } from '../src/error/review/review-repository.exception';
+import { QueryFailedError } from 'typeorm';
 import { ReviewModel } from '../src/model/review.model';
 import { SubjectReference, SubjectType } from '../src/model/subject-reference';
 import type { ReviewSearchCriteria } from '../src/model/review-search-criteria';
@@ -69,11 +71,23 @@ describe('TypeOrmReviewRepository', () => {
       expect(mockRepo.save).toHaveBeenCalled();
     });
 
-    it('should rethrow Error without code property', async () => {
+    it('should rethrow a non-infrastructure Error untouched', async () => {
       mockRepo.save.mockRejectedValue(new Error('connection lost'));
 
       await expect(repository.save(createModel())).rejects.toThrow(
         'connection lost',
+      );
+    });
+
+    it('should translate a TypeORM error into ReviewRepositoryException', async () => {
+      mockRepo.save.mockRejectedValue(
+        new QueryFailedError('insert', [], {
+          code: '23505',
+        } as unknown as Error),
+      );
+
+      await expect(repository.save(createModel())).rejects.toThrow(
+        ReviewRepositoryException,
       );
     });
   });

@@ -8,6 +8,8 @@ import type { PaginatedResult } from '../common/paginated-result';
 import type { ReviewSearchCriteria } from '../model/review-search-criteria';
 import { SortField, SortOrder } from '../model/review-search-criteria';
 import type { IReviewRepository } from '../repository/review-repository.port';
+import { MapErrors } from '../common/map-errors.decorator';
+import { reviewPersistenceFailure } from './review-error-mappings';
 
 const SORT_FIELD_COLUMN: Record<SortField, string> = {
   [SortField.CREATED_AT]: 'review.createdAt',
@@ -21,17 +23,20 @@ export class TypeOrmReviewRepository implements IReviewRepository {
     private readonly repo: Repository<ReviewEntity>,
   ) {}
 
+  @MapErrors(reviewPersistenceFailure)
   async save(review: ReviewModel): Promise<ReviewModel> {
     const entity = this.toEntity(review);
     const saved = await this.repo.save(entity);
     return this.toModel(saved);
   }
 
+  @MapErrors(reviewPersistenceFailure)
   async findById(id: number): Promise<ReviewModel | null> {
     const entity = await this.repo.findOne({ where: { id } });
     return entity ? this.toModel(entity) : null;
   }
 
+  @MapErrors(reviewPersistenceFailure)
   async findRecentByAuthorAndSubject(
     authorId: string,
     ref: SubjectReference,
@@ -48,10 +53,12 @@ export class TypeOrmReviewRepository implements IReviewRepository {
     return entity ? this.toModel(entity) : null;
   }
 
+  @MapErrors(reviewPersistenceFailure)
   async delete(id: number): Promise<void> {
     await this.repo.delete(id);
   }
 
+  @MapErrors(reviewPersistenceFailure)
   async search(
     criteria: ReviewSearchCriteria,
   ): Promise<PaginatedResult<ReviewModel>> {
