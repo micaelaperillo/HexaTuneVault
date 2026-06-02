@@ -10,10 +10,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { MapErrors } from 'error-mapper-decorator';
 import { Public } from '../decorator/public.decorator';
-import {
-  TOKEN_VERIFIER,
-  type ITokenVerifier,
-} from '../../../../port/out/token-verifier.port';
+import { TOKEN_VERIFIER, type ITokenVerifier } from '../../../../port/out';
 import type { AuthenticatedRequest } from '../auth/authenticated-request';
 import { InvalidTokenException } from '../../../../error/auth/invalid-token.exception';
 
