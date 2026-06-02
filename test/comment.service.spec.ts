@@ -14,15 +14,16 @@ describe('CommentService', () => {
     createdById: 1,
     parentReviewId: 10,
     parentCommentId: null,
+    likes: 0,
   };
 
   const mockRepo = {
     create: jest.fn(),
     findById: jest.fn(),
     findReplies: jest.fn(),
-    findLikesByCommentId: jest.fn(),
     search: jest.fn(),
     deleteById: jest.fn(),
+    hasLike: jest.fn(),
     addLike: jest.fn(),
     removeLike: jest.fn(),
   };
@@ -88,22 +89,6 @@ describe('CommentService', () => {
     });
   });
 
-  describe('getLikes', () => {
-    it('returns the likedBy ids when comment exists', async () => {
-      mockRepo.findLikesByCommentId.mockResolvedValue([2, 3]);
-      const result = await service.getLikes(1);
-      expect(mockRepo.findLikesByCommentId).toHaveBeenCalledWith(1);
-      expect(result).toEqual([2, 3]);
-    });
-
-    it('throws CommentNotFoundException when comment does not exist', async () => {
-      mockRepo.findLikesByCommentId.mockResolvedValue(null);
-      await expect(service.getLikes(99)).rejects.toThrow(
-        CommentNotFoundException,
-      );
-    });
-  });
-
   describe('search', () => {
     it('delegates to repo and returns results', async () => {
       mockRepo.search.mockResolvedValue([mockComment]);
@@ -119,6 +104,15 @@ describe('CommentService', () => {
       mockRepo.deleteById.mockResolvedValue(undefined);
       await service.deleteById(1);
       expect(mockRepo.deleteById).toHaveBeenCalledWith(1);
+    });
+  });
+
+  describe('hasLiked', () => {
+    it('delegates to repo.hasLike', async () => {
+      mockRepo.hasLike.mockResolvedValue(true);
+      const result = await service.hasLiked(1, 2);
+      expect(mockRepo.hasLike).toHaveBeenCalledWith(1, 2);
+      expect(result).toBe(true);
     });
   });
 

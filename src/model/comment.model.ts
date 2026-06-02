@@ -5,4 +5,5 @@ export interface CommentModel {
   createdById: number;
   parentReviewId: number;
   parentCommentId: number | null;
+  likes: number;
 }

@@ -1,17 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AlbumService } from '../src/use-case/album.service';
-import { ALBUM_PROVIDER } from '../src/repository/album.provider';
-import type { AlbumModel } from '../src/model/album.model';
 
-describe('AlbumService', () => {
-  let service: AlbumService;
+import { ArtistService } from '../src/use-case/artist.service';
+import { ARTIST_PROVIDER } from '../src/repository';
 
-  const mockAlbum: AlbumModel = {
-    name: 'Abbey Road',
-    cover: 'cover-url',
-    releaseDate: '1969',
-    totalTracks: 17,
-    artists: ['The Beatles'],
+import type { ArtistModel } from '../src/model';
+
+describe('ArtistService', () => {
+  let service: ArtistService;
+
+  const mockArtist: ArtistModel = {
+    name: 'The Beatles',
+    avatar: 'avatar-url',
     external_urls: {
       spotify: 'spotify-url',
     },
@@ -27,38 +26,41 @@ describe('AlbumService', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        AlbumService,
-        { provide: ALBUM_PROVIDER, useValue: mockProvider },
+        ArtistService,
+        { provide: ARTIST_PROVIDER, useValue: mockProvider },
       ],
     }).compile();
 
-    service = module.get(AlbumService);
+    service = module.get(ArtistService);
   });
 
   describe('search', () => {
     it('delegates to the provider and returns search results', async () => {
-      mockProvider.search.mockResolvedValue([mockAlbum]);
-      const filters = { name: 'Abbey Road', artist: 'The Beatles' };
+      mockProvider.search.mockResolvedValue([mockArtist]);
+      const filters = { name: 'The Beatles', genre: ['Rock'] };
+
       const result = await service.search(filters);
 
       expect(mockProvider.search).toHaveBeenCalledWith(filters);
-      expect(result).toStrictEqual([mockAlbum]);
+      expect(result).toStrictEqual([mockArtist]);
     });
   });
 
   describe('get', () => {
     it('delegates to the provider and returns get result', async () => {
-      mockProvider.get.mockResolvedValue(mockAlbum);
-      const filters = { name: 'Abbey Road' };
+      mockProvider.get.mockResolvedValue(mockArtist);
+      const filters = { name: 'The Beatles' };
+
       const result = await service.get(filters);
 
       expect(mockProvider.get).toHaveBeenCalledWith(filters);
-      expect(result).toStrictEqual(mockAlbum);
+      expect(result).toStrictEqual(mockArtist);
     });
 
     it('returns null if provider returns null', async () => {
       mockProvider.get.mockResolvedValue(null);
-      const filters = { name: 'Nonexistent Album' };
+      const filters = { name: 'Unknown Artist' };
+
       const result = await service.get(filters);
 
       expect(mockProvider.get).toHaveBeenCalledWith(filters);
