@@ -6,7 +6,7 @@ import { PodcastProviderError } from '../src/error';
 
 import type { PodcastModel } from '../src/model';
 
-describe('SpotifyArtistProvider', () => {
+describe('SpotifyPodcastProvider', () => {
   let provider: SpotifyPodcastProvider;
 
   const mockApiResponse = {
