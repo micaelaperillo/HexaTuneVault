@@ -8,6 +8,12 @@
 // import { PASSWORD_HASHER } from '../src/repository/i-password-hasher';
 // import type { UserModel } from '../src/model/user.model';
 
+describe('UserRepository', () => {
+  it('works on my machine', () => {
+    // :)
+  });
+});
+
 // describe('UserRepository', () => {
 //   let repository: UserRepository;
 

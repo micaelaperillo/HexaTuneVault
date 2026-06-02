@@ -28,5 +28,11 @@ export const localstore = [
   }),
   ServeStaticModule.forRoot({
     rootPath: uploads,
+    renderPath: content,
+    serveStaticOptions: {
+      index: false,
+      redirect: false,
+      cacheControl: true,
+    },
   }),
 ];
