@@ -79,7 +79,6 @@ export class PodcastController {
       {
         ...podcast,
         self: `/api/podcasts/${encodeURIComponent(podcast.name)}`,
-        episodes: `/api/episodes?${params}`,
         reviews: `/api/reviews?${params}`,
       },
       { excludeExtraneousValues: true },

@@ -8,7 +8,7 @@ export class PodcastResponseDto {
   readonly avatar!: string;
 
   @Expose()
-  readonly publisher!: string;
+  readonly publisher?: string;
 
   @Expose()
   readonly description!: string;
@@ -21,9 +21,6 @@ export class PodcastResponseDto {
 
   @Expose()
   readonly self!: `/${string}`;
-
-  @Expose()
-  readonly episodes!: `/${string}`;
 
   @Expose()
   readonly reviews!: `/${string}`;
