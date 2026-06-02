@@ -36,6 +36,7 @@ import { CreateCommentDto } from '../dto/create-comment.dto';
 import { CommentFiltersDto } from '../dto/comment-filters.dto';
 import { CommentResponseDto } from '../dto/comment-response.dto';
 import { CommentLikeCountResponse } from '../dto/comment-like-count-response.dto';
+import { PageDto } from '../dto/page.dto';
 import { Public } from '../infrastructure/auth/public.decorator';
 import { CurrentUser } from '../infrastructure/auth/current-user.decorator';
 import type { AuthenticatedUser } from '../model/authenticated-user';
@@ -75,14 +76,16 @@ export class CommentController {
   @Get()
   async search(
     @Query() filters: CommentFiltersDto,
-  ): Promise<CommentResponseDto[]> {
-    const comments = await this.searchComment.search({
+  ): Promise<PageDto<CommentResponseDto>> {
+    const { items, total, ...page } = await this.searchComment.search({
       createdById: filters.createdById,
       content: filters.content,
       parentReviewId: filters.reviewId,
+      page: filters.page,
+      pageSize: filters.page_size,
     });
 
-    return comments.map(CommentController.toResponse);
+    return PageDto.of(items.map(CommentController.toResponse), page, total);
   }
 
   @Public()

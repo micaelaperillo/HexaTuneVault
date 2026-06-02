@@ -75,7 +75,7 @@ export class UserService
     await this.repo.deleteById(userId);
   }
 
-  async search(filters: UserFilters): Promise<UserModel[]> {
+  async search(filters: UserFilters): Promise<Page<UserModel>> {
     return this.repo.search(filters);
   }
 

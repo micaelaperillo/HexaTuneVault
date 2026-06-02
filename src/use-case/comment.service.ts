@@ -3,6 +3,7 @@ import type {
   CommentFilters,
   ReviewModel,
   UserModel,
+  Page,
 } from '../model';
 
 import type {
@@ -67,7 +68,7 @@ export class CommentService
     await this.repo.deleteById(commentId);
   }
 
-  async search(filters: CommentFilters): Promise<CommentModel[]> {
+  async search(filters: CommentFilters): Promise<Page<CommentModel>> {
     return this.repo.search(filters);
   }
 

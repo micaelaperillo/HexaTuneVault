@@ -7,6 +7,7 @@ import { ICommentRepository } from '../repository/i-comment.repository';
 import type { CommentModel } from '../model/comment.model';
 import type { CommentFilters } from '../model/comment.filter';
 import { ReviewModel, UserModel } from '../model';
+import type { Page } from '../model';
 import { SubjectReference } from '../model/subject-reference';
 import { escapeLike } from './like-escape';
 import { commentPersistenceFailure } from './comment-error-mappings';
@@ -92,7 +93,11 @@ export class CommentRepository implements ICommentRepository {
   }
 
   @MapErrors(commentPersistenceFailure)
-  async search(filters: CommentFilters): Promise<CommentModel[]> {
+  async search(filters: CommentFilters): Promise<Page<CommentModel>> {
+    const page = filters.page && filters.page > 0 ? filters.page : 1;
+    const pageSize =
+      filters.pageSize && filters.pageSize > 0 ? filters.pageSize : 20;
+
     const qb = this.baseQuery().where('comment.parentComment IS NULL');
     if (filters.createdById !== undefined) {
       qb.andWhere('comment.createdBy = :createdById', {
@@ -109,8 +114,16 @@ export class CommentRepository implements ICommentRepository {
         parentReviewId: filters.parentReviewId,
       });
     }
-    const entities = await qb.getMany();
-    return entities.map((e) => this.toModel(e));
+    const [entities, total] = await qb
+      .skip((page - 1) * pageSize)
+      .take(pageSize)
+      .getManyAndCount();
+    return {
+      items: entities.map((e) => this.toModel(e)),
+      page,
+      pageSize,
+      total,
+    };
   }
 
   private async likeExists(

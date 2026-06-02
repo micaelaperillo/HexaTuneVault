@@ -69,9 +69,18 @@ export class UserController {
 
   @Public()
   @Get()
-  async search(@Query() filters: UserFiltersDto): Promise<UserResponseDto[]> {
-    const users = await this.searchUser.search(filters);
-    return users.map(UserController.toResponse);
+  async search(
+    @Query() filters: UserFiltersDto,
+  ): Promise<PageDto<UserResponseDto>> {
+    const { items, total, ...page } = await this.searchUser.search({
+      username: filters.username,
+      email: filters.email,
+      firstName: filters.firstName,
+      lastName: filters.lastName,
+      page: filters.page,
+      pageSize: filters.page_size,
+    });
+    return PageDto.of(items.map(UserController.toResponse), page, total);
   }
 
   @Public()

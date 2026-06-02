@@ -1,10 +1,13 @@
 import {
   IsBooleanString,
+  IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
+  Max,
+  Min,
 } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export class PodcastFilterDto {
   @IsString()
@@ -27,4 +30,17 @@ export class PodcastFilterDto {
   @Transform(({ value }) => (value as string).trim())
   @IsNotEmpty()
   readonly market?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  readonly page: number = 1;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(50)
+  readonly page_size: number = 10;
 }

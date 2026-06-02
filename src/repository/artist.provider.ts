@@ -1,4 +1,4 @@
-import type { ArtistModel, ArtistFilters } from '../model';
+import type { ArtistModel, ArtistFilters, Page } from '../model';
 
 // Documentation import
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -8,13 +8,13 @@ export const ARTIST_PROVIDER = Symbol('IArtistProvider');
 
 export interface IArtistProvider {
   /**
-   * Search for an artist given a filter
+   * Search for artists given a filter
    *
-   * @param filters The conditional filters to search by
-   * @returns The matching artists
+   * @param filters The conditional filters to search by (incl. pagination)
+   * @returns A page of matching artists
    * @throws {ArtistProviderError} On provider failure
    */
-  search(filters: ArtistFilters): Promise<ArtistModel[]>;
+  search(filters: ArtistFilters): Promise<Page<ArtistModel>>;
 
   /**
    * Get an artist given a filter

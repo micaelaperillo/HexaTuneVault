@@ -3,6 +3,7 @@ import type {
   CommentModel,
   ReviewModel,
   UserModel,
+  Page,
 } from '../model';
 
 /** DI token for {@link ICommentRepository}. */
@@ -46,7 +47,7 @@ export interface ICommentRepository {
    * Returns top-level comments (those without a parent comment) matching the
    * given filters. Replies are never included.
    */
-  search(filters: CommentFilters): Promise<CommentModel[]>;
+  search(filters: CommentFilters): Promise<Page<CommentModel>>;
 
   /**
    * Returns the direct replies (children) of the given comment.

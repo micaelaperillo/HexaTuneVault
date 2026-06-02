@@ -52,22 +52,29 @@ export class UserRepository implements IUserRepository {
   }
 
   @MapErrors(userPersistenceFailure)
-  async search(filters: UserFilters): Promise<UserModel[]> {
-    const entities = await this.repo.findBy({
-      ...(filters.username !== undefined && {
-        username: ILike(`%${escapeLike(filters.username)}%`),
-      }),
-      ...(filters.email !== undefined && {
-        email: ILike(`%${escapeLike(filters.email)}%`),
-      }),
-      ...(filters.firstName !== undefined && {
-        firstName: ILike(`%${escapeLike(filters.firstName)}%`),
-      }),
-      ...(filters.lastName !== undefined && {
-        lastName: ILike(`%${escapeLike(filters.lastName)}%`),
-      }),
+  async search(filters: UserFilters): Promise<Page<UserModel>> {
+    const page = filters.page && filters.page > 0 ? filters.page : 1;
+    const pageSize =
+      filters.pageSize && filters.pageSize > 0 ? filters.pageSize : 20;
+    const [rows, total] = await this.repo.findAndCount({
+      where: {
+        ...(filters.username !== undefined && {
+          username: ILike(`%${escapeLike(filters.username)}%`),
+        }),
+        ...(filters.email !== undefined && {
+          email: ILike(`%${escapeLike(filters.email)}%`),
+        }),
+        ...(filters.firstName !== undefined && {
+          firstName: ILike(`%${escapeLike(filters.firstName)}%`),
+        }),
+        ...(filters.lastName !== undefined && {
+          lastName: ILike(`%${escapeLike(filters.lastName)}%`),
+        }),
+      },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
     });
-    return entities.map(UserRepository.toModel);
+    return { items: rows.map(UserRepository.toModel), page, pageSize, total };
   }
 
   @MapErrors(userPersistenceFailure)

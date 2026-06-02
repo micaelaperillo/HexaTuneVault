@@ -1,5 +1,5 @@
 import type { IGetAlbum, ISearchAlbum } from '../port/album';
-import type { AlbumFilters, AlbumModel } from '../model';
+import type { AlbumFilters, AlbumModel, Page } from '../model';
 
 import { type IAlbumProvider, ALBUM_PROVIDER } from '../repository';
 
@@ -13,7 +13,7 @@ export class AlbumService implements ISearchAlbum, IGetAlbum {
     @Inject(ALBUM_PROVIDER) private readonly provider: IAlbumProvider,
   ) {}
 
-  async search(filter: AlbumFilters): Promise<AlbumModel[]> {
+  async search(filter: AlbumFilters): Promise<Page<AlbumModel>> {
     return this.provider.search(filter);
   }
 

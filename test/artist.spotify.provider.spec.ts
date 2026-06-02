@@ -67,6 +67,7 @@ describe('SpotifyArtistProvider', () => {
           uri: 'spotify:artist:4x1nvY2FN8jxqAFA0DA02H',
         },
       ],
+      total: 2,
     },
   };
 
@@ -118,8 +119,10 @@ describe('SpotifyArtistProvider', () => {
         ['artist'],
         undefined,
         10,
+        0,
       );
-      expect(result).toStrictEqual(mockMappedApiResponse);
+      expect(result.items).toStrictEqual(mockMappedApiResponse);
+      expect(result.total).toBe(2);
     });
 
     it('searchs by name and genre using the Spotify SDK', async () => {
@@ -133,8 +136,9 @@ describe('SpotifyArtistProvider', () => {
         ['artist'],
         undefined,
         10,
+        0,
       );
-      expect(result).toStrictEqual(mockMappedApiResponse);
+      expect(result.items).toStrictEqual(mockMappedApiResponse);
     });
 
     it('filters incomplete response', async () => {
@@ -147,7 +151,7 @@ describe('SpotifyArtistProvider', () => {
 
       const result = await provider.search(filters);
 
-      expect(result).toStrictEqual(mockMappedApiResponse);
+      expect(result.items).toStrictEqual(mockMappedApiResponse);
     });
 
     it('throws if the SDK fails', async () => {
@@ -179,6 +183,7 @@ describe('SpotifyArtistProvider', () => {
         ['artist'],
         undefined,
         10,
+        0,
       );
       expect(result).toStrictEqual(mockMappedApiResponse[0]);
     });

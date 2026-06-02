@@ -8,6 +8,7 @@ import {
 } from '../port';
 
 import { AlbumResponseDto } from '../dto';
+import { PageDto } from '../dto/page.dto';
 
 import {
   BadRequestException,
@@ -36,26 +37,36 @@ export class AlbumController {
   ) {}
 
   @Get()
-  async search(@Query() filters: AlbumFilterDto) {
+  async search(
+    @Query() filters: AlbumFilterDto,
+  ): Promise<PageDto<AlbumResponseDto>> {
     this.logger.debug(
       `Search album with q=${filters.q}, artist=${filters.artist}, year=${filters.year}`,
     );
 
-    if (!Object.keys(filters).length) throw new BadRequestException();
+    if (
+      filters.q === undefined &&
+      filters.artist === undefined &&
+      filters.year === undefined
+    ) {
+      throw new BadRequestException();
+    }
 
-    const results = await this.searcher.search({
+    const { items, total, ...page } = await this.searcher.search({
       name: filters.q,
       artist: filters.artist,
       year: filters.year,
+      page: filters.page,
+      pageSize: filters.page_size,
     });
 
-    return results.map(AlbumController.toResponse);
+    return PageDto.of(items.map(AlbumController.toResponse), page, total);
   }
 
   @Get(':name')
   async get(
     @Param() { name }: AlbumGetDto,
-    @Query() { artist, year }: AlbumFilterDto = {},
+    @Query() { artist, year }: AlbumFilterDto,
   ) {
     this.logger.debug(
       `Getting album with name=${name}, artist=${artist}, year=${year}`,

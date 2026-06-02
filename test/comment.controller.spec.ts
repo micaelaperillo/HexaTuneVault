@@ -123,20 +123,29 @@ describe('CommentController', () => {
   });
 
   describe('search', () => {
-    it('maps reviewId to the parentReviewId filter and returns CommentResponseDtos', async () => {
-      mockSearch.search.mockResolvedValue([mockComment]);
+    it('maps reviewId to the parentReviewId filter and returns a page of CommentResponseDtos', async () => {
+      mockSearch.search.mockResolvedValue({
+        items: [mockComment],
+        total: 1,
+        page: 1,
+        pageSize: 20,
+      });
       const result = await controller.search({
         createdById: 1,
         reviewId: 10,
+        page: 1,
+        page_size: 20,
       });
 
       expect(mockSearch.search).toHaveBeenCalledWith({
         createdById: 1,
         content: undefined,
         parentReviewId: 10,
+        page: 1,
+        pageSize: 20,
       });
-      expect(result).toHaveLength(1);
-      expect(result[0]).toBeInstanceOf(CommentResponseDto);
+      expect(result.total).toBe(1);
+      expect(result.items[0]).toBeInstanceOf(CommentResponseDto);
     });
   });
 

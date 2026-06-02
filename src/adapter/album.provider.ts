@@ -1,12 +1,13 @@
 import type { SpotifyApi, SimplifiedAlbum } from '@spotify/web-api-ts-sdk';
 
-import type { AlbumModel, AlbumFilters } from '../model';
+import type { AlbumModel, AlbumFilters, Page } from '../model';
 import type { IAlbumProvider } from '../repository';
 
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
 import { SPOTIFY_API } from '../infrastructure/api/provider';
 import { AlbumProviderError } from '../error/album';
+import { resolveSpotifyPage } from './spotify-pagination';
 
 export { ALBUM_PROVIDER } from '../repository';
 
@@ -19,22 +20,26 @@ export class SpotifyAlbumProvider implements IAlbumProvider {
   /**
    * @override
    */
-  async search(filters: AlbumFilters): Promise<AlbumModel[]> {
+  async search(filters: AlbumFilters): Promise<Page<AlbumModel>> {
     try {
       const query = SpotifyAlbumProvider.toQuery(filters);
+      const { page, pageSize, limit, offset } = resolveSpotifyPage(filters);
       this.logger.debug(query);
 
       const { albums } = await this.spotify.search(
         query,
         ['album'],
         undefined,
-        10,
+        limit as Parameters<SpotifyApi['search']>[3],
+        offset,
       );
       this.logger.debug(albums.items);
 
-      return albums.items
+      const items = albums.items
         .filter((a) => a.images.length)
         .map(SpotifyAlbumProvider.toModel);
+
+      return { items, total: albums.total, page, pageSize };
     } catch (e) {
       const error = e instanceof Error ? e : new Error(String(e));
       throw new AlbumProviderError(error);
@@ -45,7 +50,7 @@ export class SpotifyAlbumProvider implements IAlbumProvider {
    * @override
    */
   async get(filters: AlbumFilters): Promise<AlbumModel | null> {
-    return (await this.search(filters))[0] ?? null;
+    return (await this.search(filters)).items[0] ?? null;
   }
 
   private static toQuery(filters: AlbumFilters) {

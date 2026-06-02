@@ -4,13 +4,14 @@ import type {
   Market,
 } from '@spotify/web-api-ts-sdk';
 
-import type { PodcastModel, PodcastFilters } from '../model';
+import type { PodcastModel, PodcastFilters, Page } from '../model';
 import type { IPodcastProvider } from '../repository';
 
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
 import { SPOTIFY_API } from '../infrastructure/api/provider';
 import { PodcastProviderError } from '../error/podcast';
+import { resolveSpotifyPage } from './spotify-pagination';
 
 export { PODCAST_PROVIDER } from '../repository';
 
@@ -27,23 +28,27 @@ export class SpotifyPodcastProvider implements IPodcastProvider {
   /**
    * @override
    */
-  async search(filters: PodcastFilters): Promise<PodcastModel[]> {
+  async search(filters: PodcastFilters): Promise<Page<PodcastModel>> {
     try {
       const market = (filters.market as Market) || DEFAULT_MARKET;
+      const { page, pageSize, limit, offset } = resolveSpotifyPage(filters);
       this.logger.debug(`${filters.name} (market=${market})`);
 
       const { shows } = await this.spotify.search(
         filters.name,
         ['show'],
         market,
-        10,
+        limit as Parameters<SpotifyApi['search']>[3],
+        offset,
       );
       this.logger.debug(shows.items);
 
-      return shows.items
+      const items = shows.items
         .filter((s) => s && s.images.length)
         .filter((s) => SpotifyPodcastProvider.matchesFilters(s, filters))
         .map(SpotifyPodcastProvider.toModel);
+
+      return { items, total: shows.total, page, pageSize };
     } catch (e) {
       if (!(e instanceof Error)) throw e;
       throw new PodcastProviderError(e);
@@ -54,7 +59,7 @@ export class SpotifyPodcastProvider implements IPodcastProvider {
    * @override
    */
   async get(filters: PodcastFilters): Promise<PodcastModel | null> {
-    return (await this.search(filters))[0] ?? null;
+    return (await this.search(filters)).items[0] ?? null;
   }
 
   private static matchesFilters(

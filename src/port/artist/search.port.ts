@@ -1,13 +1,13 @@
-import type { ArtistModel, ArtistFilters } from '../../model';
+import type { ArtistModel, ArtistFilters, Page } from '../../model';
 
 export const SEARCH_ARTIST = Symbol('ISearchArtist');
 
 export interface ISearchArtist {
   /**
-   * Search an artist
+   * Search artists.
    *
-   * @param filters The search filters
-   * @returns The artists found
+   * @param filters The search filters (including optional pagination)
+   * @returns A page of artists found
    */
-  search(filters: ArtistFilters): Promise<ArtistModel[]>;
+  search(filters: ArtistFilters): Promise<Page<ArtistModel>>;
 }

@@ -1,16 +1,16 @@
-import type { AlbumModel, AlbumFilters } from '../model';
+import type { AlbumModel, AlbumFilters, Page } from '../model';
 
 export const ALBUM_PROVIDER = Symbol('IAlbumProvider');
 
 export interface IAlbumProvider {
   /**
-   * Search for an album given a filter
+   * Search for albums given a filter
    *
-   * @param filters The conditional filters to search by
-   * @returns The matching albums
+   * @param filters The conditional filters to search by (incl. pagination)
+   * @returns A page of matching albums
    * @throws {AlbumProviderError} On provider failure
    */
-  search(filters: AlbumFilters): Promise<AlbumModel[]>;
+  search(filters: AlbumFilters): Promise<Page<AlbumModel>>;
 
   /**
    * Get an album given a filter

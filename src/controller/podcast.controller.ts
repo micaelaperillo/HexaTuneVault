@@ -8,6 +8,7 @@ import {
 } from '../port';
 
 import { PodcastGetDto, PodcastFilterDto, PodcastResponseDto } from '../dto';
+import { PageDto } from '../dto/page.dto';
 
 import {
   Controller,
@@ -34,20 +35,30 @@ export class PodcastController {
 
   @Get()
   async search(
-    @Query() { q: name, explicit, media_type, market }: PodcastFilterDto,
-  ) {
+    @Query()
+    {
+      q: name,
+      explicit,
+      media_type,
+      market,
+      page,
+      page_size,
+    }: PodcastFilterDto,
+  ): Promise<PageDto<PodcastResponseDto>> {
     this.logger.debug(
       `Search podcast with q=${name} explicit=${explicit} media_type=${media_type} market=${market}`,
     );
 
-    const results = await this.searcher.search({
+    const { items, total, ...pageReq } = await this.searcher.search({
       name,
       explicit: explicit === undefined ? undefined : explicit === 'true',
       mediaType: media_type,
       market,
+      page,
+      pageSize: page_size,
     });
 
-    return results.map(PodcastController.toResponse);
+    return PageDto.of(items.map(PodcastController.toResponse), pageReq, total);
   }
 
   @Get(':name')

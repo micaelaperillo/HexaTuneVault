@@ -1,5 +1,5 @@
 import type { IGetArtist, ISearchArtist } from '../port/artist';
-import type { ArtistFilters, ArtistModel } from '../model';
+import type { ArtistFilters, ArtistModel, Page } from '../model';
 
 import { type IArtistProvider, ARTIST_PROVIDER } from '../repository';
 
@@ -13,7 +13,7 @@ export class ArtistService implements ISearchArtist, IGetArtist {
     @Inject(ARTIST_PROVIDER) private readonly provider: IArtistProvider,
   ) {}
 
-  search(filter: ArtistFilters): Promise<ArtistModel[]> {
+  search(filter: ArtistFilters): Promise<Page<ArtistModel>> {
     return this.provider.search(filter);
   }
 

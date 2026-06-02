@@ -1,4 +1,4 @@
-import type { PodcastModel, PodcastFilters } from '../model';
+import type { PodcastModel, PodcastFilters, Page } from '../model';
 
 // Documentation import
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -8,13 +8,13 @@ export const PODCAST_PROVIDER = Symbol('IPodcastProvider');
 
 export interface IPodcastProvider {
   /**
-   * Search for a podcast given a filter
+   * Search for podcasts given a filter
    *
-   * @param filters The conditional filters to search by
-   * @returns The matching podcasts
+   * @param filters The conditional filters to search by (incl. pagination)
+   * @returns A page of matching podcasts
    * @throws {PodcastProviderError} On provider failure
    */
-  search(filters: PodcastFilters): Promise<PodcastModel[]>;
+  search(filters: PodcastFilters): Promise<Page<PodcastModel>>;
 
   /**
    * Get a podcast given a filter

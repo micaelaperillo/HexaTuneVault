@@ -1,5 +1,12 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { Transform } from 'class-transformer';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
+import { Transform, Type } from 'class-transformer';
 
 export class ArtistFilterDto {
   @IsString()
@@ -15,4 +22,17 @@ export class ArtistFilterDto {
   @Transform(({ value }) => (value as string[]).map((s) => s.trim()))
   @IsNotEmpty({ each: true })
   readonly genre?: string[];
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  readonly page: number = 1;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(50)
+  readonly page_size: number = 10;
 }
