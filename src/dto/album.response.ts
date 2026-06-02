@@ -8,7 +8,7 @@ export class AlbumResponseDto {
   readonly cover!: string;
 
   @Expose()
-  readonly releaseDate!: string;
+  readonly releaseDate!: Date;
 
   @Expose()
   readonly totalTracks!: number;

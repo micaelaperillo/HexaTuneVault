@@ -80,7 +80,7 @@ export class SpotifyAlbumProvider implements IAlbumProvider {
     return {
       name,
       cover: images[0].url,
-      releaseDate: release_date,
+      releaseDate: new Date(release_date),
       totalTracks: total_tracks,
       artists: artists.map((a) => a.name),
       external_urls: { ...external_urls },

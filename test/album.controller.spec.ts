@@ -10,7 +10,7 @@ describe('AlbumController', () => {
   const mockAlbum: AlbumModel = {
     name: 'Abbey Road',
     cover: 'cover-url',
-    releaseDate: '1969',
+    releaseDate: new Date('1969'),
     totalTracks: 17,
     artists: ['The Beatles'],
     external_urls: {
@@ -36,27 +36,14 @@ describe('AlbumController', () => {
   });
 
   describe('search', () => {
-    it('throws BadRequestException if neither name nor artist query params are provided', async () => {
-      await expect(controller.search(undefined, undefined)).rejects.toThrow(
-        BadRequestException,
-      );
-      expect(mockSearch.search).not.toHaveBeenCalled();
-    });
-
-    it('throws BadRequestException if query params are empty strings', async () => {
-      await expect(controller.search('', '')).rejects.toThrow(
-        BadRequestException,
-      );
+    it('throws BadRequestException if no query params are provided', async () => {
+      await expect(controller.search({})).rejects.toThrow(BadRequestException);
       expect(mockSearch.search).not.toHaveBeenCalled();
     });
 
     it('calls searcher port with name filter and returns mapped responses', async () => {
       mockSearch.search.mockResolvedValue([mockAlbum]);
-      const result = await controller.search(
-        'Abbey Road',
-        undefined,
-        undefined,
-      );
+      const result = await controller.search({ q: 'Abbey Road' });
 
       expect(mockSearch.search).toHaveBeenCalledWith({
         name: 'Abbey Road',
@@ -67,10 +54,10 @@ describe('AlbumController', () => {
       expect(result[0]).toEqual({
         name: 'Abbey Road',
         cover: 'cover-url',
-        releaseDate: '1969',
+        releaseDate: new Date('1969'),
         totalTracks: 17,
         artists: ['The Beatles'],
-        self: '/api/albums/Abbey%20Road',
+        self: '/api/albums/Abbey%20Road?artist=The+Beatles&year=1969',
         reviews: '/api/reviews?album=Abbey+Road',
         external_urls: {
           spotify: 'spotify-url',
@@ -80,24 +67,18 @@ describe('AlbumController', () => {
 
     it('calls searcher port with artist filter and returns mapped responses', async () => {
       mockSearch.search.mockResolvedValue([mockAlbum]);
-      const result = await controller.search(
-        undefined,
-        'The Beatles',
-        undefined,
-      );
+      const result = await controller.search({ artist: 'The Beatles' });
 
-      expect(mockSearch.search).toHaveBeenCalledWith({
-        name: undefined,
-        artist: 'The Beatles',
-        year: undefined,
-      });
+      expect(mockSearch.search).toHaveBeenCalledWith({ artist: 'The Beatles' });
       expect(result).toHaveLength(1);
-      expect(result[0].self).toBe('/api/albums/Abbey%20Road');
+      expect(result[0].self).toBe(
+        '/api/albums/Abbey%20Road?artist=The+Beatles&year=1969',
+      );
     });
 
     it('calls searcher port with year filter and returns mapped responses', async () => {
       mockSearch.search.mockResolvedValue([mockAlbum]);
-      const result = await controller.search(undefined, undefined, 1969);
+      const result = await controller.search({ year: 1969 });
 
       expect(mockSearch.search).toHaveBeenCalledWith({
         name: undefined,
@@ -105,23 +86,25 @@ describe('AlbumController', () => {
         year: 1969,
       });
       expect(result).toHaveLength(1);
-      expect(result[0].self).toBe('/api/albums/Abbey%20Road');
+      expect(result[0].self).toBe(
+        '/api/albums/Abbey%20Road?artist=The+Beatles&year=1969',
+      );
     });
   });
 
   describe('get', () => {
     it('calls getter port with name filter and returns mapped response when found', async () => {
       mockGet.get.mockResolvedValue(mockAlbum);
-      const result = await controller.get('Abbey Road');
+      const result = await controller.get({ name: 'Abbey Road' });
 
       expect(mockGet.get).toHaveBeenCalledWith({ name: 'Abbey Road' });
       expect(result).toEqual({
         name: 'Abbey Road',
         cover: 'cover-url',
-        releaseDate: '1969',
+        releaseDate: new Date('1969'),
         totalTracks: 17,
         artists: ['The Beatles'],
-        self: '/api/albums/Abbey%20Road',
+        self: '/api/albums/Abbey%20Road?artist=The+Beatles&year=1969',
         reviews: '/api/reviews?album=Abbey+Road',
         external_urls: {
           spotify: 'spotify-url',
@@ -132,7 +115,7 @@ describe('AlbumController', () => {
     it('throws NotFoundException when getter port returns null', async () => {
       mockGet.get.mockResolvedValue(null);
 
-      await expect(controller.get('Unknown Album')).rejects.toThrow(
+      await expect(controller.get({ name: 'Unknown Album' })).rejects.toThrow(
         NotFoundException,
       );
       expect(mockGet.get).toHaveBeenCalledWith({ name: 'Unknown Album' });

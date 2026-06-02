@@ -18,9 +18,10 @@ import {
   NotFoundException,
   Logger,
   Inject,
-  ParseIntPipe,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
+import { AlbumFilterDto } from '../dto/album.filter';
+import { AlbumGetDto } from '../dto/album.get';
 
 @Controller('api/albums')
 export class AlbumController {
@@ -32,44 +33,55 @@ export class AlbumController {
   ) {}
 
   @Get()
-  async search(
-    @Query('q') name?: string,
-    @Query('artist') artist?: string,
-    @Query('year', ParseIntPipe) year?: number,
-  ) {
-    this.logger.debug(`Search album with q=${name}, artist=${artist}`);
+  async search(@Query() filters: AlbumFilterDto) {
+    this.logger.debug(
+      `Search album with q=${filters.q}, artist=${filters.artist}, year=${filters.year}`,
+    );
 
-    if (!name && !artist && (!year || year < 1))
-      throw new BadRequestException();
+    if (!Object.keys(filters).length) throw new BadRequestException();
 
     const results = await this.searcher.search({
-      name,
-      artist,
-      year,
+      name: filters.q,
+      artist: filters.artist,
+      year: filters.year,
     });
 
     return results.map(AlbumController.toResponse);
   }
 
   @Get(':name')
-  async get(@Param('name') name: string) {
-    this.logger.debug(`Getting album with name=${name}`);
+  async get(
+    @Param() { name }: AlbumGetDto,
+    @Query() { artist, year }: AlbumFilterDto = {},
+  ) {
+    this.logger.debug(
+      `Getting album with name=${name}, artist=${artist}, year=${year}`,
+    );
 
-    const album = await this.getter.get({ name });
+    const album = await this.getter.get({ name, artist, year });
     if (!album) throw new NotFoundException();
 
     return AlbumController.toResponse(album);
   }
 
   private static toResponse(this: void, album: AlbumModel): AlbumResponseDto {
-    const params = new URLSearchParams({ album: album.name }).toString();
+    const year_hack = new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      // Crucial, otherwise new Date('2000').getFullYear() === 1999
+      timeZone: 'UTC',
+    });
+
+    const params = new URLSearchParams({
+      artist: album.artists[0],
+      year: year_hack.format(album.releaseDate),
+    });
 
     return plainToInstance(
       AlbumResponseDto,
       {
         ...album,
-        self: `/api/albums/${encodeURIComponent(album.name)}`,
-        reviews: `/api/reviews?${params}`,
+        self: `/api/albums/${encodeURIComponent(album.name)}?${params}`,
+        reviews: `/api/reviews?${new URLSearchParams({ album: album.name })}`,
       },
       { excludeExtraneousValues: true },
     );
