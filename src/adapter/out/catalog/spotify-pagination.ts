@@ -8,7 +8,7 @@ const DEFAULT_PAGE_SIZE = 10;
 
 // The Spotify SDK types the search `limit` as MaxInt<50> (0..50). After
 // clamping, pageSize is always within 1..50, so this is the precise type the
-// SDK accepts — exposing it here removes the per-call cast at every provider.
+// SDK accepts.
 export type SpotifyLimit = IntClosedRange<1, typeof MAX_PAGE_SIZE>;
 
 export interface ResolvedPage {
