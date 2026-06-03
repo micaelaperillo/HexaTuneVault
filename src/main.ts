@@ -21,9 +21,11 @@ async function bootstrap() {
   app.enableCors({
     exposedHeaders: ['X-Total-Count', 'Location'],
   });
+
   // Later-registered filters run first, so the domain mappers take precedence
   // over the AllExceptionsFilter catch-all.
   app.useGlobalFilters(new AllExceptionsFilter(), ...filters);
+
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
